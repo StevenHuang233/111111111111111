@@ -21,7 +21,6 @@ from harness import (
     TraceRecorder,
     TranslationConfig,
     VisualCommentaryConfig,
-    consolidate_goal_timeline,
     dump_bilingual_commentary_result,
     build_commentary_units,
     generate_commentary,
@@ -359,96 +358,7 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(result.records[0].verdict, "not_goal")
             self.assertIn("Goal verification verdict=not_goal", result.events[0].evidence_summary)
 
-    def test_goal_timeline_consolidation_merges_duplicates_and_downgrades(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            manifest = load_manifest(write_manifest(Path(tmp), count=5))
-            events = [
-                EventCandidate(
-                    "U001",
-                    "goal",
-                    0.0,
-                    2.0,
-                    ("f0", "f1"),
-                    0.9,
-                    "live finish and ball in net",
-                    (EventPhase("live_goal", 0.0, 2.0, ("f0", "f1"), "live finish"),),
-                ),
-                EventCandidate(
-                    "U002",
-                    "goal",
-                    4.0,
-                    4.0,
-                    ("f2",),
-                    0.85,
-                    "slow-motion replay of the same finish",
-                    (EventPhase("replay", 4.0, 4.0, ("f2",), "replay angle"),),
-                ),
-                EventCandidate(
-                    "U003",
-                    "goal",
-                    6.0,
-                    8.0,
-                    ("f3", "f4"),
-                    0.8,
-                    "goalkeeper saves the shot",
-                    (EventPhase("live_goal", 6.0, 8.0, ("f3", "f4"), "keeper save"),),
-                ),
-            ]
-            response = json.dumps(
-                {
-                    "actual_goal_event_ids": ["U001"],
-                    "candidate_labels": [
-                        {
-                            "event_id": "U001",
-                            "classification": "actual_goal",
-                            "corrected_event_type": "goal",
-                            "confidence": 0.95,
-                            "merge_into_event_id": "",
-                            "rationale": "The live scoring action is visible.",
-                            "phase_labels": [{"phase_index": 0, "phase_type": "live_goal", "reason": "finish"}],
-                            "warnings": [],
-                        },
-                        {
-                            "event_id": "U002",
-                            "classification": "duplicate_replay",
-                            "corrected_event_type": "celebration_or_replay",
-                            "confidence": 0.9,
-                            "merge_into_event_id": "U001",
-                            "rationale": "Replay of the earlier goal.",
-                            "phase_labels": [{"phase_index": 0, "phase_type": "replay", "reason": "replay"}],
-                            "warnings": [],
-                        },
-                        {
-                            "event_id": "U003",
-                            "classification": "shot_or_save",
-                            "corrected_event_type": "save",
-                            "confidence": 0.88,
-                            "merge_into_event_id": "",
-                            "rationale": "The goalkeeper saves it.",
-                            "phase_labels": [],
-                            "warnings": [],
-                        },
-                    ],
-                    "warnings": [],
-                }
-            )
-
-            result = consolidate_goal_timeline(
-                events,
-                manifest,
-                load_style("broadcast_professional"),
-                FakeClient([response]),
-                config=GoalVerificationConfig(timeline_max_frames_per_goal=1),
-            )
-
-            self.assertEqual([event.event_id for event in result.events], ["U001", "U003"])
-            self.assertEqual([event.event_type for event in result.events], ["goal", "save"])
-            self.assertEqual(result.events[0].end_sec, 4.0)
-            self.assertIn("Merged U002", result.events[0].evidence_summary)
-            self.assertEqual(len(result.records), 3)
-            self.assertEqual(result.input_event_ids, ("U001", "U002", "U003"))
-
-    def test_goal_timeline_downgrades_weak_goal_without_followup(self) -> None:
+    def test_goal_verifier_downgrades_weak_goal_without_followup(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest = load_manifest(write_manifest(Path(tmp), count=2))
             event = EventCandidate(
@@ -463,33 +373,25 @@ class HarnessTests(unittest.TestCase):
             )
             response = json.dumps(
                 {
-                    "actual_goal_event_ids": ["U010"],
-                    "candidate_labels": [
-                        {
-                            "event_id": "U010",
-                            "classification": "actual_goal",
-                            "corrected_event_type": "goal",
-                            "confidence": 0.6,
-                            "merge_into_event_id": "",
-                            "rationale": "Possible goal but the ball crossing the line is not visible.",
-                            "phase_labels": [{"phase_index": 0, "phase_type": "live_goal", "reason": "shot"}],
-                            "warnings": [],
-                        }
-                    ],
+                    "verdict": "confirmed_goal",
+                    "corrected_event_type": "goal",
+                    "confidence": 0.6,
+                    "rationale": "Possible goal but the ball crossing the line is not visible.",
+                    "phase_labels": [{"phase_index": 0, "phase_type": "live_goal", "reason": "shot"}],
                     "warnings": [],
                 }
             )
 
-            result = consolidate_goal_timeline(
+            result = verify_goal_events(
                 [event],
                 manifest,
                 load_style("broadcast_professional"),
                 FakeClient([response]),
-                config=GoalVerificationConfig(min_actual_goal_confidence_without_followup=0.82),
+                config=GoalVerificationConfig(min_confirmed_goal_confidence_without_followup=0.82),
             )
 
             self.assertEqual(result.events[0].event_type, "shot")
-            self.assertEqual(result.records[0].verdict, "shot_or_save")
+            self.assertEqual(result.records[0].verdict, "not_goal")
             self.assertIn("no follow-up support", result.records[0].warnings[0])
 
     def test_illegal_event_type_repair(self) -> None:

@@ -28,7 +28,6 @@ from harness import (
     TraceRecorder,
     TranslationConfig,
     VisualCommentaryConfig,
-    consolidate_goal_timeline,
     dump_bilingual_commentary_result,
     dump_commentary_units,
     dump_goal_verification_result,
@@ -38,6 +37,7 @@ from harness import (
     load_manifest,
     load_style,
     translate_commentary_to_chinese,
+    verify_goal_event,
 )
 from harness.event_types import load_event_types
 from harness.scanner import (
@@ -57,7 +57,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 7
+EVENT_CACHE_VERSION = 9
 
 
 class ProgressLogger:
@@ -313,12 +313,10 @@ def main() -> None:
     parser.add_argument("--goal-verify-sample-fps", type=float, default=0.5)
     parser.add_argument("--goal-verify-max-frames", type=int, default=18)
     parser.add_argument("--goal-verify-max-frames-per-phase", type=int, default=4)
-    parser.add_argument("--goal-timeline-max-frames-per-candidate", type=int, default=1)
     parser.add_argument("--goal-verify-context-frames", type=int, default=1)
     parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
-    parser.add_argument("--disable-goal-duplicate-merge", action="store_true", help="Keep duplicate goal/replay candidates as downgraded standalone events instead of merging them into the nearest actual goal.")
-    parser.add_argument("--disable-weak-goal-followup-downgrade", action="store_true", help="Do not downgrade weak actual_goal candidates when they lack replay/celebration/scoreboard follow-up support.")
-    parser.add_argument("--weak-goal-followup-min-confidence", type=float, default=0.82, help="Minimum model confidence to keep an actual_goal candidate without follow-up support when live scoring evidence is otherwise strong.")
+    parser.add_argument("--disable-weak-goal-followup-downgrade", action="store_true", help="Do not downgrade weak confirmed_goal candidates when they lack replay/celebration/scoreboard follow-up support.")
+    parser.add_argument("--weak-goal-followup-min-confidence", type=float, default=0.82, help="Minimum model confidence to keep a confirmed_goal candidate without follow-up support when live scoring evidence is otherwise strong.")
     parser.add_argument("--dense-padding-sec", type=float, default=2.0)
     parser.add_argument("--max-frames-per-event", type=int, default=12)
     parser.add_argument("--max-frames-per-phase", type=int, default=4)
@@ -437,12 +435,10 @@ def main() -> None:
             sample_fps=args.goal_verify_sample_fps,
             max_frames_per_goal=args.goal_verify_max_frames,
             max_frames_per_phase=args.goal_verify_max_frames_per_phase,
-            timeline_max_frames_per_goal=args.goal_timeline_max_frames_per_candidate,
             context_frames_each_side=args.goal_verify_context_frames,
             downgrade_uncertain=args.goal_verify_downgrade_uncertain,
-            merge_duplicate_goals=not args.disable_goal_duplicate_merge,
             downgrade_weak_goal_without_followup=not args.disable_weak_goal_followup_downgrade,
-            min_actual_goal_confidence_without_followup=args.weak_goal_followup_min_confidence,
+            min_confirmed_goal_confidence_without_followup=args.weak_goal_followup_min_confidence,
         )
         goal_validation_dir = run_dir / "goal_validation"
         goal_validation_dir.mkdir(parents=True, exist_ok=True)
@@ -460,10 +456,10 @@ def main() -> None:
             if goal_count:
                 active_client = get_client()
                 active_client.set_stage(
-                    "goal_timeline_consolidation",
-                    1,
-                    extra=f"goal_candidates={goal_count} events={len(generation_events)} no_goal_count_constraint=true",
-                    workers=1,
+                    "goal_verification",
+                    goal_count,
+                    extra=f"goal_candidates={goal_count} events={len(generation_events)} mode=per_goal_visual",
+                    workers=min(args.concurrency, goal_count),
                 )
                 verification = verify_goals_parallel(
                     generation_events,
@@ -485,7 +481,7 @@ def main() -> None:
                 write_goal_verification_report(goal_validation_dir / "flagged_goals.md", verification)
                 logger.record(
                     "goal_verification_finished",
-                    extra=f"records={len(verification.records)} actual_goals={sum(1 for event in generation_events if event.event_type == 'goal')} output={refined_events_path}",
+                    extra=f"records={len(verification.records)} remaining_goal_events={sum(1 for event in generation_events if event.event_type == 'goal')} output={refined_events_path}",
                 )
             else:
                 dump_goal_verification_result(
@@ -1001,22 +997,45 @@ def verify_goals_parallel(
     trace_max_text_chars: int,
 ) -> GoalVerificationResult:
     trace_dir.mkdir(parents=True, exist_ok=True)
-    tracker = TraceRecorder(record_model_io=True, max_text_chars=trace_max_text_chars)
-    result = consolidate_goal_timeline(
-        events,
-        manifest,
-        style,
-        FixedKeyClient(client, f"goal_timeline_{events_fingerprint(events)}"),
-        tracker,
-        config,
+    refined_by_id: dict[str, EventCandidate] = {event.event_id: event for event in events}
+    records = []
+    traces: dict[str, Any] = {}
+    goal_events = [event for event in events if event.event_type == "goal"]
+
+    def run_event(event: EventCandidate) -> tuple[EventCandidate, Any, dict[str, Any]]:
+        tracker = TraceRecorder(record_model_io=True, max_text_chars=trace_max_text_chars)
+        refined, record = verify_goal_event(
+            event,
+            manifest,
+            style,
+            FixedKeyClient(client, f"goal_verify_{event.event_id}_{event_fingerprint(event)}"),
+            tracker,
+            config,
+        )
+        return refined, record, tracker.to_dict()
+
+    with ThreadPoolExecutor(max_workers=max(1, min(concurrency, len(goal_events)))) as executor:
+        futures = {executor.submit(run_event, event): event.event_id for event in goal_events}
+        for future in as_completed(futures):
+            event_id = futures[future]
+            refined, record, trace = future.result()
+            refined_by_id[event_id] = refined
+            records.append(record)
+            traces[event_id] = trace
+            (trace_dir / f"trace_{sanitize_filename(event_id)}.json").write_text(
+                json.dumps(trace, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+    ordered = [refined_by_id[event.event_id] for event in events]
+    records.sort(key=lambda item: item.event_id)
+    (trace_dir / "trace.json").write_text(json.dumps({"events": traces}, ensure_ascii=False, indent=2), encoding="utf-8")
+    return GoalVerificationResult(
+        events=tuple(ordered),
+        records=tuple(records),
+        config=config,
+        input_event_ids=tuple(event.event_id for event in events),
     )
-    trace = tracker.to_dict()
-    (trace_dir / "trace_goal_timeline.json").write_text(
-        json.dumps(trace, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    (trace_dir / "trace.json").write_text(json.dumps({"timeline": trace}, ensure_ascii=False, indent=2), encoding="utf-8")
-    return result
 
 
 def build_dense_manifests(
@@ -1227,13 +1246,13 @@ def write_event_candidates_summary(path: Path, events: list[EventCandidate], hea
 
 
 def write_goal_verification_report(path: Path, result: GoalVerificationResult) -> None:
-    actual_goals = sum(1 for event in result.events if event.event_type == "goal")
+    remaining_goal_events = sum(1 for event in result.events if event.event_type == "goal")
     merged_records = sum(1 for record in result.records if record.refined_event_type == "merged_into_goal")
     lines = [
         "# Goal Verification Report",
         "",
         f"- candidate_records={len(result.records)}",
-        f"- actual_goal_events={actual_goals}",
+        f"- remaining_goal_events={remaining_goal_events}",
         f"- merged_duplicate_records={merged_records}",
         "",
         "| Event | Verdict | Refined Type | Confidence | Warnings | Rationale |",
@@ -1289,7 +1308,6 @@ def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]
         "sample_fps": config.sample_fps,
         "max_frames_per_goal": config.max_frames_per_goal,
         "max_frames_per_phase": config.max_frames_per_phase,
-        "timeline_max_frames_per_goal": config.timeline_max_frames_per_goal,
         "context_frames_each_side": config.context_frames_each_side,
         "temperature": config.temperature,
         "top_p": config.top_p,
@@ -1297,9 +1315,8 @@ def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]
         "thinking_mode": config.thinking_mode,
         "downgrade_not_goal": config.downgrade_not_goal,
         "downgrade_uncertain": config.downgrade_uncertain,
-        "merge_duplicate_goals": config.merge_duplicate_goals,
         "downgrade_weak_goal_without_followup": config.downgrade_weak_goal_without_followup,
-        "min_actual_goal_confidence_without_followup": config.min_actual_goal_confidence_without_followup,
+        "min_confirmed_goal_confidence_without_followup": config.min_confirmed_goal_confidence_without_followup,
     }
 
 

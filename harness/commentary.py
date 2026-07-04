@@ -251,7 +251,7 @@ Event type reference for this candidate:
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Do not invent player names, teams, scores, or facts that are not present in the event evidence.
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
-Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal timeline consolidation note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
+Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 {phase_instruction}
 
 Event data:
@@ -297,7 +297,7 @@ Event type reference for this candidate:
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Use the provided frames to enrich visual details, but do not invent player names, teams, scores, or facts that are not present in the event data or visible frames.
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
-Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal timeline consolidation note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
+Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 Treat selected frames as representative samples from the event and phase intervals, not as a complete video clip.
 {phase_instruction}
 
