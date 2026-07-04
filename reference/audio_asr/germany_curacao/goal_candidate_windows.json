@@ -1,0 +1,209 @@
+[
+  {
+    "start_sec": 843,
+    "end_sec": 996,
+    "seed_start_sec": 863,
+    "seed_end_sec": 865,
+    "score": 13,
+    "hits": [
+      "先开纪录",
+      "球进了",
+      "进球",
+      "进球了"
+    ],
+    "texts": [
+      "亮球，球进了",
+      "后插上为德国队先开纪录",
+      "穆夏拉又拉进球了"
+    ],
+    "segment_indices": [
+      281,
+      283,
+      316
+    ],
+    "candidate_id": "AG01",
+    "start_time": "00:14:03",
+    "end_time": "00:16:36",
+    "frame_start_4fps": 3372,
+    "frame_end_4fps": 3984,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 1771,
+    "end_sec": 1838,
+    "seed_start_sec": 1791,
+    "seed_end_sec": 1793,
+    "score": 4,
+    "hits": [
+      "球进了"
+    ],
+    "texts": [
+      "一脚球进了"
+    ],
+    "segment_indices": [
+      655
+    ],
+    "candidate_id": "AG02",
+    "start_time": "00:29:31",
+    "end_time": "00:30:38",
+    "frame_start_4fps": 7084,
+    "frame_end_4fps": 7352,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 2719,
+    "end_sec": 2786,
+    "seed_start_sec": 2739,
+    "seed_end_sec": 2741,
+    "score": 4,
+    "hits": [
+      "球进了"
+    ],
+    "texts": [
+      "正面投球进了球"
+    ],
+    "segment_indices": [
+      986
+    ],
+    "candidate_id": "AG03",
+    "start_time": "00:45:19",
+    "end_time": "00:46:26",
+    "frame_start_4fps": 10876,
+    "frame_end_4fps": 11144,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 3439,
+    "end_sec": 3506,
+    "seed_start_sec": 3459,
+    "seed_end_sec": 3461,
+    "score": 4,
+    "hits": [
+      "扳回"
+    ],
+    "texts": [
+      "落后一球能扳回来"
+    ],
+    "segment_indices": [
+      1228
+    ],
+    "candidate_id": "AG04",
+    "start_time": "00:57:19",
+    "end_time": "00:58:26",
+    "frame_start_4fps": 13756,
+    "frame_end_4fps": 14024,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 3559,
+    "end_sec": 3626,
+    "seed_start_sec": 3579,
+    "seed_end_sec": 3581,
+    "score": 4,
+    "hits": [
+      "破门"
+    ],
+    "texts": [
+      "上半场比赛呢，德国队率先破门"
+    ],
+    "segment_indices": [
+      1271
+    ],
+    "candidate_id": "AG05",
+    "start_time": "00:59:19",
+    "end_time": "01:00:26",
+    "frame_start_4fps": 14236,
+    "frame_end_4fps": 14504,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 3684,
+    "end_sec": 3753,
+    "seed_start_sec": 3704,
+    "seed_end_sec": 3708,
+    "score": 4,
+    "hits": [
+      "球进了"
+    ],
+    "texts": [
+      "看这次陈晓华教授的大门，球进了"
+    ],
+    "segment_indices": [
+      1320
+    ],
+    "candidate_id": "AG06",
+    "start_time": "01:01:24",
+    "end_time": "01:02:33",
+    "frame_start_4fps": 14736,
+    "frame_end_4fps": 15012,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 3986,
+    "end_sec": 4054,
+    "seed_start_sec": 4006,
+    "seed_end_sec": 4009,
+    "score": 5,
+    "hits": [
+      "进球",
+      "进球了"
+    ],
+    "texts": [
+      "所以这才是他在国家队的第十个进球了"
+    ],
+    "segment_indices": [
+      1452
+    ],
+    "candidate_id": "AG07",
+    "start_time": "01:06:26",
+    "end_time": "01:07:34",
+    "frame_start_4fps": 15944,
+    "frame_end_4fps": 16216,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 4980,
+    "end_sec": 5048,
+    "seed_start_sec": 5000,
+    "seed_end_sec": 5003,
+    "score": 8,
+    "hits": [
+      "再下一城",
+      "球进了"
+    ],
+    "texts": [
+      "球进了，再下一城啊"
+    ],
+    "segment_indices": [
+      1781
+    ],
+    "candidate_id": "AG08",
+    "start_time": "01:23:00",
+    "end_time": "01:24:08",
+    "frame_start_4fps": 19920,
+    "frame_end_4fps": 20192,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  },
+  {
+    "start_sec": 6534,
+    "end_sec": 6601,
+    "seed_start_sec": 6554,
+    "seed_end_sec": 6556,
+    "score": 4,
+    "hits": [
+      "破门"
+    ],
+    "texts": [
+      "世预赛他也是有过直接任意球破门的"
+    ],
+    "segment_indices": [
+      2284
+    ],
+    "candidate_id": "AG09",
+    "start_time": "01:48:54",
+    "end_time": "01:50:01",
+    "frame_start_4fps": 26136,
+    "frame_end_4fps": 26404,
+    "note": "Weak ASR-derived candidate; verify with frames and scoreboard."
+  }
+]

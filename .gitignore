@@ -43,6 +43,8 @@ logs/
 !reference/
 !reference/audio_asr/
 !reference/audio_asr/**
+reference/audio_asr/**/__pycache__/
+reference/audio_asr/**/*.pyc
 
 # Secrets / 密钥
 .env.*

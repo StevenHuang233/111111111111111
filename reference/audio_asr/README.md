@@ -33,7 +33,10 @@ Use it mainly to check:
 | `germany_curacao/audio_reference.segments.json` | Structured subtitle segments. | 结构化字幕段。 |
 | `germany_curacao/audio_reference.timeline.md` | Human-readable timeline. | 可读时间线。 |
 | `germany_curacao/llm_judge_rubric.md` | Rubric for later LLM-assisted evaluation. | 后续大模型辅助评判 rubric。 |
+| `germany_curacao/goal_candidate_windows.json` | Weak ASR-derived candidate goal windows. | 从 ASR 弱信号提取的进球候选窗口。 |
+| `germany_curacao/goal_candidate_windows.md` | Human-readable candidate goal windows. | 可读进球候选窗口。 |
 | `tools/worldcup_bcut_reference.py` | Reproduction script copied from the VideoCaptioner experiment. | 从 VideoCaptioner 实验复制来的复现脚本。 |
+| `tools/extract_goal_candidates.py` | Lightweight keyword-based candidate extractor. | 轻量关键词候选提取脚本。 |
 
 ## Safety / 安全说明
 
