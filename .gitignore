@@ -3,3 +3,46 @@
 __pycache__/
 *.pyc
 outputs/
+
+# Large local media / 本地大媒体
+vedio/
+video/
+data/
+frames/
+frame_outputs/
+worldcup_data/
+runs/
+artifacts/
+logs/
+
+# Raw and generated media / 原始与生成媒体
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.m4v
+*.ts
+*.wmv
+*.flv
+*.webm
+*.wav
+*.aac
+*.flac
+*.mp3
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.zip
+*.7z
+*.rar
+*.pptx
+*.pdf
+
+# Secrets / 密钥
+.env.*
+!.env.example
+*.key
+*.pem
+secrets/
+._*

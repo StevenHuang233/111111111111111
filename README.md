@@ -2,6 +2,29 @@
 
 Minimal Python setup for testing Intern-S2-Preview text/image calls and building a highly decoupled football video commentary harness.
 
+中文：这是基于 Intern-S2-Preview 的世界杯视频解说 Harness。核心产出是带时间戳的解说稿，并尽量保留可核验的视频证据、事件时间线和运行 trace。
+
+## Planning docs / 规划文档
+
+For bilingual planning, judging analysis, and presentation story, see:
+
+中英双语的计划、评审分析和汇报叙事见：
+
+- `docs/planning/harness_story.md`
+- `docs/planning/judging_and_execution_plan.md`
+- `docs/planning/agent_boundary_and_fact_checking.md`
+- `docs/planning/task_spec_worldcup.md`
+- `docs/planning/video_preprocessing_guide.md`
+- `docs/planning/repo_branch_strategy.md`
+- `docs/planning/overnight_tasks.md`
+
+Important rule / 重要规则：
+
+- Keep videos, extracted frames, API keys, passwords, and large outputs outside Git.
+- 视频、抽帧、API Key、密码和大输出都不要提交到 Git。
+- If a fact is missing, search, ask, or mark it unknown. Do not invent details.
+- 缺事实时，搜索、询问或标注未知，不能无中生有。
+
 ## Setup
 
 ```powershell

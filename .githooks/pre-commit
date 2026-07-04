@@ -1,0 +1,3 @@
+#!/bin/sh
+powershell.exe -ExecutionPolicy Bypass -File scripts/pre_commit_size_guard.ps1
+

@@ -1,0 +1,47 @@
+# Docs Index / 文档索引
+
+Last updated: 2026-07-04
+
+## Read First / 优先阅读
+
+| File | EN | ZH |
+| --- | --- | --- |
+| [harness_story.md](harness_story.md) | Core story: what harness means and what we built. | 核心叙事：Harness 是什么，我们做了什么。 |
+| [judging_and_execution_plan.md](judging_and_execution_plan.md) | Requirements, priorities, and phased plan. | 题目要求、优先级和分阶段计划。 |
+| [agent_boundary_and_fact_checking.md](agent_boundary_and_fact_checking.md) | Distinguishes coding agent and target agent; defines fact policy. | 区分协作 coding agent 和目标任务 agent；定义事实策略。 |
+| [task_spec_worldcup.md](task_spec_worldcup.md) | World Cup task input, output, constraints, risks. | 世界杯任务输入、输出、约束和风险。 |
+| [video_preprocessing_guide.md](video_preprocessing_guide.md) | Frame extraction facts and next data steps. | 抽帧事实和下一步数据处理。 |
+
+## Collaboration / 协作
+
+| File | EN | ZH |
+| --- | --- | --- |
+| [repo_branch_strategy.md](repo_branch_strategy.md) | Remote branch and public-safe branch strategy. | 远程分支和公开安全分支策略。 |
+| [overnight_tasks.md](overnight_tasks.md) | What cloud agents can do overnight. | 夜间云端 agent 适合做什么。 |
+| [decision_log.md](decision_log.md) | Important decisions and tradeoffs. | 关键决策和取舍。 |
+| [lessons.md](lessons.md) | Issues, failures, lessons, reusable practices. | 问题、失败、经验和可复用做法。 |
+
+## Research / 调研
+
+| File | EN | ZH |
+| --- | --- | --- |
+| [problem_interpretation.md](problem_interpretation.md) | Briefing interpretation and visible slide details. | 老师介绍和照片内容解读。 |
+| [official_problem_statement.md](official_problem_statement.md) | Problem statement notes. | 题目要求整理。 |
+| [research_world_cup_commentary.md](research_world_cup_commentary.md) | World Cup commentary direction research. | 世界杯解说方向调研。 |
+| [research_literature_review.md](research_literature_review.md) | Academic review fallback direction research. | 论文综述备选方向调研。 |
+| [track_decision_matrix.md](track_decision_matrix.md) | Direction comparison. | 方向选择对比。 |
+
+## Submission / 提交
+
+| File | EN | ZH |
+| --- | --- | --- |
+| [submission_checklist.md](submission_checklist.md) | Final delivery checklist. | 最终提交清单。 |
+| [pitch_pack.md](pitch_pack.md) | Pitch structure and Q&A prompts. | 路演结构和答辩问题。 |
+| [token_governance.md](token_governance.md) | Cost separation and token rules. | 成本区分和 token 规则。 |
+
+## Rule / 规则
+
+EN: If a fact is not in the video evidence, official statement, reliable search result, or user-provided notes, do not invent it. Search, ask, or mark it unknown.
+
+ZH: 如果事实不在视频证据、官方题面、可靠搜索或用户提供信息中，不要编造。去搜索、询问，或标注未知。
+
