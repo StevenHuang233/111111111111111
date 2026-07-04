@@ -1,0 +1,1170 @@
+[
+  {
+    "candidate_id": "AG01",
+    "candidate_time": "00:14:03-00:16:36",
+    "asr_hits": [
+      "先开纪录",
+      "球进了",
+      "进球",
+      "进球了"
+    ],
+    "asr_texts": [
+      "亮球，球进了",
+      "后插上为德国队先开纪录",
+      "穆夏拉又拉进球了"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 843,
+        "video_time": "00:14:03",
+        "frame_id": 3372,
+        "frame_name": "frame_003372.jpg"
+      },
+      {
+        "video_sec": 881,
+        "video_time": "00:14:41",
+        "frame_id": 3524,
+        "frame_name": "frame_003524.jpg"
+      },
+      {
+        "video_sec": 919,
+        "video_time": "00:15:19",
+        "frame_id": 3676,
+        "frame_name": "frame_003676.jpg"
+      },
+      {
+        "video_sec": 957,
+        "video_time": "00:15:57",
+        "frame_id": 3828,
+        "frame_name": "frame_003828.jpg"
+      },
+      {
+        "video_sec": 996,
+        "video_time": "00:16:36",
+        "frame_id": 3984,
+        "frame_name": "frame_003984.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 851,
+        "video_time": "00:14:11",
+        "frame_id": 3404,
+        "frame_name": "frame_003404.jpg"
+      },
+      {
+        "video_sec": 853,
+        "video_time": "00:14:13",
+        "frame_id": 3412,
+        "frame_name": "frame_003412.jpg"
+      },
+      {
+        "video_sec": 855,
+        "video_time": "00:14:15",
+        "frame_id": 3420,
+        "frame_name": "frame_003420.jpg"
+      },
+      {
+        "video_sec": 857,
+        "video_time": "00:14:17",
+        "frame_id": 3428,
+        "frame_name": "frame_003428.jpg"
+      },
+      {
+        "video_sec": 859,
+        "video_time": "00:14:19",
+        "frame_id": 3436,
+        "frame_name": "frame_003436.jpg"
+      },
+      {
+        "video_sec": 861,
+        "video_time": "00:14:21",
+        "frame_id": 3444,
+        "frame_name": "frame_003444.jpg"
+      },
+      {
+        "video_sec": 863,
+        "video_time": "00:14:23",
+        "frame_id": 3452,
+        "frame_name": "frame_003452.jpg"
+      },
+      {
+        "video_sec": 865,
+        "video_time": "00:14:25",
+        "frame_id": 3460,
+        "frame_name": "frame_003460.jpg"
+      },
+      {
+        "video_sec": 867,
+        "video_time": "00:14:27",
+        "frame_id": 3468,
+        "frame_name": "frame_003468.jpg"
+      },
+      {
+        "video_sec": 869,
+        "video_time": "00:14:29",
+        "frame_id": 3476,
+        "frame_name": "frame_003476.jpg"
+      },
+      {
+        "video_sec": 871,
+        "video_time": "00:14:31",
+        "frame_id": 3484,
+        "frame_name": "frame_003484.jpg"
+      },
+      {
+        "video_sec": 873,
+        "video_time": "00:14:33",
+        "frame_id": 3492,
+        "frame_name": "frame_003492.jpg"
+      },
+      {
+        "video_sec": 875,
+        "video_time": "00:14:35",
+        "frame_id": 3500,
+        "frame_name": "frame_003500.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG02",
+    "candidate_time": "00:29:31-00:30:38",
+    "asr_hits": [
+      "球进了"
+    ],
+    "asr_texts": [
+      "一脚球进了"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 1771,
+        "video_time": "00:29:31",
+        "frame_id": 7084,
+        "frame_name": "frame_007084.jpg"
+      },
+      {
+        "video_sec": 1787,
+        "video_time": "00:29:47",
+        "frame_id": 7148,
+        "frame_name": "frame_007148.jpg"
+      },
+      {
+        "video_sec": 1804,
+        "video_time": "00:30:04",
+        "frame_id": 7216,
+        "frame_name": "frame_007216.jpg"
+      },
+      {
+        "video_sec": 1821,
+        "video_time": "00:30:21",
+        "frame_id": 7284,
+        "frame_name": "frame_007284.jpg"
+      },
+      {
+        "video_sec": 1838,
+        "video_time": "00:30:38",
+        "frame_id": 7352,
+        "frame_name": "frame_007352.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 1779,
+        "video_time": "00:29:39",
+        "frame_id": 7116,
+        "frame_name": "frame_007116.jpg"
+      },
+      {
+        "video_sec": 1781,
+        "video_time": "00:29:41",
+        "frame_id": 7124,
+        "frame_name": "frame_007124.jpg"
+      },
+      {
+        "video_sec": 1783,
+        "video_time": "00:29:43",
+        "frame_id": 7132,
+        "frame_name": "frame_007132.jpg"
+      },
+      {
+        "video_sec": 1785,
+        "video_time": "00:29:45",
+        "frame_id": 7140,
+        "frame_name": "frame_007140.jpg"
+      },
+      {
+        "video_sec": 1787,
+        "video_time": "00:29:47",
+        "frame_id": 7148,
+        "frame_name": "frame_007148.jpg"
+      },
+      {
+        "video_sec": 1789,
+        "video_time": "00:29:49",
+        "frame_id": 7156,
+        "frame_name": "frame_007156.jpg"
+      },
+      {
+        "video_sec": 1791,
+        "video_time": "00:29:51",
+        "frame_id": 7164,
+        "frame_name": "frame_007164.jpg"
+      },
+      {
+        "video_sec": 1793,
+        "video_time": "00:29:53",
+        "frame_id": 7172,
+        "frame_name": "frame_007172.jpg"
+      },
+      {
+        "video_sec": 1795,
+        "video_time": "00:29:55",
+        "frame_id": 7180,
+        "frame_name": "frame_007180.jpg"
+      },
+      {
+        "video_sec": 1797,
+        "video_time": "00:29:57",
+        "frame_id": 7188,
+        "frame_name": "frame_007188.jpg"
+      },
+      {
+        "video_sec": 1799,
+        "video_time": "00:29:59",
+        "frame_id": 7196,
+        "frame_name": "frame_007196.jpg"
+      },
+      {
+        "video_sec": 1801,
+        "video_time": "00:30:01",
+        "frame_id": 7204,
+        "frame_name": "frame_007204.jpg"
+      },
+      {
+        "video_sec": 1803,
+        "video_time": "00:30:03",
+        "frame_id": 7212,
+        "frame_name": "frame_007212.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG03",
+    "candidate_time": "00:45:19-00:46:26",
+    "asr_hits": [
+      "球进了"
+    ],
+    "asr_texts": [
+      "正面投球进了球"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 2719,
+        "video_time": "00:45:19",
+        "frame_id": 10876,
+        "frame_name": "frame_010876.jpg"
+      },
+      {
+        "video_sec": 2735,
+        "video_time": "00:45:35",
+        "frame_id": 10940,
+        "frame_name": "frame_010940.jpg"
+      },
+      {
+        "video_sec": 2752,
+        "video_time": "00:45:52",
+        "frame_id": 11008,
+        "frame_name": "frame_011008.jpg"
+      },
+      {
+        "video_sec": 2769,
+        "video_time": "00:46:09",
+        "frame_id": 11076,
+        "frame_name": "frame_011076.jpg"
+      },
+      {
+        "video_sec": 2786,
+        "video_time": "00:46:26",
+        "frame_id": 11144,
+        "frame_name": "frame_011144.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 2727,
+        "video_time": "00:45:27",
+        "frame_id": 10908,
+        "frame_name": "frame_010908.jpg"
+      },
+      {
+        "video_sec": 2729,
+        "video_time": "00:45:29",
+        "frame_id": 10916,
+        "frame_name": "frame_010916.jpg"
+      },
+      {
+        "video_sec": 2731,
+        "video_time": "00:45:31",
+        "frame_id": 10924,
+        "frame_name": "frame_010924.jpg"
+      },
+      {
+        "video_sec": 2733,
+        "video_time": "00:45:33",
+        "frame_id": 10932,
+        "frame_name": "frame_010932.jpg"
+      },
+      {
+        "video_sec": 2735,
+        "video_time": "00:45:35",
+        "frame_id": 10940,
+        "frame_name": "frame_010940.jpg"
+      },
+      {
+        "video_sec": 2737,
+        "video_time": "00:45:37",
+        "frame_id": 10948,
+        "frame_name": "frame_010948.jpg"
+      },
+      {
+        "video_sec": 2739,
+        "video_time": "00:45:39",
+        "frame_id": 10956,
+        "frame_name": "frame_010956.jpg"
+      },
+      {
+        "video_sec": 2741,
+        "video_time": "00:45:41",
+        "frame_id": 10964,
+        "frame_name": "frame_010964.jpg"
+      },
+      {
+        "video_sec": 2743,
+        "video_time": "00:45:43",
+        "frame_id": 10972,
+        "frame_name": "frame_010972.jpg"
+      },
+      {
+        "video_sec": 2745,
+        "video_time": "00:45:45",
+        "frame_id": 10980,
+        "frame_name": "frame_010980.jpg"
+      },
+      {
+        "video_sec": 2747,
+        "video_time": "00:45:47",
+        "frame_id": 10988,
+        "frame_name": "frame_010988.jpg"
+      },
+      {
+        "video_sec": 2749,
+        "video_time": "00:45:49",
+        "frame_id": 10996,
+        "frame_name": "frame_010996.jpg"
+      },
+      {
+        "video_sec": 2751,
+        "video_time": "00:45:51",
+        "frame_id": 11004,
+        "frame_name": "frame_011004.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG04",
+    "candidate_time": "00:57:19-00:58:26",
+    "asr_hits": [
+      "扳回"
+    ],
+    "asr_texts": [
+      "落后一球能扳回来"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 3439,
+        "video_time": "00:57:19",
+        "frame_id": 13756,
+        "frame_name": "frame_013756.jpg"
+      },
+      {
+        "video_sec": 3455,
+        "video_time": "00:57:35",
+        "frame_id": 13820,
+        "frame_name": "frame_013820.jpg"
+      },
+      {
+        "video_sec": 3472,
+        "video_time": "00:57:52",
+        "frame_id": 13888,
+        "frame_name": "frame_013888.jpg"
+      },
+      {
+        "video_sec": 3489,
+        "video_time": "00:58:09",
+        "frame_id": 13956,
+        "frame_name": "frame_013956.jpg"
+      },
+      {
+        "video_sec": 3506,
+        "video_time": "00:58:26",
+        "frame_id": 14024,
+        "frame_name": "frame_014024.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 3447,
+        "video_time": "00:57:27",
+        "frame_id": 13788,
+        "frame_name": "frame_013788.jpg"
+      },
+      {
+        "video_sec": 3449,
+        "video_time": "00:57:29",
+        "frame_id": 13796,
+        "frame_name": "frame_013796.jpg"
+      },
+      {
+        "video_sec": 3451,
+        "video_time": "00:57:31",
+        "frame_id": 13804,
+        "frame_name": "frame_013804.jpg"
+      },
+      {
+        "video_sec": 3453,
+        "video_time": "00:57:33",
+        "frame_id": 13812,
+        "frame_name": "frame_013812.jpg"
+      },
+      {
+        "video_sec": 3455,
+        "video_time": "00:57:35",
+        "frame_id": 13820,
+        "frame_name": "frame_013820.jpg"
+      },
+      {
+        "video_sec": 3457,
+        "video_time": "00:57:37",
+        "frame_id": 13828,
+        "frame_name": "frame_013828.jpg"
+      },
+      {
+        "video_sec": 3459,
+        "video_time": "00:57:39",
+        "frame_id": 13836,
+        "frame_name": "frame_013836.jpg"
+      },
+      {
+        "video_sec": 3461,
+        "video_time": "00:57:41",
+        "frame_id": 13844,
+        "frame_name": "frame_013844.jpg"
+      },
+      {
+        "video_sec": 3463,
+        "video_time": "00:57:43",
+        "frame_id": 13852,
+        "frame_name": "frame_013852.jpg"
+      },
+      {
+        "video_sec": 3465,
+        "video_time": "00:57:45",
+        "frame_id": 13860,
+        "frame_name": "frame_013860.jpg"
+      },
+      {
+        "video_sec": 3467,
+        "video_time": "00:57:47",
+        "frame_id": 13868,
+        "frame_name": "frame_013868.jpg"
+      },
+      {
+        "video_sec": 3469,
+        "video_time": "00:57:49",
+        "frame_id": 13876,
+        "frame_name": "frame_013876.jpg"
+      },
+      {
+        "video_sec": 3471,
+        "video_time": "00:57:51",
+        "frame_id": 13884,
+        "frame_name": "frame_013884.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG05",
+    "candidate_time": "00:59:19-01:00:26",
+    "asr_hits": [
+      "破门"
+    ],
+    "asr_texts": [
+      "上半场比赛呢，德国队率先破门"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 3559,
+        "video_time": "00:59:19",
+        "frame_id": 14236,
+        "frame_name": "frame_014236.jpg"
+      },
+      {
+        "video_sec": 3575,
+        "video_time": "00:59:35",
+        "frame_id": 14300,
+        "frame_name": "frame_014300.jpg"
+      },
+      {
+        "video_sec": 3592,
+        "video_time": "00:59:52",
+        "frame_id": 14368,
+        "frame_name": "frame_014368.jpg"
+      },
+      {
+        "video_sec": 3609,
+        "video_time": "01:00:09",
+        "frame_id": 14436,
+        "frame_name": "frame_014436.jpg"
+      },
+      {
+        "video_sec": 3626,
+        "video_time": "01:00:26",
+        "frame_id": 14504,
+        "frame_name": "frame_014504.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 3567,
+        "video_time": "00:59:27",
+        "frame_id": 14268,
+        "frame_name": "frame_014268.jpg"
+      },
+      {
+        "video_sec": 3569,
+        "video_time": "00:59:29",
+        "frame_id": 14276,
+        "frame_name": "frame_014276.jpg"
+      },
+      {
+        "video_sec": 3571,
+        "video_time": "00:59:31",
+        "frame_id": 14284,
+        "frame_name": "frame_014284.jpg"
+      },
+      {
+        "video_sec": 3573,
+        "video_time": "00:59:33",
+        "frame_id": 14292,
+        "frame_name": "frame_014292.jpg"
+      },
+      {
+        "video_sec": 3575,
+        "video_time": "00:59:35",
+        "frame_id": 14300,
+        "frame_name": "frame_014300.jpg"
+      },
+      {
+        "video_sec": 3577,
+        "video_time": "00:59:37",
+        "frame_id": 14308,
+        "frame_name": "frame_014308.jpg"
+      },
+      {
+        "video_sec": 3579,
+        "video_time": "00:59:39",
+        "frame_id": 14316,
+        "frame_name": "frame_014316.jpg"
+      },
+      {
+        "video_sec": 3581,
+        "video_time": "00:59:41",
+        "frame_id": 14324,
+        "frame_name": "frame_014324.jpg"
+      },
+      {
+        "video_sec": 3583,
+        "video_time": "00:59:43",
+        "frame_id": 14332,
+        "frame_name": "frame_014332.jpg"
+      },
+      {
+        "video_sec": 3585,
+        "video_time": "00:59:45",
+        "frame_id": 14340,
+        "frame_name": "frame_014340.jpg"
+      },
+      {
+        "video_sec": 3587,
+        "video_time": "00:59:47",
+        "frame_id": 14348,
+        "frame_name": "frame_014348.jpg"
+      },
+      {
+        "video_sec": 3589,
+        "video_time": "00:59:49",
+        "frame_id": 14356,
+        "frame_name": "frame_014356.jpg"
+      },
+      {
+        "video_sec": 3591,
+        "video_time": "00:59:51",
+        "frame_id": 14364,
+        "frame_name": "frame_014364.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG06",
+    "candidate_time": "01:01:24-01:02:33",
+    "asr_hits": [
+      "球进了"
+    ],
+    "asr_texts": [
+      "看这次陈晓华教授的大门，球进了"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 3684,
+        "video_time": "01:01:24",
+        "frame_id": 14736,
+        "frame_name": "frame_014736.jpg"
+      },
+      {
+        "video_sec": 3701,
+        "video_time": "01:01:41",
+        "frame_id": 14804,
+        "frame_name": "frame_014804.jpg"
+      },
+      {
+        "video_sec": 3718,
+        "video_time": "01:01:58",
+        "frame_id": 14872,
+        "frame_name": "frame_014872.jpg"
+      },
+      {
+        "video_sec": 3735,
+        "video_time": "01:02:15",
+        "frame_id": 14940,
+        "frame_name": "frame_014940.jpg"
+      },
+      {
+        "video_sec": 3753,
+        "video_time": "01:02:33",
+        "frame_id": 15012,
+        "frame_name": "frame_015012.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 3692,
+        "video_time": "01:01:32",
+        "frame_id": 14768,
+        "frame_name": "frame_014768.jpg"
+      },
+      {
+        "video_sec": 3694,
+        "video_time": "01:01:34",
+        "frame_id": 14776,
+        "frame_name": "frame_014776.jpg"
+      },
+      {
+        "video_sec": 3696,
+        "video_time": "01:01:36",
+        "frame_id": 14784,
+        "frame_name": "frame_014784.jpg"
+      },
+      {
+        "video_sec": 3698,
+        "video_time": "01:01:38",
+        "frame_id": 14792,
+        "frame_name": "frame_014792.jpg"
+      },
+      {
+        "video_sec": 3700,
+        "video_time": "01:01:40",
+        "frame_id": 14800,
+        "frame_name": "frame_014800.jpg"
+      },
+      {
+        "video_sec": 3702,
+        "video_time": "01:01:42",
+        "frame_id": 14808,
+        "frame_name": "frame_014808.jpg"
+      },
+      {
+        "video_sec": 3704,
+        "video_time": "01:01:44",
+        "frame_id": 14816,
+        "frame_name": "frame_014816.jpg"
+      },
+      {
+        "video_sec": 3706,
+        "video_time": "01:01:46",
+        "frame_id": 14824,
+        "frame_name": "frame_014824.jpg"
+      },
+      {
+        "video_sec": 3708,
+        "video_time": "01:01:48",
+        "frame_id": 14832,
+        "frame_name": "frame_014832.jpg"
+      },
+      {
+        "video_sec": 3710,
+        "video_time": "01:01:50",
+        "frame_id": 14840,
+        "frame_name": "frame_014840.jpg"
+      },
+      {
+        "video_sec": 3712,
+        "video_time": "01:01:52",
+        "frame_id": 14848,
+        "frame_name": "frame_014848.jpg"
+      },
+      {
+        "video_sec": 3714,
+        "video_time": "01:01:54",
+        "frame_id": 14856,
+        "frame_name": "frame_014856.jpg"
+      },
+      {
+        "video_sec": 3716,
+        "video_time": "01:01:56",
+        "frame_id": 14864,
+        "frame_name": "frame_014864.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG07",
+    "candidate_time": "01:06:26-01:07:34",
+    "asr_hits": [
+      "进球",
+      "进球了"
+    ],
+    "asr_texts": [
+      "所以这才是他在国家队的第十个进球了"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 3986,
+        "video_time": "01:06:26",
+        "frame_id": 15944,
+        "frame_name": "frame_015944.jpg"
+      },
+      {
+        "video_sec": 4003,
+        "video_time": "01:06:43",
+        "frame_id": 16012,
+        "frame_name": "frame_016012.jpg"
+      },
+      {
+        "video_sec": 4020,
+        "video_time": "01:07:00",
+        "frame_id": 16080,
+        "frame_name": "frame_016080.jpg"
+      },
+      {
+        "video_sec": 4037,
+        "video_time": "01:07:17",
+        "frame_id": 16148,
+        "frame_name": "frame_016148.jpg"
+      },
+      {
+        "video_sec": 4054,
+        "video_time": "01:07:34",
+        "frame_id": 16216,
+        "frame_name": "frame_016216.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 3994,
+        "video_time": "01:06:34",
+        "frame_id": 15976,
+        "frame_name": "frame_015976.jpg"
+      },
+      {
+        "video_sec": 3996,
+        "video_time": "01:06:36",
+        "frame_id": 15984,
+        "frame_name": "frame_015984.jpg"
+      },
+      {
+        "video_sec": 3998,
+        "video_time": "01:06:38",
+        "frame_id": 15992,
+        "frame_name": "frame_015992.jpg"
+      },
+      {
+        "video_sec": 4000,
+        "video_time": "01:06:40",
+        "frame_id": 16000,
+        "frame_name": "frame_016000.jpg"
+      },
+      {
+        "video_sec": 4002,
+        "video_time": "01:06:42",
+        "frame_id": 16008,
+        "frame_name": "frame_016008.jpg"
+      },
+      {
+        "video_sec": 4004,
+        "video_time": "01:06:44",
+        "frame_id": 16016,
+        "frame_name": "frame_016016.jpg"
+      },
+      {
+        "video_sec": 4006,
+        "video_time": "01:06:46",
+        "frame_id": 16024,
+        "frame_name": "frame_016024.jpg"
+      },
+      {
+        "video_sec": 4008,
+        "video_time": "01:06:48",
+        "frame_id": 16032,
+        "frame_name": "frame_016032.jpg"
+      },
+      {
+        "video_sec": 4010,
+        "video_time": "01:06:50",
+        "frame_id": 16040,
+        "frame_name": "frame_016040.jpg"
+      },
+      {
+        "video_sec": 4012,
+        "video_time": "01:06:52",
+        "frame_id": 16048,
+        "frame_name": "frame_016048.jpg"
+      },
+      {
+        "video_sec": 4014,
+        "video_time": "01:06:54",
+        "frame_id": 16056,
+        "frame_name": "frame_016056.jpg"
+      },
+      {
+        "video_sec": 4016,
+        "video_time": "01:06:56",
+        "frame_id": 16064,
+        "frame_name": "frame_016064.jpg"
+      },
+      {
+        "video_sec": 4018,
+        "video_time": "01:06:58",
+        "frame_id": 16072,
+        "frame_name": "frame_016072.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG08",
+    "candidate_time": "01:23:00-01:24:08",
+    "asr_hits": [
+      "再下一城",
+      "球进了"
+    ],
+    "asr_texts": [
+      "球进了，再下一城啊"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 4980,
+        "video_time": "01:23:00",
+        "frame_id": 19920,
+        "frame_name": "frame_019920.jpg"
+      },
+      {
+        "video_sec": 4997,
+        "video_time": "01:23:17",
+        "frame_id": 19988,
+        "frame_name": "frame_019988.jpg"
+      },
+      {
+        "video_sec": 5014,
+        "video_time": "01:23:34",
+        "frame_id": 20056,
+        "frame_name": "frame_020056.jpg"
+      },
+      {
+        "video_sec": 5031,
+        "video_time": "01:23:51",
+        "frame_id": 20124,
+        "frame_name": "frame_020124.jpg"
+      },
+      {
+        "video_sec": 5048,
+        "video_time": "01:24:08",
+        "frame_id": 20192,
+        "frame_name": "frame_020192.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 4988,
+        "video_time": "01:23:08",
+        "frame_id": 19952,
+        "frame_name": "frame_019952.jpg"
+      },
+      {
+        "video_sec": 4990,
+        "video_time": "01:23:10",
+        "frame_id": 19960,
+        "frame_name": "frame_019960.jpg"
+      },
+      {
+        "video_sec": 4992,
+        "video_time": "01:23:12",
+        "frame_id": 19968,
+        "frame_name": "frame_019968.jpg"
+      },
+      {
+        "video_sec": 4994,
+        "video_time": "01:23:14",
+        "frame_id": 19976,
+        "frame_name": "frame_019976.jpg"
+      },
+      {
+        "video_sec": 4996,
+        "video_time": "01:23:16",
+        "frame_id": 19984,
+        "frame_name": "frame_019984.jpg"
+      },
+      {
+        "video_sec": 4998,
+        "video_time": "01:23:18",
+        "frame_id": 19992,
+        "frame_name": "frame_019992.jpg"
+      },
+      {
+        "video_sec": 5000,
+        "video_time": "01:23:20",
+        "frame_id": 20000,
+        "frame_name": "frame_020000.jpg"
+      },
+      {
+        "video_sec": 5002,
+        "video_time": "01:23:22",
+        "frame_id": 20008,
+        "frame_name": "frame_020008.jpg"
+      },
+      {
+        "video_sec": 5004,
+        "video_time": "01:23:24",
+        "frame_id": 20016,
+        "frame_name": "frame_020016.jpg"
+      },
+      {
+        "video_sec": 5006,
+        "video_time": "01:23:26",
+        "frame_id": 20024,
+        "frame_name": "frame_020024.jpg"
+      },
+      {
+        "video_sec": 5008,
+        "video_time": "01:23:28",
+        "frame_id": 20032,
+        "frame_name": "frame_020032.jpg"
+      },
+      {
+        "video_sec": 5010,
+        "video_time": "01:23:30",
+        "frame_id": 20040,
+        "frame_name": "frame_020040.jpg"
+      },
+      {
+        "video_sec": 5012,
+        "video_time": "01:23:32",
+        "frame_id": 20048,
+        "frame_name": "frame_020048.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  },
+  {
+    "candidate_id": "AG09",
+    "candidate_time": "01:48:54-01:50:01",
+    "asr_hits": [
+      "破门"
+    ],
+    "asr_texts": [
+      "世预赛他也是有过直接任意球破门的"
+    ],
+    "coarse_scoreboard_probes": [
+      {
+        "video_sec": 6534,
+        "video_time": "01:48:54",
+        "frame_id": 26136,
+        "frame_name": "frame_026136.jpg"
+      },
+      {
+        "video_sec": 6550,
+        "video_time": "01:49:10",
+        "frame_id": 26200,
+        "frame_name": "frame_026200.jpg"
+      },
+      {
+        "video_sec": 6567,
+        "video_time": "01:49:27",
+        "frame_id": 26268,
+        "frame_name": "frame_026268.jpg"
+      },
+      {
+        "video_sec": 6584,
+        "video_time": "01:49:44",
+        "frame_id": 26336,
+        "frame_name": "frame_026336.jpg"
+      },
+      {
+        "video_sec": 6601,
+        "video_time": "01:50:01",
+        "frame_id": 26404,
+        "frame_name": "frame_026404.jpg"
+      }
+    ],
+    "dense_action_probes": [
+      {
+        "video_sec": 6542,
+        "video_time": "01:49:02",
+        "frame_id": 26168,
+        "frame_name": "frame_026168.jpg"
+      },
+      {
+        "video_sec": 6544,
+        "video_time": "01:49:04",
+        "frame_id": 26176,
+        "frame_name": "frame_026176.jpg"
+      },
+      {
+        "video_sec": 6546,
+        "video_time": "01:49:06",
+        "frame_id": 26184,
+        "frame_name": "frame_026184.jpg"
+      },
+      {
+        "video_sec": 6548,
+        "video_time": "01:49:08",
+        "frame_id": 26192,
+        "frame_name": "frame_026192.jpg"
+      },
+      {
+        "video_sec": 6550,
+        "video_time": "01:49:10",
+        "frame_id": 26200,
+        "frame_name": "frame_026200.jpg"
+      },
+      {
+        "video_sec": 6552,
+        "video_time": "01:49:12",
+        "frame_id": 26208,
+        "frame_name": "frame_026208.jpg"
+      },
+      {
+        "video_sec": 6554,
+        "video_time": "01:49:14",
+        "frame_id": 26216,
+        "frame_name": "frame_026216.jpg"
+      },
+      {
+        "video_sec": 6556,
+        "video_time": "01:49:16",
+        "frame_id": 26224,
+        "frame_name": "frame_026224.jpg"
+      },
+      {
+        "video_sec": 6558,
+        "video_time": "01:49:18",
+        "frame_id": 26232,
+        "frame_name": "frame_026232.jpg"
+      },
+      {
+        "video_sec": 6560,
+        "video_time": "01:49:20",
+        "frame_id": 26240,
+        "frame_name": "frame_026240.jpg"
+      },
+      {
+        "video_sec": 6562,
+        "video_time": "01:49:22",
+        "frame_id": 26248,
+        "frame_name": "frame_026248.jpg"
+      },
+      {
+        "video_sec": 6564,
+        "video_time": "01:49:24",
+        "frame_id": 26256,
+        "frame_name": "frame_026256.jpg"
+      },
+      {
+        "video_sec": 6566,
+        "video_time": "01:49:26",
+        "frame_id": 26264,
+        "frame_name": "frame_026264.jpg"
+      }
+    ],
+    "bisection_protocol": [
+      "Compare scoreboard at first and last coarse probes.",
+      "If score changes, bisect the interval by checking midpoint frames until the interval is <= 4 seconds.",
+      "Confirm with at least one frame showing ball/net/celebration and one frame showing scoreboard after the event.",
+      "If no score change but ASR says goal, classify as replay/summary/historical mention or disallowed/unclear pending manual review."
+    ],
+    "status": "unverified"
+  }
+]
