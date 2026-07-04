@@ -39,6 +39,11 @@ logs/
 *.pptx
 *.pdf
 
+# Tracked reference data / 明确入库的参考数据
+!reference/
+!reference/audio_asr/
+!reference/audio_asr/**
+
 # Secrets / 密钥
 .env.*
 !.env.example

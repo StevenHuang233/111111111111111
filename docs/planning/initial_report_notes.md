@@ -15,6 +15,7 @@ ZH: 我们围绕 Intern-S2-Preview 构建了一个世界杯视频解说 Harness�
 | Preprocessing | 1080p 25fps source video was extracted to 26612 JPG frames at 4fps outside Git. | 1080p 25fps 原视频已按 4fps 抽取 26612 张 JPG，保存在 Git 外。 |
 | Harness code | Repository includes frame manifest builder, event scanner, visual commentary, bilingual translation, tracing, and full-run runner. | 仓库包含 frame manifest 构建、事件扫描、视觉解说、双语翻译、trace 和全流程 runner。 |
 | Long-run controls | Latest runner supports progress logs, JSONL records, cache, checkpoint resume, concurrency, request staggering, and retry/backoff. | 最新 runner 支持进度日志、JSONL 记录、缓存、checkpoint 续跑、并发、请求错峰和 retry/backoff。 |
+| Audio reference | ASR reference package has 2323 timestamped subtitle segments for weak evaluation. | ASR 参考包包含 2323 条带时间戳字幕段，可作为弱评估信号。 |
 | Safety | `.gitignore` and planning docs keep videos, frames, outputs, and secrets outside Git. | `.gitignore` 和规划文档要求视频、帧、输出和密钥不进 Git。 |
 | Submission tracking | Required deliverables and Intern-S2 feedback questions are tracked in `submission_checklist.md` and `intern_s2_feedback_table.md`. | 必交材料和 Intern-S2 反馈问题已记录在 `submission_checklist.md` 和 `intern_s2_feedback_table.md`。 |
 

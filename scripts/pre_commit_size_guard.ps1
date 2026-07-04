@@ -21,7 +21,6 @@ foreach ($path in $staged) {
 
 if ($blocked.Count -gt 0) {
     Write-Host "Blocked large staged files. Do not commit videos, frames, model outputs, or archives." -ForegroundColor Red
-    Write-Host "阻止提交大文件。不要把视频、抽帧、模型输出或压缩包提交到 Git。" -ForegroundColor Red
     $blocked | Format-Table -AutoSize
     exit 1
 }

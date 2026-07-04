@@ -1,0 +1,70 @@
+{
+  "input_video": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\hackathon\\vedio\\德国_库拉索.mp4",
+  "ffmpeg": "D:\\software\\tools\\Doxent\\platform\\win\\ffmpeg.exe",
+  "duration_seconds": 6653.08,
+  "chunk_seconds": 600,
+  "full_audio": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\audio\\德国_库拉索.audio_16k_mono_64k.mp3",
+  "bcut_upload_allowed": true,
+  "chunks": [
+    {
+      "index": 0,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_000_000000s.mp3",
+      "offset_ms": 0
+    },
+    {
+      "index": 1,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_001_000600s.mp3",
+      "offset_ms": 600000
+    },
+    {
+      "index": 2,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_002_001200s.mp3",
+      "offset_ms": 1200000
+    },
+    {
+      "index": 3,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_003_001800s.mp3",
+      "offset_ms": 1800000
+    },
+    {
+      "index": 4,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_004_002400s.mp3",
+      "offset_ms": 2400000
+    },
+    {
+      "index": 5,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_005_003000s.mp3",
+      "offset_ms": 3000000
+    },
+    {
+      "index": 6,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_006_003600s.mp3",
+      "offset_ms": 3600000
+    },
+    {
+      "index": 7,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_007_004200s.mp3",
+      "offset_ms": 4200000
+    },
+    {
+      "index": 8,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_008_004800s.mp3",
+      "offset_ms": 4800000
+    },
+    {
+      "index": 9,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_009_005400s.mp3",
+      "offset_ms": 5400000
+    },
+    {
+      "index": 10,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_010_006000s.mp3",
+      "offset_ms": 6000000
+    },
+    {
+      "index": 11,
+      "path": "D:\\JediXing\\Documents\\personal\\研究\\BaoYan_Application_Materials_2026\\projects\\Shanghai_Artificial_Intelligence_Laboratory_2026\\VideoCaptioner-master\\work-dir\\worldcup_caption_reference\\德国_库拉索_20260704_224658\\chunks\\chunk_011_006600s.mp3",
+      "offset_ms": 6600000
+    }
+  ]
+}

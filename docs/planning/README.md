@@ -13,6 +13,7 @@ Last updated: 2026-07-04
 | [agent_boundary_and_fact_checking.md](agent_boundary_and_fact_checking.md) | Distinguishes coding agent and target agent; defines fact policy. | 区分协作 coding agent 和目标任务 agent；定义事实策略。 |
 | [task_spec_worldcup.md](task_spec_worldcup.md) | World Cup task input, output, constraints, risks. | 世界杯任务输入、输出、约束和风险。 |
 | [video_preprocessing_guide.md](video_preprocessing_guide.md) | Frame extraction facts and next data steps. | 抽帧事实和下一步数据处理。 |
+| [audio_reference_notes.md](audio_reference_notes.md) | Audio ASR reference package and evaluation policy. | 音频 ASR 参考包和评估口径。 |
 
 ## Current Implementation Snapshot / 当前实现快照
 
