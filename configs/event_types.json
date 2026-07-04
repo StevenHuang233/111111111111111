@@ -3,9 +3,9 @@
     {
       "id": "goal",
       "name": "Goal",
-      "description": "The ball appears to cross the goal line, the scoreboard changes, or players clearly celebrate a scored goal.",
-      "positive_cues": ["ball inside or behind the net", "goalkeeper beaten", "players running away celebrating", "scoreboard increment", "replay of a finish"],
-      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration"]
+      "description": "A live goal is strongly supported by the ball crossing the goal line, a scoreboard increment, or immediate unambiguous celebration after a finish.",
+      "positive_cues": ["ball inside or behind the net", "ball clearly over the goal line", "scoreboard increment", "players running away celebrating immediately after a finish", "replay clearly tied to a confirmed live goal"],
+      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration", "goalkeeper holding or parrying the ball", "historical discussion of a past goal", "halftime summary", "replay with no score confirmation"]
     },
     {
       "id": "shot",

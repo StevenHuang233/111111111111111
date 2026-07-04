@@ -14,6 +14,7 @@ Last updated: 2026-07-04
 | [task_spec_worldcup.md](task_spec_worldcup.md) | World Cup task input, output, constraints, risks. | 世界杯任务输入、输出、约束和风险。 |
 | [video_preprocessing_guide.md](video_preprocessing_guide.md) | Frame extraction facts and next data steps. | 抽帧事实和下一步数据处理。 |
 | [audio_reference_notes.md](audio_reference_notes.md) | Audio ASR reference package and evaluation policy. | 音频 ASR 参考包和评估口径。 |
+| [output_audit_and_harness_fixes.md](output_audit_and_harness_fixes.md) | Current output audit and targeted harness fixes. | 当前输出审计和针对性 Harness 修正。 |
 
 ## Current Implementation Snapshot / 当前实现快照
 

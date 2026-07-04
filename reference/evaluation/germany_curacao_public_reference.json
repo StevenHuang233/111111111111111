@@ -1,0 +1,139 @@
+{
+  "policy": "Evaluation-only reference. Do not inject this file into the target commentary agent prompt or runtime context.",
+  "policy_zh": "仅用于验证的参考资料。不要把本文件注入目标解说 agent 的 prompt 或运行上下文。",
+  "match": {
+    "teams": ["Germany", "Curacao"],
+    "final_score": "Germany 7-1 Curacao",
+    "venue_note": "Houston, according to public reports",
+    "sources": [
+      {
+        "name": "Cadena SER match report",
+        "url": "https://cadenaser.com/nacional/2026/06/14/alemania-7-1-curazao-resumen-resultado-y-goles-del-partido-del-grupo-e-del-mundial-2026-cadena-ser/",
+        "use": "Detailed goal order, scorers, and minutes."
+      },
+      {
+        "name": "Times of India match report",
+        "url": "https://timesofindia.indiatimes.com/sports/football/fifa-world-cup/fifa-world-cup-2026-germany-set-two-tournament-records-as-curaaos-dream-debut-ends-in-7-1-collapse/articleshow/131728428.cms",
+        "use": "Result, broad match narrative, and scorer categories."
+      },
+      {
+        "name": "Bavarian Football Works Havertz POTM note",
+        "url": "https://www.bavarianfootballworks.com/fifa-world-cup/216157/kai-havertz-player-of-the-match-germany-7-1-world-cup-win-curacao",
+        "use": "Havertz two-goal context and 7-1 confirmation."
+      }
+    ]
+  },
+  "known_goal_sequence": [
+    {
+      "order": 1,
+      "score_after": "Germany 1-0 Curacao",
+      "minute": "6",
+      "team": "Germany",
+      "scorer": "Nmecha",
+      "notes": "Second-line finish after a group move."
+    },
+    {
+      "order": 2,
+      "score_after": "Germany 1-1 Curacao",
+      "minute": "21",
+      "team": "Curacao",
+      "scorer": "Livano Comenencia",
+      "notes": "Historic first World Cup goal for Curacao."
+    },
+    {
+      "order": 3,
+      "score_after": "Germany 2-1 Curacao",
+      "minute": "38",
+      "team": "Germany",
+      "scorer": "Schlotterbeck",
+      "notes": "Header from a corner."
+    },
+    {
+      "order": 4,
+      "score_after": "Germany 3-1 Curacao",
+      "minute": "45+5",
+      "team": "Germany",
+      "scorer": "Havertz",
+      "notes": "Penalty after Bazoer fouled Nmecha."
+    },
+    {
+      "order": 5,
+      "score_after": "Germany 4-1 Curacao",
+      "minute": "47",
+      "team": "Germany",
+      "scorer": "Musiala",
+      "notes": "Run into space and low finish."
+    },
+    {
+      "order": 6,
+      "score_after": "Germany 5-1 Curacao",
+      "minute": "68",
+      "team": "Germany",
+      "scorer": "Brown",
+      "notes": "Strong shot from the edge of the area."
+    },
+    {
+      "order": 7,
+      "score_after": "Germany 6-1 Curacao",
+      "minute": "78",
+      "team": "Germany",
+      "scorer": "Undav",
+      "notes": "Finish into an open or exposed goalmouth."
+    },
+    {
+      "order": 8,
+      "score_after": "Germany 7-1 Curacao",
+      "minute": "88",
+      "team": "Germany",
+      "scorer": "Havertz",
+      "notes": "Second Havertz goal; lob/quality finish."
+    }
+  ],
+  "known_participant_names": [
+    "Germany",
+    "Curacao",
+    "Curaçao",
+    "Nmecha",
+    "Comenencia",
+    "Schlotterbeck",
+    "Schlotterbek",
+    "Havertz",
+    "Musiala",
+    "Brown",
+    "Undav",
+    "Nagelsmann",
+    "Bazoer",
+    "Room",
+    "Neuer",
+    "Kimmich",
+    "Tah",
+    "Rudiger",
+    "Rüdiger",
+    "Pavlovic",
+    "Pavlović",
+    "Sane",
+    "Sané",
+    "Wirtz"
+  ],
+  "forbidden_wrong_entities_for_this_match": [
+    "Colombia",
+    "Colombian",
+    "哥伦比亚",
+    "Paraguay",
+    "巴拉圭"
+  ],
+  "style_red_flags": [
+    "player in white",
+    "player in a white jersey",
+    "white jersey",
+    "blue jersey",
+    "green jersey",
+    "orange jersey",
+    "白衣",
+    "身穿白色球衣",
+    "身穿绿色球衣",
+    "身穿橙色球衣",
+    "蓝队",
+    "白色球衣"
+  ]
+}

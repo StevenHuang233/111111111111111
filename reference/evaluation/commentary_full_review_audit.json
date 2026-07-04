@@ -1,0 +1,640 @@
+{
+  "summary": {
+    "segment_count": 75,
+    "generated_goal_count": 23,
+    "expected_goal_count_from_public_reference": 8,
+    "asr_goal_candidate_count": 9,
+    "critical_or_high_issue_count": 12,
+    "style_issue_count": 13,
+    "score_claim_count": 23
+  },
+  "expected_goal_sequence": [
+    {
+      "order": 1,
+      "score_after": "Germany 1-0 Curacao",
+      "minute": "6",
+      "team": "Germany",
+      "scorer": "Nmecha",
+      "notes": "Second-line finish after a group move."
+    },
+    {
+      "order": 2,
+      "score_after": "Germany 1-1 Curacao",
+      "minute": "21",
+      "team": "Curacao",
+      "scorer": "Livano Comenencia",
+      "notes": "Historic first World Cup goal for Curacao."
+    },
+    {
+      "order": 3,
+      "score_after": "Germany 2-1 Curacao",
+      "minute": "38",
+      "team": "Germany",
+      "scorer": "Schlotterbeck",
+      "notes": "Header from a corner."
+    },
+    {
+      "order": 4,
+      "score_after": "Germany 3-1 Curacao",
+      "minute": "45+5",
+      "team": "Germany",
+      "scorer": "Havertz",
+      "notes": "Penalty after Bazoer fouled Nmecha."
+    },
+    {
+      "order": 5,
+      "score_after": "Germany 4-1 Curacao",
+      "minute": "47",
+      "team": "Germany",
+      "scorer": "Musiala",
+      "notes": "Run into space and low finish."
+    },
+    {
+      "order": 6,
+      "score_after": "Germany 5-1 Curacao",
+      "minute": "68",
+      "team": "Germany",
+      "scorer": "Brown",
+      "notes": "Strong shot from the edge of the area."
+    },
+    {
+      "order": 7,
+      "score_after": "Germany 6-1 Curacao",
+      "minute": "78",
+      "team": "Germany",
+      "scorer": "Undav",
+      "notes": "Finish into an open or exposed goalmouth."
+    },
+    {
+      "order": 8,
+      "score_after": "Germany 7-1 Curacao",
+      "minute": "88",
+      "team": "Germany",
+      "scorer": "Havertz",
+      "notes": "Second Havertz goal; lob/quality finish."
+    }
+  ],
+  "score_claims": [
+    {
+      "event_id": "U005",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "claim": "1-0"
+    },
+    {
+      "event_id": "U005",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "claim": "1-0"
+    },
+    {
+      "event_id": "U005",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "claim": "14:08"
+    },
+    {
+      "event_id": "U005",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "claim": "14:12"
+    },
+    {
+      "event_id": "U005",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "claim": "14:24"
+    },
+    {
+      "event_id": "U018",
+      "event_type": "shot",
+      "time": "00:29:48-00:29:48",
+      "claim": "1-0"
+    },
+    {
+      "event_id": "U023",
+      "event_type": "shot",
+      "time": "00:36:52-00:36:52",
+      "claim": "1-1"
+    },
+    {
+      "event_id": "U026",
+      "event_type": "save",
+      "time": "00:37:52-00:37:52",
+      "claim": "37:52"
+    },
+    {
+      "event_id": "U033",
+      "event_type": "goal",
+      "time": "00:45:16-00:46:36",
+      "claim": "2-1"
+    },
+    {
+      "event_id": "U034",
+      "event_type": "goal",
+      "time": "00:49:40-00:50:40",
+      "claim": "2-1"
+    },
+    {
+      "event_id": "U039",
+      "event_type": "goal",
+      "time": "00:55:48-00:56:48",
+      "claim": "2-1"
+    },
+    {
+      "event_id": "U041",
+      "event_type": "goal",
+      "time": "01:01:40-01:02:44",
+      "claim": "4-1"
+    },
+    {
+      "event_id": "U047",
+      "event_type": "goal",
+      "time": "01:12:24-01:12:28",
+      "claim": "4-1"
+    },
+    {
+      "event_id": "U053",
+      "event_type": "goal",
+      "time": "01:18:08-01:18:52",
+      "claim": "5-1"
+    },
+    {
+      "event_id": "U056",
+      "event_type": "goal",
+      "time": "01:21:32-01:22:04",
+      "claim": "4-1"
+    },
+    {
+      "event_id": "U057",
+      "event_type": "goal",
+      "time": "01:23:16-01:24:24",
+      "claim": "5-1"
+    },
+    {
+      "event_id": "U061",
+      "event_type": "shot",
+      "time": "01:28:00-01:28:00",
+      "claim": "73:34"
+    },
+    {
+      "event_id": "U064",
+      "event_type": "goal",
+      "time": "01:31:28-01:32:36",
+      "claim": "6-1"
+    },
+    {
+      "event_id": "U066",
+      "event_type": "save",
+      "time": "01:36:08-01:36:08",
+      "claim": "6-1"
+    },
+    {
+      "event_id": "U066",
+      "event_type": "save",
+      "time": "01:36:08-01:36:08",
+      "claim": "81:42"
+    },
+    {
+      "event_id": "U067",
+      "event_type": "goal",
+      "time": "01:38:04-01:38:32",
+      "claim": "6-1"
+    },
+    {
+      "event_id": "U067",
+      "event_type": "goal",
+      "time": "01:38:04-01:38:32",
+      "claim": "6比1"
+    },
+    {
+      "event_id": "U071",
+      "event_type": "goal",
+      "time": "01:42:08-01:43:24",
+      "claim": "7-1"
+    }
+  ],
+  "goal_alignment": [
+    {
+      "event_id": "U005",
+      "time": "00:14:08-00:15:28",
+      "score_claims": [
+        "1-0",
+        "1-0",
+        "14:08",
+        "14:12",
+        "14:24"
+      ],
+      "nearest_asr_candidate": "AG01",
+      "nearest_asr_time": "00:14:03-00:16:36",
+      "distance_to_asr_sec": 5,
+      "text_excerpt": "德国队率先取得领先！第14分08秒，一名身穿白色球衣的德国球员进入禁区，受到防守队员的紧逼盯防。他在第14分12秒于禁区内射门，身穿橙色球衣的门将奋力扑救并触碰到皮球，但球反弹出来。到第14分24秒，皮球越过球门线，记分牌更新为1-0。23"
+    },
+    {
+      "event_id": "U008",
+      "time": "00:17:12-00:18:12",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG01",
+      "nearest_asr_time": "00:14:03-00:16:36",
+      "distance_to_asr_sec": 36,
+      "text_excerpt": "德国队扩大了领先优势！一次精妙的进攻中，昆库带球向前，制造了犯规，随后球传到穆勒脚下，他射门越过扑救的门将。球网晃动确认进球，现场观众爆发出庆祝的欢呼。"
+    },
+    {
+      "event_id": "U020",
+      "time": "00:30:48-00:31:20",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG02",
+      "nearest_asr_time": "00:29:31-00:30:38",
+      "distance_to_asr_sec": 10,
+      "text_excerpt": "一名身穿白色球衣的德国球员在禁区范围内射门，但身穿蓝色球衣的门将飞身扑救成功阻止了射门。球没有进入球门。"
+    },
+    {
+      "event_id": "U022",
+      "time": "00:34:52-00:36:16",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG02",
+      "nearest_asr_time": "00:29:31-00:30:38",
+      "distance_to_asr_sec": 254,
+      "text_excerpt": "德国队在禁区前沿获得任意球。皮球快速开出并绕过人墙，德国15号球员高高跃起，力压防守队员头球攻门。皮球飞越了扑救的门将，直入网窝！德国队进球！进球球员将手放在胸前庆祝，而门将则面露失望。"
+    },
+    {
+      "event_id": "U033",
+      "time": "00:45:16-00:46:36",
+      "score_claims": [
+        "2-1"
+      ],
+      "nearest_asr_candidate": "AG03",
+      "nearest_asr_time": "00:45:19-00:46:26",
+      "distance_to_asr_sec": 3,
+      "text_excerpt": "德国队在禁区外获得任意球。皮球精准踢出，绕过人墙，飞入球门死角！德国队球员爆发庆祝，记分牌更新为2-1。看台上的球迷挥舞旗帜、欢呼雀跃，队友们纷纷冲上前互相祝贺这粒关键进球。"
+    },
+    {
+      "event_id": "U034",
+      "time": "00:49:40-00:50:40",
+      "score_claims": [
+        "2-1"
+      ],
+      "nearest_asr_candidate": "AG03",
+      "nearest_asr_time": "00:45:19-00:46:26",
+      "distance_to_asr_sec": 194,
+      "text_excerpt": "德国队在本场比赛中率先取得领先。一名球员带球进入禁区，射门越过门将，将球送入网窝。德国球员庆祝得分，记分牌更新为2-1。回放显示，进攻球员在中圈附近带球过掉防守队员，随后精准射门，使门将无能为力。随着进球被确认，观众席上爆发出热烈的欢呼声。"
+    },
+    {
+      "event_id": "U035",
+      "time": "00:51:40-00:53:00",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG04",
+      "nearest_asr_time": "00:57:19-00:58:26",
+      "distance_to_asr_sec": 339,
+      "text_excerpt": "德国队在禁区外获得任意球。皮球精准地开出，绕过人墙，飞入球门死角。德国球员庆祝进球，皮球入网，德国队领先优势扩大。"
+    },
+    {
+      "event_id": "U039",
+      "time": "00:55:48-00:56:48",
+      "score_claims": [
+        "2-1"
+      ],
+      "nearest_asr_candidate": "AG04",
+      "nearest_asr_time": "00:57:19-00:58:26",
+      "distance_to_asr_sec": 91,
+      "text_excerpt": "德国队在禁区前沿射门，皮球越过飞身扑救的哥伦比亚门将，飞入球门。进球有效，德国队2-1领先。随后裁判准备开出任意球，德国队7号球员上前准备主罚。"
+    },
+    {
+      "event_id": "U040",
+      "time": "00:57:00-00:58:20",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG04",
+      "nearest_asr_time": "00:57:19-00:58:26",
+      "distance_to_asr_sec": 19,
+      "text_excerpt": "德国队获得点球机会，球员7号主罚，助跑后大力射门，皮球直挂球门死角，门将虽奋力扑救但未能阻止入网！德国队3-1领先！"
+    },
+    {
+      "event_id": "U041",
+      "time": "01:01:40-01:02:44",
+      "score_claims": [
+        "4-1"
+      ],
+      "nearest_asr_candidate": "AG06",
+      "nearest_asr_time": "01:01:24-01:02:33",
+      "distance_to_asr_sec": 16,
+      "text_excerpt": "德国队进入对方半场，多名球员在禁区附近站位。穆西亚拉在禁区内射门，门将飞身扑救但未能阻止皮球入网。皮球越过球门线，穆西亚拉跑开庆祝。两名德国球员穆西亚拉和恩梅查拥抱庆祝。记分牌更新为4-1。德国球迷热情欢呼，挥舞围巾并举起手臂。德国球员在场"
+    },
+    {
+      "event_id": "U042",
+      "time": "01:02:56-01:03:00",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG06",
+      "nearest_asr_time": "01:01:24-01:02:33",
+      "distance_to_asr_sec": 23,
+      "text_excerpt": "穆西亚拉为德国队破门，将领先优势扩大至四球，这是一场对库拉索的压倒性胜利。"
+    },
+    {
+      "event_id": "U043",
+      "time": "01:06:04-01:06:16",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG07",
+      "nearest_asr_time": "01:06:26-01:07:34",
+      "distance_to_asr_sec": 22,
+      "text_excerpt": "德国队进球了！皮球入网，德国球员与队友庆祝。进球后，萨内和穆西亚拉向观众致意。"
+    },
+    {
+      "event_id": "U047",
+      "time": "01:12:24-01:12:28",
+      "score_claims": [
+        "4-1"
+      ],
+      "nearest_asr_candidate": "AG07",
+      "nearest_asr_time": "01:06:26-01:07:34",
+      "distance_to_asr_sec": 290,
+      "text_excerpt": "穆西亚拉为德国队破门，这是他在本届赛事中的第10个进球。比分更新为4-1，穆西亚拉在射门后稍作喘息。"
+    },
+    {
+      "event_id": "U048",
+      "time": "01:14:52-01:15:00",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG07",
+      "nearest_asr_time": "01:06:26-01:07:34",
+      "distance_to_asr_sec": 438,
+      "text_excerpt": "德国队进球了！皮球入网，德国球员与队友庆祝，而门将仍倒在地上。"
+    },
+    {
+      "event_id": "U053",
+      "time": "01:18:08-01:18:52",
+      "score_claims": [
+        "5-1"
+      ],
+      "nearest_asr_candidate": "AG08",
+      "nearest_asr_time": "01:23:00-01:24:08",
+      "distance_to_asr_sec": 292,
+      "text_excerpt": "德国队发动快速进攻。前锋突入禁区，摆脱越位陷阱。他调整一步后，低射破门，皮球越过出击的门将，直挂球门死角。进球！网窝晃动，现场球迷欢呼沸腾。进球球员转身，手指指向天空庆祝。看台上一名德国球迷双手抱头，被这瞬间震撼。回放显示，前锋在禁区边缘接"
+    },
+    {
+      "event_id": "U056",
+      "time": "01:21:32-01:22:04",
+      "score_claims": [
+        "4-1"
+      ],
+      "nearest_asr_candidate": "AG08",
+      "nearest_asr_time": "01:23:00-01:24:08",
+      "distance_to_asr_sec": 88,
+      "text_excerpt": "库拉索队在禁区前沿获得任意球。球传入禁区，一名库拉索前锋迎球大力头球攻门。德国门将奋力扑救却未能触球——皮球飞入网窝！库拉索球员爆发庆祝，现场球迷欢呼雀跃。看台上球迷挥舞旗帜，一名球员高举手臂向看台致意。记分牌仍显示4-1，但此球已扭转比赛"
+    },
+    {
+      "event_id": "U057",
+      "time": "01:23:16-01:24:24",
+      "score_claims": [
+        "5-1"
+      ],
+      "nearest_asr_candidate": "AG08",
+      "nearest_asr_time": "01:23:00-01:24:08",
+      "distance_to_asr_sec": 16,
+      "text_excerpt": "德国队在禁区前沿射门。皮球入网，门将扑救徒劳无功。德国队进球了！18号球员与队友激情庆祝，现场观众欢呼雀跃。比分更新为5-1，德国队领先。"
+    },
+    {
+      "event_id": "U063",
+      "time": "01:29:44-01:30:40",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG08",
+      "nearest_asr_time": "01:23:00-01:24:08",
+      "distance_to_asr_sec": 336,
+      "text_excerpt": "第75分钟，德国队身穿白色球衣的球员在禁区前沿射门。身穿绿色球衣的门将向右侧飞身扑救，但未能阻止皮球入网。现场观众爆发出欢呼声，球迷们鼓掌庆祝这一进球。慢镜头回放显示，尽管门将奋力扑救，皮球仍滚入网窝。随后画面切换到身穿橙色球衣的门将持球，"
+    },
+    {
+      "event_id": "U064",
+      "time": "01:31:28-01:32:36",
+      "score_claims": [
+        "6-1"
+      ],
+      "nearest_asr_candidate": "AG08",
+      "nearest_asr_time": "01:23:00-01:24:08",
+      "distance_to_asr_sec": 440,
+      "text_excerpt": "德国队进球了！皮球入网，德国球员们爆发庆祝。记分牌更新为6-1，确认进球有效。看台上的球迷纷纷起立，疯狂欢呼，庆祝球队在比赛的这一关键时刻。"
+    },
+    {
+      "event_id": "U067",
+      "time": "01:38:04-01:38:32",
+      "score_claims": [
+        "6-1",
+        "6比1"
+      ],
+      "nearest_asr_candidate": "AG09",
+      "nearest_asr_time": "01:48:54-01:50:01",
+      "distance_to_asr_sec": 650,
+      "text_excerpt": "德国队在对方半场持续组织进攻，球员进入禁区制造压力。球被转移到危险位置，随后有人从近距离射门。德国队26号球员维尔茨跟进庆祝，皮球入网，将德国队对库拉索的领先优势扩大至6比1。"
+    },
+    {
+      "event_id": "U071",
+      "time": "01:42:08-01:43:24",
+      "score_claims": [
+        "7-1"
+      ],
+      "nearest_asr_candidate": "AG09",
+      "nearest_asr_time": "01:48:54-01:50:01",
+      "distance_to_asr_sec": 406,
+      "text_excerpt": "进了！德国队再次得分！哈弗茨在禁区内射门得分，骗过了飞身扑救的门将。比分更新为7-1，德国球迷爆发庆祝。哈弗茨与队友维尔茨和施洛特贝克一起被队友包围，展现出欢乐的团队精神。球迷挥舞旗帜，疯狂欢呼，这是德国队在本场比赛中的统治性时刻。"
+    },
+    {
+      "event_id": "U073",
+      "time": "01:46:32-01:47:44",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG09",
+      "nearest_asr_time": "01:48:54-01:50:01",
+      "distance_to_asr_sec": 142,
+      "text_excerpt": "伤停补时阶段，哥伦比亚10号球员带球高速突破，身后有一名德国后卫紧追不舍。他进入禁区并射门，皮球飞过了扑救的门将，直入网窝！哥伦比亚进球了！现场观众欢呼雀跃，球员们庆祝进球，看台上的球迷用手机记录下这一精彩瞬间。回放显示，进攻球员跑位巧妙，"
+    },
+    {
+      "event_id": "U075",
+      "time": "01:48:12-01:49:32",
+      "score_claims": [],
+      "nearest_asr_candidate": "AG09",
+      "nearest_asr_time": "01:48:54-01:50:01",
+      "distance_to_asr_sec": 42,
+      "text_excerpt": "伤停补时阶段，德国队在禁区外获得任意球。皮球摆放妥当，德国球员起脚大力射门，皮球绕过人墙飞入球门死角。哥伦比亚门将奋力扑救但未能触球。进球有效，德国球员庆祝，观众对这一绝杀进球做出反应。"
+    }
+  ],
+  "issues": [
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U003",
+      "time": "00:11:52-00:11:52",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U005",
+      "time": "00:14:08-00:15:28",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "high",
+      "category": "unsupported_named_fact",
+      "event_id": "U005",
+      "time": "00:14:08-00:15:28",
+      "message": "Named player 'Ibragimov' is unsupported by the evaluation reference."
+    },
+    {
+      "severity": "high",
+      "category": "unsupported_named_fact",
+      "event_id": "U008",
+      "time": "00:17:12-00:18:12",
+      "message": "Named player 'Nkunku' is unsupported by the evaluation reference."
+    },
+    {
+      "severity": "high",
+      "category": "unsupported_named_fact",
+      "event_id": "U008",
+      "time": "00:17:12-00:18:12",
+      "message": "Named player 'Müller' is unsupported by the evaluation reference."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U009",
+      "time": "00:18:40-00:18:40",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U011",
+      "time": "00:20:44-00:20:44",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U018",
+      "time": "00:29:48-00:29:48",
+      "message": "Color/jersey descriptor '蓝队' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "critical",
+      "category": "goal_label_contradiction",
+      "event_id": "U020",
+      "time": "00:30:48-00:31:20",
+      "message": "Event is labeled goal but its text says no goal / no ball entry."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U020",
+      "time": "00:30:48-00:31:20",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U027",
+      "time": "00:38:32-00:38:32",
+      "message": "Color/jersey descriptor 'blue jersey' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U029",
+      "time": "00:41:28-00:41:28",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U037",
+      "time": "00:55:16-00:55:16",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U039",
+      "time": "00:55:48-00:56:48",
+      "message": "Mentions 'Colombia', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U039",
+      "time": "00:55:48-00:56:48",
+      "message": "Mentions 'Colombian', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U039",
+      "time": "00:55:48-00:56:48",
+      "message": "Mentions '哥伦比亚', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U045",
+      "time": "01:09:12-01:09:12",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U061",
+      "time": "01:28:00-01:28:00",
+      "message": "Color/jersey descriptor 'blue jersey' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U063",
+      "time": "01:29:44-01:30:40",
+      "message": "Color/jersey descriptor 'player in white' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "medium",
+      "category": "non_broadcast_style",
+      "event_id": "U072",
+      "time": "01:45:20-01:45:20",
+      "message": "Color/jersey descriptor '身穿白色球衣' should usually be team/player identity or avoided."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U073",
+      "time": "01:46:32-01:47:44",
+      "message": "Mentions 'Colombia', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U073",
+      "time": "01:46:32-01:47:44",
+      "message": "Mentions '哥伦比亚', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U075",
+      "time": "01:48:12-01:49:32",
+      "message": "Mentions 'Colombia', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U075",
+      "time": "01:48:12-01:49:32",
+      "message": "Mentions 'Colombian', which is not part of Germany vs Curacao."
+    },
+    {
+      "severity": "critical",
+      "category": "wrong_team_or_entity",
+      "event_id": "U075",
+      "time": "01:48:12-01:49:32",
+      "message": "Mentions '哥伦比亚', which is not part of Germany vs Curacao."
+    }
+  ],
+  "recommendations": [
+    "Add a scoreboard/state verifier before accepting any goal label or score-changing commentary.",
+    "Use ASR goal candidates only as weak retrieval windows, then verify with frame evidence.",
+    "Force every generated goal to pass a monotonically increasing score-state check.",
+    "Require unsupported player names to be backed by roster, jersey number OCR, or user metadata; otherwise say team/player role.",
+    "Add a style linter that rejects repeated color-shirt descriptions in final broadcast text.",
+    "Separate live goals, replays, halftime summaries, and historical mentions before commentary generation."
+  ]
+}

@@ -106,7 +106,8 @@ class HarnessTests(unittest.TestCase):
         registry = load_event_types()
         reference = registry.prompt_reference()
         self.assertIn("goal", registry.event_types)
-        self.assertIn("The ball appears to cross the goal line", reference)
+        self.assertIn("scoreboard increment", reference)
+        self.assertIn("replay with no score confirmation", reference)
 
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=1)
@@ -126,7 +127,8 @@ class HarnessTests(unittest.TestCase):
             )
             prompt_content = fake.calls[0]["messages"][0]["content"][0]["text"]
             self.assertIn("Event definitions and decision cues", prompt_content)
-            self.assertIn("The ball appears to cross the goal line", prompt_content)
+            self.assertIn("scoreboard increment", prompt_content)
+            self.assertIn("replay with no score confirmation", prompt_content)
 
     def test_sliding_windows(self) -> None:
         frames = tuple(FrameInfo(f"f{i}", Path(f"f{i}.png"), float(i)) for i in range(10))
@@ -413,6 +415,8 @@ class HarnessTests(unittest.TestCase):
             self.assertIsInstance(content, list)
             self.assertTrue(any(part.get("type") == "image_url" for part in content if isinstance(part, dict)))
             self.assertIn("selected visual frames", content[0]["text"])
+            self.assertIn("Evidence overrides the event label", content[0]["text"])
+            self.assertIn("Avoid repetitive kit-color phrases", content[0]["text"])
 
     def test_visual_commentary_samples_interval_context_frames(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

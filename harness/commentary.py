@@ -240,7 +240,14 @@ Use this style exactly:
 {style.prompt_injection}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
-Do not invent player names, teams, scores, or facts that are not present in the event evidence.
+Fact and style rules:
+- Evidence overrides the event label. If event_type says "goal" but the evidence shows a save, miss, replay, or unclear outcome, do not claim a goal.
+- Only claim a goal or score change when the evidence contains a scoreboard increment, ball over the line/in the net, or immediate unambiguous live celebration after a finish.
+- Do not invent player names, teams, scores, cards, referees, venues, or tactical facts that are not present in the event evidence.
+- Mention player names only if they are visible in the evidence or supplied by structured metadata. Otherwise use team, role, or jersey number when visible.
+- Avoid repetitive kit-color phrases such as "player in white" or "green goalkeeper"; use team/role wording instead. Kit color is only a rare fallback when identity is otherwise impossible.
+- Never introduce a country, club, or team name that is absent from the event data or source video.
+- If score, scorer, or match clock is uncertain, say the visual evidence is unclear instead of guessing.
 {phase_instruction}
 
 Event data:
@@ -282,6 +289,13 @@ Use this style exactly:
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Use the provided frames to enrich visual details, but do not invent player names, teams, scores, or facts that are not present in the event data or visible frames.
 Treat selected frames as representative samples from the event and phase intervals, not as a complete video clip.
+Fact and style rules:
+- Evidence overrides the event label. If event_type says "goal" but the selected frames show a save, miss, replay, or unclear outcome, do not claim a goal.
+- Only claim a goal or score change when the frames or event evidence show a scoreboard increment, ball over the line/in the net, or immediate unambiguous live celebration after a finish.
+- Mention player names only if a shirt number/name graphic, scoreboard graphic, event data, or user metadata supports that name. Otherwise use team, role, or jersey number when visible.
+- Avoid repetitive kit-color phrases such as "player in white" or "green goalkeeper"; use team/role wording instead. Kit color is only a rare fallback when identity is otherwise impossible.
+- Never introduce a country, club, or team name that is absent from the event data, source video, or visible broadcast graphics.
+- If score, scorer, or match clock is uncertain, say the visual evidence is unclear instead of guessing.
 {phase_instruction}
 
 Selected frame prefixes:
