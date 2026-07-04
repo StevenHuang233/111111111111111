@@ -314,6 +314,27 @@ The bilingual output nests both languages under each segment:
 }
 ```
 
+## Full run with progress and resume
+
+For a full-video run with live progress, ETA, and checkpoint resume:
+
+```powershell
+$env:INTERN_API_KEY="your_key"
+python run_full_bilingual_with_progress.py --run-name "full_latest_bilingual"
+```
+
+The runner writes:
+
+- `progress.log`: human-readable progress with current step, count, average call time, and ETA.
+- `progress.jsonl`: machine-readable progress records.
+- `cache/<stage>/call_000001.json`: cached model responses for breakpoint resume.
+- `coarse/events.json`: full-video coarse scan result.
+- `dense/<event>/events.json`: dense scan result for each coarse event interval.
+- `commentary/<event>/commentary_bilingual.json`: per-event bilingual commentary.
+- `commentary_bilingual.json`: aggregated bilingual commentary.
+
+Resume is enabled by default. If the process is interrupted, run the same command with the same `--run-name`; completed stages and cached model calls are reused. Use `--no-resume` only when you want to ignore checkpoints.
+
 ## Tests
 
 Run local tests without a real API key:
