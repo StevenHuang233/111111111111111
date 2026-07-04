@@ -284,6 +284,13 @@ Return JSON only:
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | Commentary and subtitle candidates |
 | `trace.json` | `index/elapsed_sec/step/action/detail` | Step trace and module transition log |
 
+When `TraceRecorder(record_model_io=True)` is used, `trace.json` also records each model call:
+
+- `model_call_input`: prompt text, frame IDs, timestamps, and local image paths.
+- `model_call_output`: raw model text output.
+
+Image base64 payloads are not written to trace files. Local image paths are recorded instead to keep logs reviewable.
+
 ### Composite event phases
 
 A `goal` event can now contain multiple phases:

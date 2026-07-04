@@ -11,7 +11,7 @@ from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .styles import StyleProfile
 from .time_utils import format_timestamp
-from .tracing import NullTracker, StepTracker
+from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
 
 
 class ChatClient(Protocol):
@@ -138,6 +138,12 @@ def scan_events(
             },
         )
         messages = _build_scan_messages(frames, style, registry)
+        if should_record_model_io(trace):
+            trace.record(
+                "scan_events.window",
+                "model_call_input",
+                _scan_model_input_detail(messages, frames, window_index, trace),
+            )
         data = active_client.chat(
             messages,
             temperature=style.temperature,
@@ -146,6 +152,15 @@ def scan_events(
             thinking_mode=style.thinking_mode,
         )
         text = _response_text(data)
+        if should_record_model_io(trace):
+            trace.record(
+                "scan_events.window",
+                "model_call_output",
+                {
+                    "window_index": window_index,
+                    "content": clip_text(text, tracker_text_limit(trace)),
+                },
+            )
         try:
             parsed = _parse_scan_response(text, frames, registry, window_index)
             raw_observations.extend(parsed)
@@ -161,7 +176,7 @@ def scan_events(
         except Exception as exc:
             trace.record("scan_events.window", "parse_failed_try_repair", {"window_index": window_index, "error": str(exc)})
             repaired = _try_repair_scan_response(
-                active_client, text, str(exc), frames, registry, window_index, scan_config.repair_attempts
+                active_client, text, str(exc), frames, registry, window_index, scan_config.repair_attempts, trace
             )
             if repaired is None:
                 window_errors.append(f"window={window_index}: {exc}")
@@ -247,6 +262,32 @@ Return JSON only with this schema:
     return [{"role": "user", "content": content}]
 
 
+def _scan_model_input_detail(
+    messages: list[dict[str, Any]],
+    frames: tuple[FrameInfo, ...],
+    window_index: int,
+    tracker: StepTracker,
+) -> dict[str, Any]:
+    prompt = ""
+    content = messages[0].get("content", []) if messages else []
+    if isinstance(content, list) and content and isinstance(content[0], dict):
+        prompt = str(content[0].get("text", ""))
+    return {
+        "window_index": window_index,
+        "prompt": clip_text(prompt, tracker_text_limit(tracker)),
+        "frames": [
+            {
+                "frame_id": frame.frame_id,
+                "timestamp_sec": frame.timestamp_sec,
+                "timestamp": format_timestamp(frame.timestamp_sec),
+                "path": str(frame.path),
+            }
+            for frame in frames
+        ],
+        "image_payload_policy": "Image inputs are sent as data URIs to the API, but trace records local paths instead of base64 payloads.",
+    }
+
+
 def _frame_prefix(frame: FrameInfo) -> str:
     return f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]"
 
@@ -303,6 +344,7 @@ def _try_repair_scan_response(
     registry: EventTypeRegistry,
     window_index: int,
     attempts: int,
+    tracker: StepTracker,
 ) -> list[FrameObservation] | None:
     if attempts <= 0:
         return None
@@ -321,7 +363,25 @@ Bad response:
 Return JSON only with the same schema:
 {{"frames":[{{"frame_id":"...","needs_commentary":false,"event_type":"no_event","confidence":0.0,"evidence":"..."}}]}}
 """.strip()
+    if should_record_model_io(tracker):
+        tracker.record(
+            "scan_events.window.repair",
+            "model_call_input",
+            {
+                "window_index": window_index,
+                "prompt": clip_text(repair_prompt, tracker_text_limit(tracker)),
+            },
+        )
     data = client.chat([{"role": "user", "content": repair_prompt}], temperature=0.0, top_p=1.0, max_tokens=1024)
+    if should_record_model_io(tracker):
+        tracker.record(
+            "scan_events.window.repair",
+            "model_call_output",
+            {
+                "window_index": window_index,
+                "content": clip_text(_response_text(data), tracker_text_limit(tracker)),
+            },
+        )
     try:
         return _parse_scan_response(_response_text(data), frames, registry, window_index)
     except Exception:

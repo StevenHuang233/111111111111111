@@ -11,7 +11,7 @@ from .manifest import FramesManifest
 from .scanner import EventCandidate
 from .styles import StyleProfile
 from .time_utils import format_timestamp
-from .tracing import NullTracker, StepTracker
+from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
 
 
 class ChatClient(Protocol):
@@ -69,14 +69,30 @@ def generate_commentary(
                 "phase_types": [phase.phase_type for phase in event.phases],
             },
         )
+        messages = _build_commentary_messages(event, manifest, style)
+        if should_record_model_io(trace):
+            trace.record(
+                "generate_commentary.event",
+                "model_call_input",
+                {
+                    "event_id": event.event_id,
+                    "prompt": clip_text(str(messages[0].get("content", "")), tracker_text_limit(trace)),
+                },
+            )
         data = active_client.chat(
-            _build_commentary_messages(event, manifest, style),
+            messages,
             temperature=style.temperature,
             top_p=style.top_p,
             max_tokens=style.max_tokens,
             thinking_mode=style.thinking_mode,
         )
         text = data["choices"][0]["message"].get("content") or ""
+        if should_record_model_io(trace):
+            trace.record(
+                "generate_commentary.event",
+                "model_call_output",
+                {"event_id": event.event_id, "content": clip_text(text, tracker_text_limit(trace))},
+            )
         segments.append(_parse_commentary_response(text, event))
         trace.record("generate_commentary.event", "parsed_model_response", {"event_id": event.event_id})
 

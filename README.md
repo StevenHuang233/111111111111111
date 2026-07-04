@@ -102,6 +102,13 @@ The trace records high-level and module-level steps such as:
 
 Each step includes an index, elapsed seconds, action name, and structured details such as frame IDs, window ranges, event counts, phase types, and merge counts.
 
+When `TraceRecorder(record_model_io=True)` is used, each model call also records:
+
+- `model_call_input`: prompt text, frame IDs, timestamps, and local image paths.
+- `model_call_output`: raw model text response.
+
+Image base64 payloads are not written to trace files. The trace records local image paths instead, so the log stays reviewable.
+
 ## Frame manifest
 
 Use `frames_manifest.json` as the boundary between your frame extraction step and this harness:
@@ -130,6 +137,24 @@ For a quick smoke test, create a smaller manifest:
 ```powershell
 python build_frame_manifest.py "C:\path\to\frames" --fps 4 --every-n 4 --max-frames 30 --output "C:\path\to\frames\frames_manifest_smoke.json"
 ```
+
+For coarse scanning on 4fps frames, use one frame every 4 seconds:
+
+```powershell
+python build_frame_manifest.py "C:\path\to\frames" --fps 4 --every-n 16 --output "C:\path\to\frames\frames_manifest_coarse_4s.json"
+```
+
+After coarse scanning, build dense per-event manifests from the full manifest:
+
+```powershell
+python build_event_interval_manifests.py `
+  --full-manifest "C:\path\to\frames\frames_manifest.json" `
+  --events "outputs\coarse\events.json" `
+  --output-dir "outputs\dense_event_manifests" `
+  --padding-sec 2
+```
+
+Those detailed manifests use every frame in the selected event interval.
 
 ## Style control
 

@@ -290,6 +290,13 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | 解说与字幕候选 |
 | `trace.json` | `index/elapsed_sec/step/action/detail` | 步骤跟踪和模块跳转记录 |
 
+`trace.json` 在 `TraceRecorder(record_model_io=True)` 时还会记录每次模型调用：
+
+- `model_call_input`：prompt 文本、帧 ID、时间戳、本地图片路径。
+- `model_call_output`：模型原始文本输出。
+
+为了避免日志过大，图片 base64 不写入 trace，只记录本地图片路径。
+
 ### 复合事件 phases
 
 `goal` 事件现在可能包含多个阶段：
