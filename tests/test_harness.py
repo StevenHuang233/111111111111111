@@ -448,6 +448,50 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(len(result.records), 3)
             self.assertEqual(result.input_event_ids, ("U001", "U002", "U003"))
 
+    def test_goal_timeline_downgrades_weak_goal_without_followup(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = load_manifest(write_manifest(Path(tmp), count=2))
+            event = EventCandidate(
+                "U010",
+                "goal",
+                0.0,
+                2.0,
+                ("f0", "f1"),
+                0.7,
+                "attacker shoots toward goal but the result is unclear",
+                (EventPhase("live_goal", 0.0, 2.0, ("f0", "f1"), "shot toward goal"),),
+            )
+            response = json.dumps(
+                {
+                    "actual_goal_event_ids": ["U010"],
+                    "candidate_labels": [
+                        {
+                            "event_id": "U010",
+                            "classification": "actual_goal",
+                            "corrected_event_type": "goal",
+                            "confidence": 0.6,
+                            "merge_into_event_id": "",
+                            "rationale": "Possible goal but the ball crossing the line is not visible.",
+                            "phase_labels": [{"phase_index": 0, "phase_type": "live_goal", "reason": "shot"}],
+                            "warnings": [],
+                        }
+                    ],
+                    "warnings": [],
+                }
+            )
+
+            result = consolidate_goal_timeline(
+                [event],
+                manifest,
+                load_style("broadcast_professional"),
+                FakeClient([response]),
+                config=GoalVerificationConfig(min_actual_goal_confidence_without_followup=0.82),
+            )
+
+            self.assertEqual(result.events[0].event_type, "shot")
+            self.assertEqual(result.records[0].verdict, "shot_or_save")
+            self.assertIn("no follow-up support", result.records[0].warnings[0])
+
     def test_illegal_event_type_repair(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=1)

@@ -57,7 +57,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 4
+EVENT_CACHE_VERSION = 5
 
 
 class ProgressLogger:
@@ -317,6 +317,8 @@ def main() -> None:
     parser.add_argument("--goal-verify-context-frames", type=int, default=1)
     parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
     parser.add_argument("--disable-goal-duplicate-merge", action="store_true", help="Keep duplicate goal/replay candidates as downgraded standalone events instead of merging them into the nearest actual goal.")
+    parser.add_argument("--disable-weak-goal-followup-downgrade", action="store_true", help="Do not downgrade weak actual_goal candidates when they lack replay/celebration/scoreboard follow-up support.")
+    parser.add_argument("--weak-goal-followup-min-confidence", type=float, default=0.82, help="Minimum model confidence to keep an actual_goal candidate without follow-up support when live scoring evidence is otherwise strong.")
     parser.add_argument("--dense-padding-sec", type=float, default=2.0)
     parser.add_argument("--max-frames-per-event", type=int, default=12)
     parser.add_argument("--max-frames-per-phase", type=int, default=4)
@@ -439,6 +441,8 @@ def main() -> None:
             context_frames_each_side=args.goal_verify_context_frames,
             downgrade_uncertain=args.goal_verify_downgrade_uncertain,
             merge_duplicate_goals=not args.disable_goal_duplicate_merge,
+            downgrade_weak_goal_without_followup=not args.disable_weak_goal_followup_downgrade,
+            min_actual_goal_confidence_without_followup=args.weak_goal_followup_min_confidence,
         )
         goal_validation_dir = run_dir / "goal_validation"
         goal_validation_dir.mkdir(parents=True, exist_ok=True)
@@ -1294,6 +1298,8 @@ def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]
         "downgrade_not_goal": config.downgrade_not_goal,
         "downgrade_uncertain": config.downgrade_uncertain,
         "merge_duplicate_goals": config.merge_duplicate_goals,
+        "downgrade_weak_goal_without_followup": config.downgrade_weak_goal_without_followup,
+        "min_actual_goal_confidence_without_followup": config.min_actual_goal_confidence_without_followup,
     }
 
 

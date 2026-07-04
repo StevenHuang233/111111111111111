@@ -19,7 +19,7 @@ class ChatClient(Protocol):
         ...
 
 
-GOAL_VERIFICATION_VERSION = 3
+GOAL_VERIFICATION_VERSION = 4
 
 ALLOWED_VERDICTS = {"confirmed_goal", "not_goal", "uncertain"}
 ALLOWED_TIMELINE_CLASSIFICATIONS = {
@@ -47,6 +47,37 @@ ALLOWED_CORRECTED_TYPES = {
     "other_relevant",
 }
 GOAL_PHASE_TYPES = {"buildup", "live_goal", "replay", "celebration", "var_review"}
+GOAL_FOLLOWUP_PHASE_TYPES = {"replay", "celebration", "var_review"}
+GOAL_FOLLOWUP_MARKERS = (
+    "replay",
+    "slow motion",
+    "slow-motion",
+    "celebrat",
+    "scoreboard",
+    "score bug",
+    "score graphic",
+    "graphic",
+    "var",
+    "decision",
+    "crowd cheering",
+    "players embracing",
+    "arms raised",
+    "reaction",
+)
+STRONG_LIVE_GOAL_MARKERS = (
+    "ball in net",
+    "ball inside the net",
+    "inside the net",
+    "behind the net",
+    "crossing the goal line",
+    "crosses the goal line",
+    "crossed the goal line",
+    "over the line",
+    "net rippling",
+    "net ripples",
+    "finish into the net",
+    "goalkeeper beaten",
+)
 
 
 @dataclass(frozen=True)
@@ -63,6 +94,8 @@ class GoalVerificationConfig:
     downgrade_not_goal: bool = True
     downgrade_uncertain: bool = False
     merge_duplicate_goals: bool = True
+    downgrade_weak_goal_without_followup: bool = True
+    min_actual_goal_confidence_without_followup: float = 0.82
 
 
 @dataclass(frozen=True)
@@ -442,6 +475,7 @@ def _build_goal_timeline_messages(
                 "confidence": event.confidence,
                 "evidence_frames": list(event.evidence_frames),
                 "evidence_summary": event.evidence_summary,
+                "support_signals": _goal_support_signals(event),
                 "phases": [
                     {
                         "phase_index": phase_index,
@@ -482,6 +516,9 @@ Your task:
 - If a duplicate/replay/celebration/scoreboard candidate belongs to a real goal, set merge_into_event_id to the actual_goal event_id.
 - Do not use any known or assumed total goal count. Do not force the timeline to contain a fixed number of goals.
 - Do not count the same scoring sequence twice. Prefer the earliest candidate with live scoring evidence as actual_goal, and mark later replay/celebration material as duplicate context.
+- Follow-up support means a later replay, celebration, scoreboard confirmation, or VAR/decision context that supports the live scoring moment. Lack of follow-up support is not proof by itself, but it should lower confidence.
+- If a candidate has neither clear live scoring evidence nor follow-up support, do not keep it as actual_goal; classify it as shot_or_save or uncertain.
+- If visual evidence directly contradicts a goal, such as a save, miss, keeper catch, block, or ball never crossing the line, downgrade it even if the original event_type is goal.
 - Do not invent teams, players, scores, or facts.
 
 Corrected event type rules:
@@ -556,11 +593,9 @@ def _parse_goal_timeline_response(
         event_id = str(raw.get("event_id", "")).strip()
         if event_id not in goal_ids:
             continue
-        classification = str(raw.get("classification", "uncertain")).strip()
+        classification = str(raw.get("classification", "")).strip()
         if classification not in ALLOWED_TIMELINE_CLASSIFICATIONS:
-            classification = "uncertain"
-        if event_id in actual_ids:
-            classification = "actual_goal"
+            classification = "actual_goal" if event_id in actual_ids else "uncertain"
 
         corrected_event_type = str(raw.get("corrected_event_type", "")).strip()
         if classification == "actual_goal":
@@ -619,6 +654,8 @@ def _parse_goal_timeline_response(
             },
         )
 
+    labels = _apply_weak_goal_without_followup_policy(labels, goal_by_id, config)
+
     valid_actual_ids = {
         event_id
         for event_id, row in labels.items()
@@ -638,6 +675,53 @@ def _parse_goal_timeline_response(
         "candidate_labels": list(labels.values()),
         "warnings": [str(item) for item in warnings if isinstance(item, str)],
     }
+
+
+def _apply_weak_goal_without_followup_policy(
+    labels: dict[str, dict[str, Any]],
+    goal_by_id: dict[str, EventCandidate],
+    config: GoalVerificationConfig,
+) -> dict[str, dict[str, Any]]:
+    if not config.downgrade_weak_goal_without_followup:
+        return labels
+
+    followup_target_ids = {
+        str(row.get("merge_into_event_id", ""))
+        for row in labels.values()
+        if row.get("classification") in {"duplicate_replay", "celebration_only", "scoreboard_graphic"}
+        and str(row.get("merge_into_event_id", "")) in goal_by_id
+    }
+    updated = dict(labels)
+    threshold = max(0.0, min(1.0, config.min_actual_goal_confidence_without_followup))
+    for event_id, row in labels.items():
+        if row.get("classification") != "actual_goal" or event_id not in goal_by_id:
+            continue
+        event = goal_by_id[event_id]
+        support = _goal_support_signals(event)
+        has_followup_support = bool(support["has_followup_support"]) or event_id in followup_target_ids
+        has_strong_live_evidence = bool(support["has_strong_live_goal_evidence"]) or _row_has_strong_goal_evidence(row)
+        confidence = _clamp_float(row.get("confidence", 0.0))
+        if has_followup_support:
+            continue
+
+        replacement = dict(row)
+        warnings = list(replacement.get("warnings", [])) if isinstance(replacement.get("warnings", []), list) else []
+        if not has_strong_live_evidence or confidence < threshold:
+            replacement["classification"] = "shot_or_save"
+            replacement["corrected_event_type"] = "shot"
+            replacement["merge_into_event_id"] = ""
+            warnings.append("downgraded actual_goal because it has no follow-up support and weak live scoring evidence")
+            rationale = str(replacement.get("rationale", "")).strip()
+            extra = (
+                "Downgraded by weak-goal follow-up policy: no replay/celebration/scoreboard/VAR support "
+                "and insufficient clear live scoring evidence."
+            )
+            replacement["rationale"] = f"{rationale} {extra}".strip()
+        else:
+            warnings.append("actual_goal_without_followup_support")
+        replacement["warnings"] = list(dict.fromkeys(str(item) for item in warnings if str(item)))
+        updated[event_id] = replacement
+    return updated
 
 
 def _apply_goal_timeline_consolidation(
@@ -822,6 +906,38 @@ def _nearest_actual_goal_id(
     return nearest.event_id
 
 
+def _goal_support_signals(event: EventCandidate) -> dict[str, Any]:
+    phases = event.phases or (
+        EventPhase(event.event_type, event.start_sec, event.end_sec, event.evidence_frames, event.evidence_summary),
+    )
+    phase_types = [phase.phase_type for phase in phases]
+    summaries = [event.evidence_summary, *(phase.evidence_summary for phase in phases)]
+    has_followup_phase = any(phase.phase_type in GOAL_FOLLOWUP_PHASE_TYPES for phase in phases)
+    has_followup_marker = any(_contains_marker(text, GOAL_FOLLOWUP_MARKERS) for text in summaries)
+    has_strong_live_goal_evidence = any(_contains_marker(text, STRONG_LIVE_GOAL_MARKERS) for text in summaries)
+    return {
+        "has_followup_support": bool(has_followup_phase or has_followup_marker),
+        "has_followup_phase": bool(has_followup_phase),
+        "has_followup_marker": bool(has_followup_marker),
+        "has_live_goal_phase": any(phase_type == "live_goal" for phase_type in phase_types),
+        "has_strong_live_goal_evidence": bool(has_strong_live_goal_evidence),
+        "phase_types": phase_types,
+    }
+
+
+def _row_has_strong_goal_evidence(row: dict[str, Any]) -> bool:
+    texts = [
+        str(row.get("rationale", "")),
+        " ".join(str(item) for item in row.get("warnings", []) if isinstance(item, str)),
+    ]
+    return any(_contains_marker(text, STRONG_LIVE_GOAL_MARKERS) for text in texts)
+
+
+def _contains_marker(text: str, markers: tuple[str, ...]) -> bool:
+    lowered = text.lower()
+    return any(marker in lowered for marker in markers)
+
+
 def _select_timeline_frames(
     event: EventCandidate,
     manifest_frames: tuple[FrameInfo, ...],
@@ -840,6 +956,8 @@ def _select_timeline_frames(
         downgrade_not_goal=config.downgrade_not_goal,
         downgrade_uncertain=config.downgrade_uncertain,
         merge_duplicate_goals=config.merge_duplicate_goals,
+        downgrade_weak_goal_without_followup=config.downgrade_weak_goal_without_followup,
+        min_actual_goal_confidence_without_followup=config.min_actual_goal_confidence_without_followup,
     )
     return _select_verification_frames(event, manifest_frames, timeline_config)
 
@@ -1129,6 +1247,8 @@ def _config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]:
         "downgrade_not_goal": config.downgrade_not_goal,
         "downgrade_uncertain": config.downgrade_uncertain,
         "merge_duplicate_goals": config.merge_duplicate_goals,
+        "downgrade_weak_goal_without_followup": config.downgrade_weak_goal_without_followup,
+        "min_actual_goal_confidence_without_followup": config.min_actual_goal_confidence_without_followup,
     }
 
 
