@@ -85,7 +85,7 @@ class GoalVerificationConfig:
     sample_fps: float | None = 0.5
     max_frames_per_goal: int = 18
     max_frames_per_phase: int = 4
-    timeline_max_frames_per_goal: int = 4
+    timeline_max_frames_per_goal: int = 1
     context_frames_each_side: int = 1
     temperature: float = 0.1
     top_p: float = 0.8

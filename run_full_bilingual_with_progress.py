@@ -57,7 +57,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 6
+EVENT_CACHE_VERSION = 7
 
 
 class ProgressLogger:
@@ -313,7 +313,7 @@ def main() -> None:
     parser.add_argument("--goal-verify-sample-fps", type=float, default=0.5)
     parser.add_argument("--goal-verify-max-frames", type=int, default=18)
     parser.add_argument("--goal-verify-max-frames-per-phase", type=int, default=4)
-    parser.add_argument("--goal-timeline-max-frames-per-candidate", type=int, default=4)
+    parser.add_argument("--goal-timeline-max-frames-per-candidate", type=int, default=1)
     parser.add_argument("--goal-verify-context-frames", type=int, default=1)
     parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
     parser.add_argument("--disable-goal-duplicate-merge", action="store_true", help="Keep duplicate goal/replay candidates as downgraded standalone events instead of merging them into the nearest actual goal.")
