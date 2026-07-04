@@ -57,7 +57,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 3
+EVENT_CACHE_VERSION = 4
 
 
 class ProgressLogger:
@@ -316,7 +316,6 @@ def main() -> None:
     parser.add_argument("--goal-timeline-max-frames-per-candidate", type=int, default=4)
     parser.add_argument("--goal-verify-context-frames", type=int, default=1)
     parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
-    parser.add_argument("--expected-goal-count", type=int, default=0, help="Known total scored goals for timeline consolidation. 0 means no trusted count.")
     parser.add_argument("--disable-goal-duplicate-merge", action="store_true", help="Keep duplicate goal/replay candidates as downgraded standalone events instead of merging them into the nearest actual goal.")
     parser.add_argument("--dense-padding-sec", type=float, default=2.0)
     parser.add_argument("--max-frames-per-event", type=int, default=12)
@@ -439,7 +438,6 @@ def main() -> None:
             timeline_max_frames_per_goal=args.goal_timeline_max_frames_per_candidate,
             context_frames_each_side=args.goal_verify_context_frames,
             downgrade_uncertain=args.goal_verify_downgrade_uncertain,
-            expected_goal_count=args.expected_goal_count or None,
             merge_duplicate_goals=not args.disable_goal_duplicate_merge,
         )
         goal_validation_dir = run_dir / "goal_validation"
@@ -460,7 +458,7 @@ def main() -> None:
                 active_client.set_stage(
                     "goal_timeline_consolidation",
                     1,
-                    extra=f"goal_candidates={goal_count} events={len(generation_events)} expected_goal_count={args.expected_goal_count or 'unknown'}",
+                    extra=f"goal_candidates={goal_count} events={len(generation_events)} no_goal_count_constraint=true",
                     workers=1,
                 )
                 verification = verify_goals_parallel(
@@ -1295,7 +1293,6 @@ def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]
         "thinking_mode": config.thinking_mode,
         "downgrade_not_goal": config.downgrade_not_goal,
         "downgrade_uncertain": config.downgrade_uncertain,
-        "expected_goal_count": config.expected_goal_count,
         "merge_duplicate_goals": config.merge_duplicate_goals,
     }
 

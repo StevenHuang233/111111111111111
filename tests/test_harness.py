@@ -438,7 +438,7 @@ class HarnessTests(unittest.TestCase):
                 manifest,
                 load_style("broadcast_professional"),
                 FakeClient([response]),
-                config=GoalVerificationConfig(expected_goal_count=1, timeline_max_frames_per_goal=1),
+                config=GoalVerificationConfig(timeline_max_frames_per_goal=1),
             )
 
             self.assertEqual([event.event_id for event in result.events], ["U001", "U003"])

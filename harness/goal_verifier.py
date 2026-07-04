@@ -19,7 +19,7 @@ class ChatClient(Protocol):
         ...
 
 
-GOAL_VERIFICATION_VERSION = 2
+GOAL_VERIFICATION_VERSION = 3
 
 ALLOWED_VERDICTS = {"confirmed_goal", "not_goal", "uncertain"}
 ALLOWED_TIMELINE_CLASSIFICATIONS = {
@@ -62,7 +62,6 @@ class GoalVerificationConfig:
     thinking_mode: bool = False
     downgrade_not_goal: bool = True
     downgrade_uncertain: bool = False
-    expected_goal_count: int | None = None
     merge_duplicate_goals: bool = True
 
 
@@ -227,7 +226,6 @@ def consolidate_goal_timeline(
             "video_id": manifest.video_id,
             "event_count": len(events),
             "goal_candidate_count": len(goal_events),
-            "expected_goal_count": verify_config.expected_goal_count,
             "goal_verification_version": GOAL_VERIFICATION_VERSION,
         },
     )
@@ -244,7 +242,6 @@ def consolidate_goal_timeline(
         "prepare_model_call",
         {
             "goal_candidate_count": len(goal_events),
-            "expected_goal_count": verify_config.expected_goal_count,
             "selected_frame_ids": {
                 event_id: [frame.frame_id for frame in frames]
                 for event_id, frames in selected_frames.items()
@@ -469,19 +466,10 @@ def _build_goal_timeline_messages(
             }
         )
 
-    expected_text = (
-        f"The match is known to contain exactly {config.expected_goal_count} actual scored goals. "
-        f"Select at most {config.expected_goal_count} actual_goal candidates; do not create extra goals from replays, scoreboard shots, or celebrations."
-        if config.expected_goal_count and config.expected_goal_count > 0
-        else "No trusted total goal count is provided. Still avoid counting replays, scoreboard shots, or celebrations as separate goals."
-    )
     prompt = f"""
 You are consolidating a football match timeline before commentary generation.
 
 The coarse scanner produced multiple event_type=goal candidates, but that label is only a candidate label. It can include live goals, shots, saves, replays, celebrations, and scoreboard graphics.
-
-Known match constraint:
-{expected_text}
 
 Your task:
 - Classify every candidate independently but with full timeline awareness.
@@ -492,7 +480,8 @@ Your task:
 - Use shot_or_save when the candidate is really a shot, save, block, or near miss instead of a scored goal.
 - Use uncertain only when evidence is genuinely ambiguous.
 - If a duplicate/replay/celebration/scoreboard candidate belongs to a real goal, set merge_into_event_id to the actual_goal event_id.
-- Do not count the same scoring sequence twice. Prefer the earliest candidate with live scoring evidence as actual_goal, and merge later replay/celebration material into it.
+- Do not use any known or assumed total goal count. Do not force the timeline to contain a fixed number of goals.
+- Do not count the same scoring sequence twice. Prefer the earliest candidate with live scoring evidence as actual_goal, and mark later replay/celebration material as duplicate context.
 - Do not invent teams, players, scores, or facts.
 
 Corrected event type rules:
@@ -629,9 +618,6 @@ def _parse_goal_timeline_response(
                 "warnings": ["missing model label"],
             },
         )
-
-    if config.expected_goal_count and config.expected_goal_count > 0:
-        labels = _enforce_expected_goal_limit(labels, goal_by_id, config.expected_goal_count)
 
     valid_actual_ids = {
         event_id
@@ -815,40 +801,6 @@ def _merge_duplicate_goal_candidate(
     )
 
 
-def _enforce_expected_goal_limit(
-    labels: dict[str, dict[str, Any]],
-    goal_by_id: dict[str, EventCandidate],
-    expected_goal_count: int,
-) -> dict[str, dict[str, Any]]:
-    actual_rows = [
-        row
-        for row in labels.values()
-        if row.get("classification") == "actual_goal" and row.get("event_id") in goal_by_id
-    ]
-    if len(actual_rows) <= expected_goal_count:
-        return labels
-
-    actual_rows.sort(
-        key=lambda row: (
-            -_clamp_float(row.get("confidence", 0.0)),
-            goal_by_id[str(row["event_id"])].start_sec,
-        )
-    )
-    keep_ids = {str(row["event_id"]) for row in actual_rows[:expected_goal_count]}
-    for row in actual_rows[expected_goal_count:]:
-        row["classification"] = "duplicate_replay"
-        row["corrected_event_type"] = "celebration_or_replay"
-        row["merge_into_event_id"] = _nearest_actual_goal_id(
-            goal_by_id[str(row["event_id"])],
-            goal_by_id,
-            keep_ids,
-        )
-        warnings = row.setdefault("warnings", [])
-        if isinstance(warnings, list):
-            warnings.append(f"demoted because expected_goal_count={expected_goal_count} was exceeded")
-    return labels
-
-
 def _nearest_actual_goal_id(
     event: EventCandidate,
     goal_by_id: dict[str, EventCandidate],
@@ -887,7 +839,6 @@ def _select_timeline_frames(
         thinking_mode=config.thinking_mode,
         downgrade_not_goal=config.downgrade_not_goal,
         downgrade_uncertain=config.downgrade_uncertain,
-        expected_goal_count=config.expected_goal_count,
         merge_duplicate_goals=config.merge_duplicate_goals,
     )
     return _select_verification_frames(event, manifest_frames, timeline_config)
@@ -1177,7 +1128,6 @@ def _config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]:
         "thinking_mode": config.thinking_mode,
         "downgrade_not_goal": config.downgrade_not_goal,
         "downgrade_uncertain": config.downgrade_uncertain,
-        "expected_goal_count": config.expected_goal_count,
         "merge_duplicate_goals": config.merge_duplicate_goals,
     }
 
