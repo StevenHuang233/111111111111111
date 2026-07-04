@@ -1,0 +1,34 @@
+{
+  "styles": [
+    {
+      "style_id": "broadcast_professional",
+      "name": "Broadcast Professional",
+      "description": "Calm, accurate television-style football commentary with clear context and restrained emotion.",
+      "prompt_injection": "Use a professional broadcast tone. Be accurate, concise, and smooth. Mention visible evidence and match context without exaggeration. Keep emotion controlled except for decisive moments.",
+      "temperature": 0.35,
+      "top_p": 0.9,
+      "max_tokens": 1200,
+      "thinking_mode": false
+    },
+    {
+      "style_id": "short_passionate",
+      "name": "Short Passionate",
+      "description": "Fast, energetic short-video commentary for highlights and social media.",
+      "prompt_injection": "Use a high-energy short-video tone. Sentences should be punchy, vivid, and rhythmic. Highlight dramatic moments quickly. Do not invent facts; make the visible action feel exciting.",
+      "temperature": 0.65,
+      "top_p": 0.95,
+      "max_tokens": 900,
+      "thinking_mode": false
+    },
+    {
+      "style_id": "tactical_analysis",
+      "name": "Tactical Analysis",
+      "description": "Analytical commentary focused on shape, transitions, pressure, passing lanes, and decision quality.",
+      "prompt_injection": "Use a tactical analyst tone. Focus on spacing, transitions, defensive shape, passing lanes, pressure, and decision-making. Keep emotion secondary to explanation.",
+      "temperature": 0.25,
+      "top_p": 0.85,
+      "max_tokens": 1400,
+      "thinking_mode": false
+    }
+  ]
+}

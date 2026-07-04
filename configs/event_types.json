@@ -1,0 +1,109 @@
+{
+  "event_types": [
+    {
+      "id": "goal",
+      "name": "Goal",
+      "description": "The ball appears to cross the goal line, the scoreboard changes, or players clearly celebrate a scored goal.",
+      "positive_cues": ["ball inside or behind the net", "goalkeeper beaten", "players running away celebrating", "scoreboard increment", "replay of a finish"],
+      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration"]
+    },
+    {
+      "id": "shot",
+      "name": "Shot",
+      "description": "A player attempts to score by striking, heading, or redirecting the ball toward goal, but the frame does not prove it became a goal.",
+      "positive_cues": ["shooting body shape", "ball traveling toward goal", "header at goal", "defenders or goalkeeper reacting to a shot"],
+      "negative_cues": ["simple pass or cross", "goal already confirmed", "general possession far from goal"]
+    },
+    {
+      "id": "save",
+      "name": "Save",
+      "description": "The goalkeeper or a defender prevents a likely goal or blocks a clear shot near the goal.",
+      "positive_cues": ["goalkeeper diving or stretching", "ball stopped near goal", "defensive block on the goal line", "rebound after goalkeeper contact"],
+      "negative_cues": ["routine catch with no pressure", "shot wide without contact", "goal scored"]
+    },
+    {
+      "id": "dangerous_attack",
+      "name": "Dangerous Attack",
+      "description": "An attacking team is in or near the final third with a promising chance, but no specific shot, goal, set piece, or foul is clearly shown.",
+      "positive_cues": ["fast break", "attacker entering penalty area", "overload near box", "through ball behind defense", "cross into a crowded area"],
+      "negative_cues": ["slow buildup in midfield", "dead-ball restart", "confirmed shot or goal"]
+    },
+    {
+      "id": "corner",
+      "name": "Corner Kick",
+      "description": "A corner kick is being taken, prepared, or replayed.",
+      "positive_cues": ["ball placed near corner flag", "players gathered in penalty area for a corner", "corner flag visible during restart"],
+      "negative_cues": ["open-play cross from near the corner", "throw-in", "free kick from wide area"]
+    },
+    {
+      "id": "free_kick",
+      "name": "Free Kick",
+      "description": "A free kick restart is being prepared or taken outside the penalty spot context.",
+      "positive_cues": ["stationary ball after foul", "defensive wall", "referee managing restart", "free-kick taker standing over ball"],
+      "negative_cues": ["corner kick", "penalty kick", "normal open-play pass"]
+    },
+    {
+      "id": "penalty",
+      "name": "Penalty",
+      "description": "A penalty kick is awarded, prepared, taken, saved, or scored.",
+      "positive_cues": ["ball on penalty spot", "single taker facing goalkeeper", "players outside penalty area", "referee penalty signal"],
+      "negative_cues": ["free kick outside the box", "open-play shot", "corner kick"]
+    },
+    {
+      "id": "foul",
+      "name": "Foul",
+      "description": "Illegal physical contact, a trip, push, handball, or another stoppage-causing infringement is visible or strongly indicated.",
+      "positive_cues": ["player falling after contact", "referee whistle or gesture", "players protesting", "tackle through opponent"],
+      "negative_cues": ["normal shoulder challenge", "player slipping alone", "card shown without visible foul context"]
+    },
+    {
+      "id": "card",
+      "name": "Card",
+      "description": "The referee shows or is clearly about to show a yellow or red card.",
+      "positive_cues": ["yellow card visible", "red card visible", "referee holding card above head", "player disciplinary reaction"],
+      "negative_cues": ["ordinary foul with no card shown", "substitution board", "score graphic"]
+    },
+    {
+      "id": "substitution",
+      "name": "Substitution",
+      "description": "A player substitution is happening or clearly displayed.",
+      "positive_cues": ["substitution board", "player entering or leaving touchline", "broadcast substitution graphic", "coaches greeting player"],
+      "negative_cues": ["injury treatment without player replacement", "player warming up only"]
+    },
+    {
+      "id": "var_review",
+      "name": "VAR Review",
+      "description": "A VAR review, referee monitor check, or broadcast VAR decision sequence is visible.",
+      "positive_cues": ["VAR graphic", "referee at pitchside monitor", "check complete or decision graphic", "players waiting during review"],
+      "negative_cues": ["normal replay without review context", "ordinary referee discussion"]
+    },
+    {
+      "id": "celebration_or_replay",
+      "name": "Celebration Or Replay",
+      "description": "A celebration, emotional reaction, or replay of an important moment is shown when the exact live event type is not clear.",
+      "positive_cues": ["players celebrating together", "crowd celebration", "slow-motion replay angle", "close-up emotional reaction"],
+      "negative_cues": ["active live attack with clear event type", "routine crowd shot unrelated to play"]
+    },
+    {
+      "id": "period_transition",
+      "name": "Period Transition",
+      "description": "Kickoff, halftime, full-time, restart after halftime, or another major match-period transition is shown.",
+      "positive_cues": ["players lined up for kickoff", "referee starting or ending half", "halftime or full-time graphic", "teams leaving or entering pitch"],
+      "negative_cues": ["ordinary restart after foul", "random midfield possession"]
+    },
+    {
+      "id": "other_relevant",
+      "name": "Other Relevant",
+      "description": "A clearly commentary-worthy football moment that does not fit any other configured event type.",
+      "positive_cues": ["injury treatment", "major tactical instruction", "unusual broadcast graphic", "important crowd or bench reaction"],
+      "negative_cues": ["ordinary possession", "unclear frame", "low-information scene"]
+    },
+    {
+      "id": "no_event",
+      "name": "No Event",
+      "description": "No commentary-worthy football event is visible in the frame.",
+      "positive_cues": ["ordinary buildup", "static midfield possession", "unclear or low-information frame", "broadcast shot with no significant action"],
+      "negative_cues": ["clear goal", "clear shot", "clear set piece", "visible card or substitution"]
+    }
+  ]
+}
