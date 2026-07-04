@@ -19,6 +19,9 @@ class ChatClient(Protocol):
         ...
 
 
+SCAN_ALGORITHM_VERSION = 2
+
+
 @dataclass(frozen=True)
 class ScanConfig:
     window_size_frames: int = 6
@@ -107,6 +110,7 @@ def scan_events(
             "stride_frames": scan_config.stride_frames,
             "merge_gap_sec": scan_config.merge_gap_sec,
             "goal_replay_merge_gap_sec": scan_config.goal_replay_merge_gap_sec,
+            "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
         },
     )
     registry = load_event_types(scan_config.event_types_path)
@@ -204,7 +208,7 @@ def scan_events(
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
-    events = _merge_event_candidates(initial_events, scan_config, registry)
+    events = _merge_event_candidates(initial_events, scan_config, registry, observations)
     trace.record(
         "scan_events",
         "merge_event_candidates",
@@ -312,9 +316,10 @@ def _parse_scan_response(
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError("Each frame result must be an object.")
-        frame_id = str(row.get("frame_id", ""))
-        if frame_id not in frame_by_id:
-            raise ValueError(f"Unknown frame_id '{frame_id}'.")
+        raw_frame_id = str(row.get("frame_id", ""))
+        frame_id = _normalize_frame_id(raw_frame_id, frame_by_id)
+        if frame_id is None:
+            raise ValueError(f"Unknown frame_id '{raw_frame_id}'.")
 
         event_type = registry.validate(str(row.get("event_type", registry.no_event_type)))
         needs_commentary = bool(row.get("needs_commentary", False)) and event_type != registry.no_event_type
@@ -334,6 +339,25 @@ def _parse_scan_response(
         )
 
     return observations
+
+
+def _normalize_frame_id(raw_frame_id: str, frame_by_id: dict[str, FrameInfo]) -> str | None:
+    cleaned = raw_frame_id.strip()
+    if cleaned in frame_by_id:
+        return cleaned
+
+    for separator in (",", " ", "\n", "\t"):
+        prefix = cleaned.split(separator, 1)[0].strip()
+        if prefix in frame_by_id:
+            return prefix
+
+    for frame_id in sorted(frame_by_id, key=len, reverse=True):
+        if not cleaned.startswith(frame_id):
+            continue
+        suffix = cleaned[len(frame_id) :].strip()
+        if not suffix or suffix.startswith((",", "[", "(", "-", "|")) or "timestamp" in suffix.lower():
+            return frame_id
+    return None
 
 
 def _try_repair_scan_response(
@@ -454,8 +478,8 @@ def _build_event_candidates(
         ):
             end += 1
 
-        start_sec = _previous_non_demand_time(observations, start, manifest.frames[start].timestamp_sec)
-        end_sec = _next_non_demand_time(observations, end, manifest.frames[end].timestamp_sec)
+        start_sec = manifest.frames[start].timestamp_sec
+        end_sec = manifest.frames[end].timestamp_sec
         run = observations[start : end + 1]
         confidence = max(item.confidence for item in run)
         evidence_summary = "; ".join(dict.fromkeys(item.evidence for item in run if item.evidence))
@@ -505,6 +529,7 @@ def _merge_event_candidates(
     candidates: list[EventCandidate],
     config: ScanConfig,
     registry: EventTypeRegistry,
+    observations: list[FrameObservation] | None = None,
 ) -> list[EventCandidate]:
     if not candidates:
         return []
@@ -518,7 +543,7 @@ def _merge_event_candidates(
             continue
 
         previous = merged[-1]
-        if _should_merge_events(previous, candidate, config):
+        if _should_merge_events(previous, candidate, config, observations):
             merged[-1] = _merge_two_events(previous, candidate, registry)
         else:
             merged.append(candidate)
@@ -526,16 +551,25 @@ def _merge_event_candidates(
     return [_renumber_event(event, index + 1) for index, event in enumerate(merged)]
 
 
-def _should_merge_events(left: EventCandidate, right: EventCandidate, config: ScanConfig) -> bool:
+def _should_merge_events(
+    left: EventCandidate,
+    right: EventCandidate,
+    config: ScanConfig,
+    observations: list[FrameObservation] | None = None,
+) -> bool:
     gap = right.start_sec - left.end_sec
     overlaps_or_close = gap <= config.merge_gap_sec
-    if left.event_type == right.event_type and overlaps_or_close:
+    has_no_event_barrier = _has_between_observation_barrier(left, right, observations, block_event_type_change=False)
+    has_type_barrier = _has_between_observation_barrier(left, right, observations, block_event_type_change=True)
+
+    if left.event_type == right.event_type and overlaps_or_close and not has_type_barrier:
         return True
 
     if (
         left.event_type == "goal"
         and right.event_type == "celebration_or_replay"
         and gap <= config.goal_replay_merge_gap_sec
+        and not has_no_event_barrier
     ):
         return True
 
@@ -543,9 +577,35 @@ def _should_merge_events(left: EventCandidate, right: EventCandidate, config: Sc
         left.event_type == "celebration_or_replay"
         and right.event_type == "goal"
         and gap <= config.goal_replay_merge_gap_sec
+        and not has_no_event_barrier
     ):
         return True
 
+    return False
+
+
+def _has_between_observation_barrier(
+    left: EventCandidate,
+    right: EventCandidate,
+    observations: list[FrameObservation] | None,
+    *,
+    block_event_type_change: bool,
+) -> bool:
+    if not observations:
+        return False
+
+    lower = min(left.end_sec, right.start_sec)
+    upper = max(left.end_sec, right.start_sec)
+    if lower == upper:
+        return False
+
+    for observation in observations:
+        if not (lower < observation.timestamp_sec < upper):
+            continue
+        if not observation.needs_commentary:
+            return True
+        if block_event_type_change and observation.event_type not in {left.event_type, right.event_type}:
+            return True
     return False
 
 
@@ -607,20 +667,6 @@ def _renumber_event(event: EventCandidate, number: int) -> EventCandidate:
 
 def _unique_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values))
-
-
-def _previous_non_demand_time(observations: list[FrameObservation], start_index: int, default: float) -> float:
-    for index in range(start_index - 1, -1, -1):
-        if not observations[index].needs_commentary:
-            return observations[index].timestamp_sec
-    return default
-
-
-def _next_non_demand_time(observations: list[FrameObservation], end_index: int, default: float) -> float:
-    for index in range(end_index + 1, len(observations)):
-        if not observations[index].needs_commentary:
-            return observations[index].timestamp_sec
-    return default
 
 
 def scan_result_to_dict(result: ScanResult) -> dict[str, Any]:

@@ -12,6 +12,7 @@ from PIL import Image
 from harness import (
     CommentaryResult,
     CommentarySegment,
+    CommentaryUnitConfig,
     EventCandidate,
     EventPhase,
     ScanConfig,
@@ -20,6 +21,7 @@ from harness import (
     TranslationConfig,
     VisualCommentaryConfig,
     dump_bilingual_commentary_result,
+    build_commentary_units,
     generate_commentary,
     run_bilingual_pipeline,
     load_event_types,
@@ -33,6 +35,7 @@ from harness.manifest import FrameInfo
 from harness.scanner import build_windows
 from harness.time_utils import format_timestamp
 from intern_client import InternClient
+from run_full_bilingual_with_progress import build_dense_manifests
 
 
 class FakeClient:
@@ -59,6 +62,21 @@ def write_manifest(root: Path, count: int = 5) -> Path:
         frame_path = Path("frames") / f"f{index}.png"
         write_png(root / frame_path)
         frames.append({"frame_id": f"f{index}", "path": str(frame_path), "timestamp_sec": index * 2.0})
+
+    manifest_path = root / "frames_manifest.json"
+    manifest_path.write_text(
+        json.dumps({"video_id": "demo", "source_video": "demo.mp4", "frames": frames}),
+        encoding="utf-8",
+    )
+    return manifest_path
+
+
+def write_manifest_with_timestamps(root: Path, timestamps: list[float]) -> Path:
+    frames = []
+    for index, timestamp in enumerate(timestamps):
+        frame_path = Path("frames") / f"f{index}.png"
+        write_png(root / frame_path)
+        frames.append({"frame_id": f"f{index}", "path": str(frame_path), "timestamp_sec": timestamp})
 
     manifest_path = root / "frames_manifest.json"
     manifest_path.write_text(
@@ -156,12 +174,12 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(len(result.events), 1)
             event = result.events[0]
             self.assertEqual(event.event_type, "goal")
-            self.assertEqual(event.start_sec, 0.0)
-            self.assertEqual(event.end_sec, 6.0)
+            self.assertEqual(event.start_sec, 2.0)
+            self.assertEqual(event.end_sec, 4.0)
             self.assertEqual(event.evidence_frames, ("f1", "f2"))
             self.assertEqual(event.phases[0].phase_type, "live_goal")
 
-    def test_time_range_merge_for_split_same_type_events(self) -> None:
+    def test_no_event_breaks_split_same_type_events(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=6)
             response = json.dumps(
@@ -182,10 +200,59 @@ class HarnessTests(unittest.TestCase):
                 ScanConfig(window_size_frames=6, stride_frames=6, merge_gap_sec=4.0),
                 FakeClient([response]),
             )
-            self.assertEqual(len(result.events), 1)
-            self.assertEqual(result.events[0].event_type, "shot")
-            self.assertEqual(result.events[0].evidence_frames, ("f1", "f3"))
-            self.assertEqual(len(result.events[0].phases), 2)
+            self.assertEqual(len(result.events), 2)
+            self.assertEqual([event.event_type for event in result.events], ["shot", "shot"])
+            self.assertEqual(result.events[0].evidence_frames, ("f1",))
+            self.assertEqual(result.events[1].evidence_frames, ("f3",))
+
+    def test_scan_normalizes_frame_ids_with_timestamp_suffix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=1)
+            response = json.dumps(
+                {
+                    "frames": [
+                        {
+                            "frame_id": "f0, timestamp=00:00.00",
+                            "needs_commentary": True,
+                            "event_type": "shot",
+                            "confidence": 0.8,
+                            "evidence": "shot visible",
+                        }
+                    ]
+                }
+            )
+            result = scan_events(
+                manifest_path,
+                load_style("broadcast_professional"),
+                ScanConfig(window_size_frames=1, stride_frames=1),
+                FakeClient([response]),
+            )
+            self.assertEqual(result.events[0].evidence_frames, ("f0",))
+            self.assertEqual(result.window_errors, ())
+
+    def test_event_type_change_is_boundary(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=4)
+            response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": True, "event_type": "period_transition", "confidence": 0.8, "evidence": "ceremony"},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "other_relevant", "confidence": 0.9, "evidence": "crowd"},
+                        {"frame_id": "f2", "needs_commentary": True, "event_type": "period_transition", "confidence": 0.85, "evidence": "lineup"},
+                        {"frame_id": "f3", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            result = scan_events(
+                manifest_path,
+                load_style("broadcast_professional"),
+                ScanConfig(window_size_frames=4, stride_frames=4, merge_gap_sec=8.0),
+                FakeClient([response]),
+            )
+
+            self.assertEqual(len(result.events), 3)
+            self.assertEqual([event.event_type for event in result.events], ["period_transition", "other_relevant", "period_transition"])
+            self.assertEqual([(event.start_sec, event.end_sec) for event in result.events], [(0.0, 0.0), (2.0, 2.0), (4.0, 4.0)])
 
     def test_goal_replay_merge_creates_replay_phase(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -196,9 +263,9 @@ class HarnessTests(unittest.TestCase):
                         {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
                         {"frame_id": "f1", "needs_commentary": True, "event_type": "goal", "confidence": 0.92, "evidence": "ball in net"},
                         {"frame_id": "f2", "needs_commentary": True, "event_type": "goal", "confidence": 0.9, "evidence": "players celebrate"},
-                        {"frame_id": "f3", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
-                        {"frame_id": "f4", "needs_commentary": True, "event_type": "celebration_or_replay", "confidence": 0.83, "evidence": "slow motion replay angle"},
-                        {"frame_id": "f5", "needs_commentary": True, "event_type": "celebration_or_replay", "confidence": 0.81, "evidence": "wide replay shows pass"},
+                        {"frame_id": "f3", "needs_commentary": True, "event_type": "celebration_or_replay", "confidence": 0.83, "evidence": "slow motion replay angle"},
+                        {"frame_id": "f4", "needs_commentary": True, "event_type": "celebration_or_replay", "confidence": 0.81, "evidence": "wide replay shows pass"},
+                        {"frame_id": "f5", "needs_commentary": True, "event_type": "celebration_or_replay", "confidence": 0.8, "evidence": "replay continues"},
                         {"frame_id": "f6", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
                     ]
                 }
@@ -214,6 +281,45 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(event.event_type, "goal")
             self.assertEqual([phase.phase_type for phase in event.phases], ["live_goal", "replay"])
             self.assertIn("wide replay", event.evidence_summary)
+
+    def test_commentary_units_merge_goal_with_mixed_replay_sequence(self) -> None:
+        events = [
+            EventCandidate("E001", "shot", 10.0, 10.0, ("f1",), 0.8, "shot starts", (EventPhase("shot", 10.0, 10.0, ("f1",), "shot starts"),)),
+            EventCandidate("E002", "goal", 14.0, 18.0, ("f2", "f3"), 0.95, "ball in net", (EventPhase("live_goal", 14.0, 18.0, ("f2", "f3"), "ball in net"),)),
+            EventCandidate("E003", "dangerous_attack", 26.0, 26.0, ("f4",), 0.75, "replay buildup", (EventPhase("dangerous_attack", 26.0, 26.0, ("f4",), "replay buildup"),)),
+            EventCandidate("E004", "celebration_or_replay", 30.0, 34.0, ("f5",), 0.9, "slow replay", (EventPhase("celebration_or_replay", 30.0, 34.0, ("f5",), "slow replay"),)),
+            EventCandidate("E005", "foul", 100.0, 100.0, ("f6",), 0.7, "late foul", (EventPhase("foul", 100.0, 100.0, ("f6",), "late foul"),)),
+        ]
+
+        units = build_commentary_units(events, CommentaryUnitConfig(goal_context_before_sec=8.0, goal_replay_after_sec=24.0))
+
+        self.assertEqual(len(units), 2)
+        self.assertEqual(units[0].event_type, "goal")
+        self.assertEqual(units[0].start_sec, 10.0)
+        self.assertEqual(units[0].end_sec, 34.0)
+        self.assertEqual([phase.phase_type for phase in units[0].phases], ["buildup", "live_goal", "replay", "replay"])
+        self.assertEqual(units[1].event_type, "foul")
+
+    def test_commentary_units_mark_goal_celebration_phase(self) -> None:
+        events = [
+            EventCandidate("E001", "goal", 20.0, 20.0, ("f1",), 0.95, "ball in net", (EventPhase("live_goal", 20.0, 20.0, ("f1",), "ball in net"),)),
+            EventCandidate(
+                "E002",
+                "celebration_or_replay",
+                24.0,
+                28.0,
+                ("f2",),
+                0.9,
+                "players celebrating with arms raised and crowd cheering",
+                (EventPhase("celebration_or_replay", 24.0, 28.0, ("f2",), "players celebrating with arms raised and crowd cheering"),),
+            ),
+        ]
+
+        units = build_commentary_units(events, CommentaryUnitConfig(goal_replay_after_sec=20.0))
+
+        self.assertEqual(len(units), 1)
+        self.assertEqual(units[0].event_type, "goal")
+        self.assertEqual([phase.phase_type for phase in units[0].phases], ["live_goal", "celebration"])
 
     def test_illegal_event_type_repair(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -442,6 +548,59 @@ class HarnessTests(unittest.TestCase):
             self.assertIn("frame_id=f1", sent_text)
             self.assertIn("frame_id=f2", sent_text)
             self.assertIn("frame_id=f3", sent_text)
+
+    def test_visual_commentary_respects_sample_fps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest_with_timestamps(Path(tmp), [0.0, 1.0, 2.0, 3.0, 4.0])
+            manifest = load_manifest(manifest_path)
+            event = EventCandidate(
+                event_id="E001",
+                event_type="shot",
+                start_sec=0.0,
+                end_sec=4.0,
+                evidence_frames=("f0", "f1", "f2", "f3", "f4"),
+                confidence=0.8,
+                evidence_summary="shot sequence",
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "A shot sequence.", "subtitle_lines": []})])
+            generate_commentary(
+                [event],
+                manifest,
+                load_style("broadcast_professional"),
+                fake,
+                visual_config=VisualCommentaryConfig(
+                    max_frames_per_event=10,
+                    max_frames_per_phase=10,
+                    context_frames_each_side=0,
+                    sample_fps=0.5,
+                ),
+            )
+
+            content = fake.calls[-1]["messages"][0]["content"]
+            sent_text = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
+            self.assertIn("frame_id=f0", sent_text)
+            self.assertIn("frame_id=f2", sent_text)
+            self.assertIn("frame_id=f4", sent_text)
+            self.assertNotIn("frame_id=f1", sent_text)
+            self.assertNotIn("frame_id=f3", sent_text)
+
+    def test_dense_manifests_respect_sample_fps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = load_manifest(write_manifest_with_timestamps(root, [index * 0.25 for index in range(9)]))
+            event = EventCandidate(
+                event_id="E001",
+                event_type="shot",
+                start_sec=0.0,
+                end_sec=2.0,
+                evidence_frames=(),
+                confidence=0.8,
+                evidence_summary="shot",
+            )
+            paths = build_dense_manifests(manifest, [event], root / "dense", padding_sec=0.0, sample_fps=1.0, resume=False)
+            data = json.loads(paths[0].read_text(encoding="utf-8"))
+            self.assertEqual([frame["timestamp_sec"] for frame in data["frames"]], [0.0, 1.0, 2.0])
+            self.assertEqual(data["event_source"]["sample_fps"], 1.0)
 
     def test_pipeline_trace_records_step_jumps(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

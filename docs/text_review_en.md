@@ -296,6 +296,7 @@ Return JSON only:
 | `event_types_path` | `None` | Custom event type config path | Use when adding a custom taxonomy |
 | `merge_gap_sec` | 4.0 | Maximum gap for merging same-type event candidates | Handles one event split by sliding windows |
 | `goal_replay_merge_gap_sec` | 30.0 | Maximum gap for merging a goal with nearby celebration/replay | Enables dual goal-plus-replay commentary |
+| `dense_sample_fps` | 1.0 | Dense per-event manifest sampling rate used by the full runner | Reduces 4fps source frames to 1fps before dense scanning |
 
 ### Manifest fields
 
@@ -331,6 +332,8 @@ The default pipeline and `generate_commentary()` now use visual commentary gener
 |---|---:|---|
 | `max_frames_per_event` | 12 | Maximum images sent to the commentary model for one event |
 | `max_frames_per_phase` | 4 | Maximum representative frames sampled from each phase |
+| `context_frames_each_side` | 1 | Neighboring frames sampled on each side for visual context without widening the event interval |
+| `sample_fps` | 0.5 | Visual frame sampling rate for commentary generation |
 
 The previous summary-only generation path is still available as `generate_commentary_from_summary()`.
 

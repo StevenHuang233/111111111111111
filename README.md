@@ -174,10 +174,11 @@ python build_event_interval_manifests.py `
   --full-manifest "C:\path\to\frames\frames_manifest.json" `
   --events "outputs\coarse\events.json" `
   --output-dir "outputs\dense_event_manifests" `
-  --padding-sec 2
+  --padding-sec 2 `
+  --sample-fps 1
 ```
 
-Those detailed manifests use every frame in the selected event interval.
+Those detailed manifests default to 1fps, so a 4fps source manifest is downsampled before dense scanning. Use `--sample-fps 0` to keep every frame.
 
 ## Style control
 
@@ -214,7 +215,7 @@ ScanConfig(window_size_frames=6, stride_frames=3)
 
 For rough early exploration, use larger values such as `8/4` or `10/5`. For important clips, use smaller values such as `4/2`.
 
-The scanner marks each frame as either commentary-worthy or `no_event`. Event intervals are expanded from the first needed frame back to the previous non-needed frame, and from the last needed frame forward to the next non-needed frame.
+The scanner marks each frame as either commentary-worthy or `no_event`. Event candidates are built from consecutive positive frames with the same `event_type`. A `no_event` frame always splits the sequence, and a change from one event type to another is also treated as a boundary. This keeps sparse labels such as `other_relevant` from being stretched across a long neighboring `period_transition` segment.
 
 After frame-level aggregation, the scanner also performs event-level merging:
 
@@ -230,6 +231,34 @@ ScanConfig(
     goal_replay_merge_gap_sec=30.0,
 )
 ```
+
+## Commentary unit packing
+
+The scan result is kept as raw evidence in `coarse/events.json`. Before dense scanning or coarse-only generation, the full runner now builds a separate commentary-facing event list in `commentary_units/events.json`.
+
+This layer is intentionally separate from scanning:
+
+- It does not call the model.
+- It consumes only `EventCandidate` data.
+- It groups one goal, its buildup, celebration, and replay-like neighboring events into one `goal` commentary unit.
+- It keeps raw scan output available for audit.
+- It can filter low-value event types before generation without deleting the raw scan result.
+
+Main tuning parameters:
+
+```powershell
+--goal-unit-before-sec 20
+--goal-unit-after-sec 48
+--generation-event-types goal,shot,save
+--exclude-generation-event-types period_transition,other_relevant
+--min-generation-confidence 0.8
+--max-generation-events 10
+--disable-commentary-units
+```
+
+For goal units, `goal_unit_before_sec` controls how much buildup can be absorbed before the first goal frame. `goal_unit_after_sec` controls how much replay or celebration can be absorbed after the first goal frame. The window is not recursively extended by later replay frames that are also labeled as `goal`, so one false replay label should not stretch a goal package indefinitely.
+
+Use `--max-generation-events` for a cheap smoke test. It writes the selected subset to `commentary_units/events_selected.json`.
 
 ## Event types
 
@@ -275,6 +304,8 @@ By default, the speaking interval equals the detected event interval.
 VisualCommentaryConfig(
     max_frames_per_event=12,
     max_frames_per_phase=4,
+    context_frames_each_side=1,
+    sample_fps=0.5,
 )
 ```
 
@@ -329,11 +360,23 @@ The runner writes:
 - `progress.jsonl`: machine-readable progress records.
 - `cache/<stage>/call_000001.json`: cached model responses for breakpoint resume.
 - `coarse/events.json`: full-video coarse scan result.
+- `commentary_units/events.json`: filtered and packed generation units built from coarse events.
+- `commentary_units/events_selected.json`: optional smoke-test subset when `--max-generation-events` is set.
 - `dense/<event>/events.json`: dense scan result for each coarse event interval.
 - `commentary/<event>/commentary_bilingual.json`: per-event bilingual commentary.
 - `commentary_bilingual.json`: aggregated bilingual commentary.
 
 Resume is enabled by default. If the process is interrupted, run the same command with the same `--run-name`; completed stages and cached model calls are reused. Use `--no-resume` only when you want to ignore checkpoints.
+
+Use `--coarse-only-generation` when dense scan is too slow or does not add enough value for a demo. In that mode the runner stops after coarse scanning and generates bilingual commentary directly from coarse events, using the full manifest for sampled visual frames:
+
+```powershell
+python run_full_bilingual_with_progress.py `
+  --run-name "coarse_demo" `
+  --coarse-only-generation `
+  --commentary-sample-fps 0.5 `
+  --exclude-generation-event-types period_transition,other_relevant
+```
 
 `--concurrency` controls independent model calls. Coarse scan windows and dense scan windows run concurrently. For bilingual generation, English must be generated before the matching Chinese translation for the same event, but different events can run concurrently.
 

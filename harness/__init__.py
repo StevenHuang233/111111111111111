@@ -20,6 +20,7 @@ from .commentary import (
     generate_visual_commentary,
 )
 from .event_types import DEFAULT_EVENT_TYPES, EventTypeDefinition, EventTypeRegistry, load_event_types
+from .event_units import CommentaryUnitConfig, build_commentary_units, dump_commentary_units
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
 from .scanner import (
@@ -38,6 +39,7 @@ from .tracing import NullTracker, StepTracker, TraceRecorder, TraceStep
 __all__ = [
     "CommentaryResult",
     "CommentarySegment",
+    "CommentaryUnitConfig",
     "SubtitleLine",
     "BilingualCommentaryResult",
     "BilingualCommentarySegment",
@@ -65,8 +67,10 @@ __all__ = [
     "commentary_result_to_dict",
     "dump_bilingual_commentary_result",
     "dump_commentary_result",
+    "dump_commentary_units",
     "dump_scan_result",
     "generate_bilingual_commentary",
+    "build_commentary_units",
     "generate_commentary",
     "generate_commentary_from_summary",
     "generate_visual_commentary",

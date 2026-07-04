@@ -47,6 +47,8 @@ class CommentaryResult:
 class VisualCommentaryConfig:
     max_frames_per_event: int = 12
     max_frames_per_phase: int = 4
+    context_frames_each_side: int = 1
+    sample_fps: float | None = 0.5
 
 
 def generate_commentary(
@@ -137,6 +139,8 @@ def generate_visual_commentary(
             "event_count": len(events),
             "max_frames_per_event": visual_config.max_frames_per_event,
             "max_frames_per_phase": visual_config.max_frames_per_phase,
+            "context_frames_each_side": visual_config.context_frames_each_side,
+            "sample_fps": visual_config.sample_fps,
         },
     )
 
@@ -228,10 +232,11 @@ def _build_commentary_messages(
         ],
     }
     phase_instruction = ""
-    if event.event_type == "goal" and any(phase.phase_type == "replay" for phase in event.phases):
+    if event.event_type == "goal" and any(phase.phase_type in {"replay", "celebration", "var_review"} for phase in event.phases):
         phase_instruction = (
-            "This goal event includes both the live goal phase and a replay phase. "
-            "Generate dual commentary: first describe the live goal moment, then use the replay phase to add details such as shooting route, passing, positioning, defensive issues, or goalkeeper reaction when visible."
+            "This goal event may be a goal sequence package with buildup, live_goal, replay, celebration, and var_review phases. "
+            "Generate sequence-aware commentary: call the live_goal first, then use replay phases for tactical or technical details, "
+            "celebration phases for emotional reaction, and var_review phases only if the evidence clearly supports review context."
         )
     prompt = f"""
 You are generating football commentary for one detected event.
@@ -265,10 +270,11 @@ def _build_visual_commentary_messages(
 ) -> list[dict[str, Any]]:
     event_json = _event_to_prompt_dict(event, manifest)
     phase_instruction = ""
-    if event.event_type == "goal" and any(phase.phase_type == "replay" for phase in event.phases):
+    if event.event_type == "goal" and any(phase.phase_type in {"replay", "celebration", "var_review"} for phase in event.phases):
         phase_instruction = (
-            "This goal event includes both the live goal phase and a replay phase. "
-            "Generate dual commentary: first describe the live goal moment, then use the replay frames to add details such as shooting route, passing, positioning, defensive issues, or goalkeeper reaction when visible."
+            "This goal event may be a goal sequence package with buildup, live_goal, replay, celebration, and var_review phases. "
+            "Generate sequence-aware commentary: call the live_goal first, then use replay frames for tactical or technical details, "
+            "celebration frames for emotional reaction, and var_review frames only if the evidence clearly supports review context."
         )
     frame_listing = "\n".join(
         f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]" for frame in frames
@@ -343,26 +349,40 @@ def _select_visual_frames(
     frame_by_id = {frame.frame_id: frame for frame in manifest_frames}
     selected_frames: list[FrameInfo] = []
     for phase in event.phases:
-        phase_frames = _frames_in_time_range(manifest_frames, phase.start_sec, phase.end_sec)
+        phase_frames = _frames_in_time_range_with_context(
+            manifest_frames,
+            phase.start_sec,
+            phase.end_sec,
+            config.context_frames_each_side,
+        )
+        phase_frames = _sample_frames_by_fps(phase_frames, config.sample_fps)
         selected_frames.extend(
             _select_related_frame_sample(
                 phase_frames,
                 phase.evidence_frames,
                 config.max_frames_per_phase,
                 frame_by_id,
+                config.sample_fps,
             )
         )
 
     selected_frames = _unique_frames(selected_frames)
     remaining_budget = max(0, config.max_frames_per_event - len(selected_frames))
     if remaining_budget:
-        event_frames = _frames_in_time_range(manifest_frames, event.start_sec, event.end_sec)
+        event_frames = _frames_in_time_range_with_context(
+            manifest_frames,
+            event.start_sec,
+            event.end_sec,
+            config.context_frames_each_side,
+        )
+        event_frames = _sample_frames_by_fps(event_frames, config.sample_fps)
         selected_frames.extend(
             _select_related_frame_sample(
                 event_frames,
                 event.evidence_frames,
                 remaining_budget,
                 frame_by_id,
+                config.sample_fps,
             )
         )
 
@@ -373,21 +393,53 @@ def _frames_in_time_range(frames: tuple[FrameInfo, ...], start_sec: float, end_s
     return tuple(frame for frame in frames if start_sec <= frame.timestamp_sec <= end_sec)
 
 
+def _frames_in_time_range_with_context(
+    frames: tuple[FrameInfo, ...],
+    start_sec: float,
+    end_sec: float,
+    context_each_side: int,
+) -> tuple[FrameInfo, ...]:
+    in_range_indexes = [index for index, frame in enumerate(frames) if start_sec <= frame.timestamp_sec <= end_sec]
+    if not in_range_indexes:
+        return ()
+
+    context = max(0, context_each_side)
+    start_index = max(0, in_range_indexes[0] - context)
+    end_index = min(len(frames) - 1, in_range_indexes[-1] + context)
+    return frames[start_index : end_index + 1]
+
+
 def _select_related_frame_sample(
     interval_frames: tuple[FrameInfo, ...],
     evidence_frame_ids: tuple[str, ...],
     limit: int,
     frame_by_id: dict[str, FrameInfo],
+    sample_fps: float | None,
 ) -> list[FrameInfo]:
     if limit <= 0:
         return []
 
     evidence_frames = tuple(frame_by_id[frame_id] for frame_id in evidence_frame_ids if frame_id in frame_by_id)
+    evidence_frames = _sample_frames_by_fps(evidence_frames, sample_fps)
     selected = list(_sample_frames(evidence_frames, min(limit, len(evidence_frames))))
     remaining = limit - len(_unique_frames(selected))
     if remaining > 0:
         selected.extend(_sample_frames(interval_frames, remaining))
     return _unique_frames(selected)[:limit]
+
+
+def _sample_frames_by_fps(frames: tuple[FrameInfo, ...], sample_fps: float | None) -> tuple[FrameInfo, ...]:
+    if not frames or sample_fps is None or sample_fps <= 0:
+        return frames
+
+    min_interval_sec = 1.0 / sample_fps
+    selected: list[FrameInfo] = []
+    last_timestamp: float | None = None
+    for frame in sorted(frames, key=lambda item: item.timestamp_sec):
+        if last_timestamp is None or frame.timestamp_sec >= last_timestamp + min_interval_sec - 1e-6:
+            selected.append(frame)
+            last_timestamp = frame.timestamp_sec
+    return tuple(selected)
 
 
 def _sample_frames(frames: tuple[FrameInfo, ...], limit: int) -> tuple[FrameInfo, ...]:
