@@ -1,6 +1,6 @@
 # 非代码文本与配置参数审阅稿（中文）
 
-本文用于人工审核当前世界杯视频解说 Harness 中会影响模型行为、用户配置和输出结构的非代码文本。当前运行时配置源主要来自 `configs/styles.json`、`configs/event_types.json`、`harness/scanner.py`、`harness/commentary.py`。
+本文用于人工审核当前世界杯视频解说 Harness 中会影响模型行为、用户配置和输出结构的非代码文本。当前运行时配置源主要来自 `configs/styles.json`、`configs/event_types.json`、`harness/scanner.py`、`harness/commentary.py`、`harness/bilingual.py`。
 
 ## 1. 审核范围
 
@@ -9,6 +9,7 @@
 - 扫描阶段 Prompt：低帧率图片窗口识别事件时发送给模型的说明。
 - 修复阶段 Prompt：模型输出非法 JSON 或非法事件类型时的修复说明。
 - 精细解说 Prompt：针对已识别事件，结合结构化事件信息和相关关键帧生成解说片段。
+- 双语翻译 Prompt：先生成英文解说，再把英文结果转成中文，同时保留原始语义和风格。
 - 人工配置参数：manifest 格式、滑块参数、风格参数、事件类型参数、输出字段。
 - 步骤跟踪：记录 pipeline 如何在各模块之间跳转、每一步调用了什么。
 
@@ -241,6 +242,36 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 
 ## 7. 需要重点审核的配置参数
 
+### 双语翻译 Prompt（中文审核版）
+
+该 Prompt 用于把英文解说结果翻译成中文。真实运行时每个事件片段单独调用一次。
+
+```text
+你正在把足球解说从英文翻译成简体中文。
+
+语义忠实是第一优先级。保留完全一致的事实含义、时间、数字、球员名、球队名、比分引用和不确定性。
+只有在保证语义后，再应用这个解说风格：
+{style.prompt_injection}
+
+翻译规则：
+- 不添加英文源文本中不存在的事实、球员名、球队名、比分或战术细节。
+- 保持相同的 event_id、event_type、talk_start_sec、talk_end_sec 和字幕时间。
+- 中文应自然，适合口播足球解说。
+- 如果风格和语义冲突，选择语义。
+- 只返回 JSON。
+
+英文源文本：
+{source_json}
+
+只返回 JSON：
+{
+  "commentary_text": "Chinese spoken commentary text",
+  "subtitle_lines": [
+    {"start_sec": 0.0, "end_sec": 2.0, "text": "Chinese subtitle text"}
+  ]
+}
+```
+
 ### 环境变量
 
 | 参数 | 默认值 | 用途 | 是否建议改 |
@@ -288,6 +319,7 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 |---|---|---|
 | `events.json` | `event_id/event_type/start_sec/end_sec/evidence_frames/confidence/evidence_summary/phases` | 事件证据链 |
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | 解说与字幕候选 |
+| `commentary_bilingual.json` | `event_id/english/commentary_text/chinese/commentary_text/subtitle_lines` | 中英文双语解说与字幕候选 |
 | `trace.json` | `index/elapsed_sec/step/action/detail` | 步骤跟踪和模块跳转记录 |
 
 `trace.json` 在 `TraceRecorder(record_model_io=True)` 时还会记录每次模型调用：
@@ -307,6 +339,30 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 | `max_frames_per_phase` | 4 | 每个 phase 最多抽取多少张代表帧 |
 
 原来的纯 summary 生成逻辑仍保留为 `generate_commentary_from_summary()`。
+
+### 双语解说参数
+
+双语模块默认逻辑是：先用视觉增强生成英文，再把英文结果翻译成中文。也可以只调用 `translate_commentary_to_chinese()` 翻译已有英文 `CommentaryResult`。
+
+| 参数 | 默认值 | 作用 |
+|---|---:|---|
+| `target_language` | `Simplified Chinese` | 目标语言名称，注入翻译 Prompt |
+| `target_language_code` | `zh-CN` | 输出 metadata 中的目标语言代码 |
+| `temperature` | 0.2 | 翻译随机性，默认较低以保证词义 |
+| `top_p` | 0.9 | 采样范围 |
+| `max_tokens` | 1600 | 单个事件翻译输出上限 |
+| `thinking_mode` | `false` | 默认关闭，避免输出思考过程 |
+
+双语输出会在每个事件下保留两份文本：
+
+```json
+{
+  "event_id": "E001",
+  "event_type": "goal",
+  "english": {"commentary_text": "...", "subtitle_lines": []},
+  "chinese": {"commentary_text": "...", "subtitle_lines": []}
+}
+```
 
 ### 复合事件 phases
 

@@ -1,6 +1,6 @@
 # Non-Code Text and Configuration Review Draft (English)
 
-This document organizes the current non-code text that affects model behavior, user configuration, and output structure in the football commentary harness. Runtime configuration mainly comes from `configs/styles.json`, `configs/event_types.json`, `harness/scanner.py`, and `harness/commentary.py`.
+This document organizes the current non-code text that affects model behavior, user configuration, and output structure in the football commentary harness. Runtime configuration mainly comes from `configs/styles.json`, `configs/event_types.json`, `harness/scanner.py`, `harness/commentary.py`, and `harness/bilingual.py`.
 
 ## 1. Review Scope
 
@@ -9,6 +9,7 @@ This document organizes the current non-code text that affects model behavior, u
 - Scan prompt: instructions sent to the model for low-frame-rate event scanning.
 - Repair prompt: instructions used when the model returns invalid JSON or unsupported event types.
 - Commentary prompt: instructions used to generate commentary from structured event data and selected keyframes.
+- Bilingual translation prompt: instructions used to translate English commentary into Chinese while preserving meaning and style.
 - Manual configuration parameters: manifest format, sliding-window parameters, style parameters, event type parameters, and output fields.
 - Step tracing: records how the pipeline moves across modules and what each step calls.
 
@@ -235,6 +236,36 @@ Return JSON only:
 
 ## 7. Configuration Parameters to Review
 
+### Bilingual translation prompt template
+
+This prompt translates English commentary into Chinese. Runtime calls it once per event segment.
+
+```text
+You are translating football commentary from English into Simplified Chinese.
+
+Meaning fidelity is the first priority. Preserve the exact factual meaning, timing, numbers, names, teams, score references, and uncertainty.
+Apply this commentary style only after preserving meaning:
+{style.prompt_injection}
+
+Translation rules:
+- Do not add facts, player names, team names, scores, or tactical details that are not in the English source.
+- Keep the same event_id, event_type, talk_start_sec, talk_end_sec, and subtitle timing.
+- Translate naturally for spoken football commentary in Simplified Chinese.
+- If style and meaning conflict, choose meaning.
+- Return JSON only.
+
+English source:
+{source_json}
+
+Return JSON only:
+{
+  "commentary_text": "Chinese spoken commentary text",
+  "subtitle_lines": [
+    {"start_sec": 0.0, "end_sec": 2.0, "text": "Chinese subtitle text"}
+  ]
+}
+```
+
 ### Environment variables
 
 | Parameter | Default | Purpose | Review suggestion |
@@ -282,6 +313,7 @@ Return JSON only:
 |---|---|---|
 | `events.json` | `event_id/event_type/start_sec/end_sec/evidence_frames/confidence/evidence_summary/phases` | Event evidence chain |
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | Commentary and subtitle candidates |
+| `commentary_bilingual.json` | `event_id/english/commentary_text/chinese/commentary_text/subtitle_lines` | English and Chinese commentary and subtitle candidates |
 | `trace.json` | `index/elapsed_sec/step/action/detail` | Step trace and module transition log |
 
 When `TraceRecorder(record_model_io=True)` is used, `trace.json` also records each model call:
@@ -301,6 +333,30 @@ The default pipeline and `generate_commentary()` now use visual commentary gener
 | `max_frames_per_phase` | 4 | Maximum representative frames sampled from each phase |
 
 The previous summary-only generation path is still available as `generate_commentary_from_summary()`.
+
+### Bilingual commentary parameters
+
+The bilingual module first generates English commentary with visual frames, then translates each segment into Chinese. You can also call `translate_commentary_to_chinese()` on an existing English `CommentaryResult`.
+
+| Parameter | Default | Purpose |
+|---|---:|---|
+| `target_language` | `Simplified Chinese` | Target language name injected into the translation prompt |
+| `target_language_code` | `zh-CN` | Target language code in output metadata |
+| `temperature` | 0.2 | Translation randomness; low by default for meaning fidelity |
+| `top_p` | 0.9 | Sampling nucleus |
+| `max_tokens` | 1600 | Output budget per event translation |
+| `thinking_mode` | `false` | Disabled by default to avoid reasoning leakage |
+
+Bilingual output keeps both languages under each event segment:
+
+```json
+{
+  "event_id": "E001",
+  "event_type": "goal",
+  "english": {"commentary_text": "...", "subtitle_lines": []},
+  "chinese": {"commentary_text": "...", "subtitle_lines": []}
+}
+```
 
 ### Composite event phases
 

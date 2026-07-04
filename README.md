@@ -46,9 +46,12 @@ For text and configuration review, see:
 from harness import (
     ScanConfig,
     TraceRecorder,
+    TranslationConfig,
     VisualCommentaryConfig,
+    dump_bilingual_commentary_result,
     dump_commentary_result,
     dump_scan_result,
+    run_bilingual_pipeline,
     run_pipeline,
 )
 
@@ -63,6 +66,24 @@ result = run_pipeline(
 
 dump_scan_result(result.scan, "outputs/events.json")
 dump_commentary_result(result.commentary, "outputs/commentary.json")
+tracker.dump("outputs/trace.json")
+```
+
+For bilingual English/Chinese output, use the separate bilingual pipeline:
+
+```python
+tracker = TraceRecorder()
+result = run_bilingual_pipeline(
+    manifest_path="frames_manifest.json",
+    style_id_or_path="broadcast_professional",
+    scan_config=ScanConfig(window_size_frames=6, stride_frames=3),
+    tracker=tracker,
+    visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=12, max_frames_per_phase=4),
+    translation_config=TranslationConfig(),
+)
+
+dump_scan_result(result.scan, "outputs/events.json")
+dump_bilingual_commentary_result(result.bilingual_commentary, "outputs/commentary_bilingual.json")
 tracker.dump("outputs/trace.json")
 ```
 
@@ -258,6 +279,40 @@ VisualCommentaryConfig(
 ```
 
 The previous summary-only behavior is still available as `generate_commentary_from_summary()`.
+
+## Bilingual commentary
+
+The bilingual module keeps English generation and Chinese translation decoupled:
+
+- `generate_bilingual_commentary()` first generates English commentary with visual frames, then translates each segment into Chinese.
+- `translate_commentary_to_chinese()` translates an existing `CommentaryResult`, so you can reuse an existing `commentary.json` without rerunning visual generation.
+- `run_bilingual_pipeline()` runs scan, English visual generation, and Chinese translation in one call.
+
+The translation prompt injects the selected style, but meaning fidelity has priority. It preserves event IDs, event types, timing, names, teams, scores, numbers, and uncertainty from the English source.
+
+Translation tuning:
+
+```python
+TranslationConfig(
+    target_language="Simplified Chinese",
+    target_language_code="zh-CN",
+    temperature=0.2,
+    top_p=0.9,
+    max_tokens=1600,
+    thinking_mode=False,
+)
+```
+
+The bilingual output nests both languages under each segment:
+
+```json
+{
+  "event_id": "E001",
+  "event_type": "goal",
+  "english": {"commentary_text": "...", "subtitle_lines": []},
+  "chinese": {"commentary_text": "...", "subtitle_lines": []}
+}
+```
 
 ## Tests
 

@@ -10,17 +10,24 @@ from typing import Any
 from PIL import Image
 
 from harness import (
+    CommentaryResult,
+    CommentarySegment,
     EventCandidate,
     EventPhase,
     ScanConfig,
+    SubtitleLine,
     TraceRecorder,
+    TranslationConfig,
     VisualCommentaryConfig,
+    dump_bilingual_commentary_result,
     generate_commentary,
+    run_bilingual_pipeline,
     load_event_types,
     load_manifest,
     load_style,
     run_pipeline,
     scan_events,
+    translate_commentary_to_chinese,
 )
 from harness.manifest import FrameInfo
 from harness.scanner import build_windows
@@ -260,6 +267,68 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(result.segments[0].talk_end_sec, 2.0)
             self.assertIn("decisive", result.segments[0].commentary_text.lower())
 
+    def test_translate_commentary_to_chinese_with_style_prompt(self) -> None:
+        commentary = CommentaryResult(
+            video_id="demo",
+            style_id="broadcast_professional",
+            segments=(
+                CommentarySegment(
+                    event_id="E001",
+                    event_type="goal",
+                    talk_start_sec=0.0,
+                    talk_end_sec=4.0,
+                    commentary_text="A decisive finish opens the scoring.",
+                    subtitle_lines=(SubtitleLine(0.0, 4.0, "A decisive finish."),),
+                ),
+            ),
+        )
+        response = json.dumps(
+            {
+                "commentary_text": "一次决定性的终结打破僵局。",
+                "subtitle_lines": [{"start_sec": 0.0, "end_sec": 4.0, "text": "决定性的终结。"}],
+            },
+            ensure_ascii=False,
+        )
+        fake = FakeClient([response])
+        result = translate_commentary_to_chinese(
+            commentary,
+            load_style("broadcast_professional"),
+            fake,
+            config=TranslationConfig(max_tokens=512),
+        )
+
+        self.assertEqual(result.source_language, "en")
+        self.assertEqual(result.target_language_code, "zh-CN")
+        self.assertEqual(result.segments[0].english.commentary_text, "A decisive finish opens the scoring.")
+        self.assertIn("打破僵局", result.segments[0].chinese.commentary_text)
+        prompt = fake.calls[0]["messages"][0]["content"]
+        self.assertIn("Meaning fidelity is the first priority", prompt)
+        self.assertIn("Use a professional broadcast tone", prompt)
+
+    def test_dump_bilingual_commentary_result(self) -> None:
+        commentary = CommentaryResult(
+            video_id="demo",
+            style_id="broadcast_professional",
+            segments=(
+                CommentarySegment(
+                    event_id="E001",
+                    event_type="shot",
+                    talk_start_sec=0.0,
+                    talk_end_sec=2.0,
+                    commentary_text="The shot flashes wide.",
+                    subtitle_lines=(),
+                ),
+            ),
+        )
+        fake = FakeClient([json.dumps({"commentary_text": "这脚射门偏出。", "subtitle_lines": []}, ensure_ascii=False)])
+        result = translate_commentary_to_chinese(commentary, load_style("broadcast_professional"), fake)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bilingual.json"
+            dump_bilingual_commentary_result(result, path)
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(data["segments"][0]["english"]["commentary_text"], "The shot flashes wide.")
+            self.assertEqual(data["segments"][0]["chinese"]["commentary_text"], "这脚射门偏出。")
+
     def test_run_pipeline_with_fake_client(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=3)
@@ -282,6 +351,41 @@ class HarnessTests(unittest.TestCase):
             )
             self.assertEqual(len(result.scan.events), 1)
             self.assertEqual(len(result.commentary.segments), 1)
+
+    def test_run_bilingual_pipeline_with_fake_client(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=3)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "shot", "confidence": 0.75, "evidence": "shot toward goal"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "A shot flashes toward goal.", "subtitle_lines": []})
+            translation_response = json.dumps(
+                {"commentary_text": "一脚射门直奔球门而去。", "subtitle_lines": []},
+                ensure_ascii=False,
+            )
+            tracker = TraceRecorder()
+            result = run_bilingual_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=3, stride_frames=3),
+                FakeClient([scan_response, commentary_response, translation_response]),
+                tracker,
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=2, max_frames_per_phase=2),
+                translation_config=TranslationConfig(max_tokens=512),
+            )
+
+            self.assertEqual(len(result.scan.events), 1)
+            self.assertEqual(len(result.bilingual_commentary.segments), 1)
+            self.assertIn("射门", result.bilingual_commentary.segments[0].chinese.commentary_text)
+            actions = [(step.step, step.action) for step in tracker.steps]
+            self.assertIn(("generate_visual_commentary.event", "prepare_model_call"), actions)
+            self.assertIn(("translate_commentary_to_chinese.segment", "prepare_model_call"), actions)
 
     def test_visual_commentary_receives_selected_frames(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,6 +1,17 @@
+from .bilingual import (
+    BilingualCommentaryResult,
+    BilingualCommentarySegment,
+    LocalizedCommentary,
+    TranslationConfig,
+    bilingual_commentary_result_to_dict,
+    dump_bilingual_commentary_result,
+    generate_bilingual_commentary,
+    translate_commentary_to_chinese,
+)
 from .commentary import (
     CommentaryResult,
     CommentarySegment,
+    SubtitleLine,
     VisualCommentaryConfig,
     commentary_result_to_dict,
     dump_commentary_result,
@@ -10,7 +21,7 @@ from .commentary import (
 )
 from .event_types import DEFAULT_EVENT_TYPES, EventTypeDefinition, EventTypeRegistry, load_event_types
 from .manifest import FrameInfo, FramesManifest, load_manifest
-from .pipeline import PipelineResult, run_pipeline
+from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
 from .scanner import (
     EventCandidate,
     EventPhase,
@@ -27,6 +38,10 @@ from .tracing import NullTracker, StepTracker, TraceRecorder, TraceStep
 __all__ = [
     "CommentaryResult",
     "CommentarySegment",
+    "SubtitleLine",
+    "BilingualCommentaryResult",
+    "BilingualCommentarySegment",
+    "BilingualPipelineResult",
     "DEFAULT_EVENT_TYPES",
     "EventCandidate",
     "EventPhase",
@@ -35,6 +50,7 @@ __all__ = [
     "FrameInfo",
     "FrameObservation",
     "FramesManifest",
+    "LocalizedCommentary",
     "PipelineResult",
     "ScanConfig",
     "ScanResult",
@@ -43,17 +59,23 @@ __all__ = [
     "TraceRecorder",
     "TraceStep",
     "NullTracker",
+    "TranslationConfig",
     "VisualCommentaryConfig",
+    "bilingual_commentary_result_to_dict",
     "commentary_result_to_dict",
+    "dump_bilingual_commentary_result",
     "dump_commentary_result",
     "dump_scan_result",
+    "generate_bilingual_commentary",
     "generate_commentary",
     "generate_commentary_from_summary",
     "generate_visual_commentary",
     "load_event_types",
     "load_manifest",
     "load_style",
+    "run_bilingual_pipeline",
     "run_pipeline",
     "scan_events",
     "scan_result_to_dict",
+    "translate_commentary_to_chinese",
 ]
