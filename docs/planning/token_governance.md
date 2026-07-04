@@ -44,6 +44,24 @@ Metrics:
 - Success rate.
 - Unit cost per successful task.
 
+## Current Runtime Controls
+
+EN:
+
+- Use sparse coarse manifests before dense event manifests.
+- Use the resumable runner cache at `outputs/<run-name>/cache/<stage>/call_*.json` to avoid paying again for completed model calls.
+- Use `progress.log` and `progress.jsonl` to estimate remaining time and detect stalls.
+- Prefer sequential execution until API rate limits, cache consistency, and output ordering are tested.
+- Keep smoke tests tiny; use full-video runs only after schema and fact checks pass.
+
+ZH:
+
+- 先用稀疏 coarse manifest，再对事件区间生成 dense manifest。
+- 使用 `outputs/<run-name>/cache/<stage>/call_*.json` 的可续跑缓存，避免已完成模型调用重复付费。
+- 用 `progress.log` 和 `progress.jsonl` 估计剩余时间并发现卡住的阶段。
+- 在 API 限流、缓存一致性和输出顺序验证前，优先采用顺序执行。
+- smoke 测试保持很小；等结构和事实核验通过后再跑全片。
+
 ## Review Question
 
 Every optimization should answer: what quality changed, what cost changed, and whether the tradeoff is worth it.

@@ -12,6 +12,12 @@ Last updated: 2026-07-04
 | [task_spec_worldcup.md](task_spec_worldcup.md) | World Cup task input, output, constraints, risks. | 世界杯任务输入、输出、约束和风险。 |
 | [video_preprocessing_guide.md](video_preprocessing_guide.md) | Frame extraction facts and next data steps. | 抽帧事实和下一步数据处理。 |
 
+## Current Implementation Snapshot / 当前实现快照
+
+EN: The shared repository now contains a full-video bilingual runner, `run_full_bilingual_with_progress.py`. It supports coarse scanning, dense per-event manifests, per-event bilingual commentary, progress logs, cached model calls, and same-run checkpoint resume. Treat this as implementation evidence, but still verify it with smoke tests before claiming full robustness.
+
+ZH: 协作仓库当前已经包含全片双语运行入口 `run_full_bilingual_with_progress.py`。它支持粗扫、按事件生成 dense manifest、逐事件双语解说、进度日志、模型调用缓存，以及同名运行的 checkpoint 续跑。它可以作为实现证据，但在汇报中宣称“完整稳定”前仍需要 smoke test 验证。
+
 ## Collaboration / 协作
 
 | File | EN | ZH |

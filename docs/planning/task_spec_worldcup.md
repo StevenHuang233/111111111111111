@@ -70,6 +70,15 @@ video
   -> final commentary package
 ```
 
+## Runtime Modes
+
+| Mode | EN Purpose | 中文目的 |
+| --- | --- | --- |
+| Smoke | Use a tiny manifest, for example 30 frames, to verify imports, config, API connectivity, output schema, and trace writing. | 用很小的 manifest，例如 30 帧，验证导入、配置、API 连通性、输出结构和 trace 写入。 |
+| Coarse scan | Use sparse frames to find candidate events at lower cost. | 用稀疏帧低成本发现候选事件。 |
+| Dense event pass | Revisit only candidate event intervals with denser frames. | 只对候选事件区间使用更密集帧复查。 |
+| Full bilingual run | Use `run_full_bilingual_with_progress.py` to run coarse scan, dense passes, bilingual commentary, aggregation, progress logging, and resume. | 用 `run_full_bilingual_with_progress.py` 串起粗扫、dense 复查、双语解说、聚合、进度记录和续跑。 |
+
 ## Evaluation
 
 Quality:
@@ -101,7 +110,13 @@ MVP target:
 
 > Given a short clip or selected match segment, extract representative frames, build a timestamped event timeline, use Intern-S2-Preview to generate a grounded energetic Chinese commentary script, verify unsupported claims, and export script plus trace.
 
-Full-match support should be implemented as batching over clips only after the MVP is stable.
+Current extension:
+
+> The repository now contains a full-match-style resumable runner. It should be treated as an integration path after smoke tests pass, not as a reason to skip small verified demos.
+
+中文补充：
+
+> 当前仓库已经有接近全片运行的可续跑 runner。它应作为 smoke 通过后的集成路径，而不是跳过小规模可验证 demo 的理由。
 
 ## Risks
 
@@ -112,4 +127,6 @@ Full-match support should be implemented as batching over clips only after the M
 | Intern-S2 has limited direct video capability | Convert video into structured visual evidence and event timelines before model calls. |
 | Commentary hallucination | Require named facts to come from metadata or detected evidence; run verifier before final output. |
 | Copyright or privacy | Do not commit original video or extracted frames; use local ignored folders. |
+| Resume appears implemented but unverified locally | Prove it with a small interrupted run before using it as a pitch claim. |
+| 可续跑看起来已实现但本机未验证 | 先用小任务中断重跑验证，再在路演中宣称。 |
 

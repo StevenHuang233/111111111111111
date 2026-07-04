@@ -1,12 +1,40 @@
 # Judging And Execution Plan / 评审标准与执行计划
 
-Last updated: 2026-07-04 19:00
+Last updated: 2026-07-04
 
 ## Current Situation / 当前情况
 
 EN: Less than 15 hours remain. Humans leave around 22:00 and resume around 09:00 the next day. The priority is a complete runnable flow, complete submission materials, and a clear harness story.
 
 ZH: 剩余时间不到 15 小时。人约 22:00 离开，第二天 09:00 恢复工作。优先级是完整可运行流程、完整提交材料和讲得清楚的 Harness 叙事。
+
+## Implementation Evidence / 当前实现证据
+
+| Item | EN Status | 中文状态 |
+| --- | --- | --- |
+| Frame preprocessing | 4fps extraction has produced 26612 JPG frames from the 1080p 25fps source video, stored outside Git. | 已从 1080p 25fps 原视频按 4fps 抽取 26612 张 JPG，存放在 Git 外。 |
+| Smoke manifest path | README documents `build_frame_manifest.py --max-frames 30` for quick smoke tests. | README 已写明用 `build_frame_manifest.py --max-frames 30` 做快速 smoke。 |
+| Full-run orchestration | `run_full_bilingual_with_progress.py` provides coarse scan, dense event manifests, per-event bilingual commentary, and final aggregation. | `run_full_bilingual_with_progress.py` 提供粗扫、事件级 dense manifest、逐事件双语解说和最终聚合。 |
+| Resume and progress | The runner writes `progress.log`, `progress.jsonl`, cached API calls, stage outputs, and reuses checkpoints by default. | runner 写出 `progress.log`、`progress.jsonl`、API 调用缓存和阶段产物，并默认复用 checkpoint。 |
+| Concurrency | Not claimed yet. Sequential resumable execution is safer until rate limits, cache consistency, and output ordering are tested. | 暂不宣称并发。先以顺序可续跑为稳妥路线，等限流、缓存一致性和输出顺序验证后再加。 |
+
+## Immediate Verification Targets / 近期验证目标
+
+EN:
+
+- Run local unit tests: `python -m unittest discover -s tests -v`.
+- Build a 30-frame smoke manifest from the extracted frames.
+- Run the smallest Intern-S2 real API smoke when the key is ready.
+- Interrupt and rerun a small job with the same `--run-name` to prove checkpoint resume.
+- Compare video timestamp, visible match clock, scoreboard, and generated text for at least one demo window.
+
+ZH:
+
+- 运行本地单测：`python -m unittest discover -s tests -v`。
+- 从抽帧目录生成 30 帧 smoke manifest。
+- API key 准备好后跑最小 Intern-S2 真实 smoke。
+- 对小任务中断后用相同 `--run-name` 重跑，证明 checkpoint 续跑。
+- 至少对一个 demo 窗口核对视频时间、画面比赛计时、比分牌和生成解说。
 
 ## Judging Requirements / 题目要求整理
 
@@ -77,12 +105,14 @@ EN:
 - Use Intern-S2-Preview as the core final model.
 - Generate timestamped commentary from evidence, not from unsupported guesses.
 - Keep output structured for subtitles or dubbing.
+- Prefer the existing resumable full-run runner for integrated demos after smoke tests pass.
 
 ZH:
 
 - 最终核心模型使用 Intern-S2-Preview。
 - 基于证据生成带时间戳解说，不凭空猜。
 - 输出结构适合字幕或配音。
+- smoke 通过后，优先用已有可续跑全流程 runner 做集成 demo。
 
 Exit criteria / 完成标准:
 
@@ -95,11 +125,13 @@ EN:
 
 - Check score, time, event type, unsupported names, and unsupported facts.
 - Keep a correction log.
+- Verify that resume logs and cached calls match the actual produced commentary.
 
 ZH:
 
 - 检查比分、时间、事件类型、无依据人名和无依据事实。
 - 保留修订记录。
+- 核对续跑日志、缓存调用和最终解说是否一致。
 
 Exit criteria / 完成标准:
 
@@ -112,11 +144,13 @@ EN:
 
 - Package code, docs, title, intro, demo video, contribution slides, and Intern-S2 feedback.
 - Prepare 30-second and 10-15 minute stories.
+- Use progress logs, traces, and checkpoint resume as concrete harness evidence.
 
 ZH:
 
 - 整理代码、文档、标题、简介、Demo 视频、贡献 PPT 和 Intern-S2 反馈。
 - 准备 30 秒版本和 10-15 分钟版本。
+- 用进度日志、trace 和 checkpoint 续跑作为 Harness 的具体证据。
 
 Exit criteria / 完成标准:
 

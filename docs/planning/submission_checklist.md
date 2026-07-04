@@ -25,3 +25,13 @@ This checklist is a placeholder until the official task is released.
 - Video and screenshots match the final demo.
 - Contribution evidence is traceable.
 - Claims in the pitch have supporting traces, metrics, or examples.
+
+## Evidence To Package / 建议打包证据
+
+| Evidence | EN Use | 中文用途 |
+| --- | --- | --- |
+| `progress.log` and `progress.jsonl` | Show long-running harness progress, ETA, and stages. | 展示长任务 Harness 的进度、ETA 和阶段。 |
+| `cache/<stage>/call_*.json` count, not full sensitive contents | Show resume and cost control without exposing keys or private payloads. | 展示续跑和成本控制，但不暴露 key 或私密 payload。 |
+| `coarse/events.json` and dense event outputs | Show coarse-to-dense task decomposition. | 展示从粗扫到 dense 复查的任务拆解。 |
+| `commentary_bilingual.json` | Final timestamped bilingual commentary result. | 最终带时间戳双语解说结果。 |
+| A small interrupted-run demo | Prove checkpoint resume if time allows. | 如时间允许，用小任务证明 checkpoint 续跑。 |

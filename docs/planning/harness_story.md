@@ -49,6 +49,16 @@ Output / 输出:
 | Trace | Save what was seen, what was inferred, what Intern-S2 generated, and what was corrected. | 保存看到什么、推断什么、Intern-S2 生成什么、修正了什么。 |
 | Safety | Keep large media and secrets outside Git; isolate local paths and API keys. | 大媒体和密钥不进 Git；隔离本地路径和 API Key。 |
 
+## Current Built Evidence / 当前已实现证据
+
+EN: The codebase now has a concrete long-running harness entry point: `run_full_bilingual_with_progress.py`. It turns a full frame manifest and a coarse manifest into coarse event detection, dense per-event manifests, per-event bilingual commentary, an aggregated bilingual commentary JSON, progress logs, cached API responses, and checkpoint reuse.
+
+ZH: 当前代码库已经有一个长任务 Harness 入口：`run_full_bilingual_with_progress.py`。它把全量 frame manifest 和 coarse manifest 转换为粗粒度事件检测、事件级 dense manifest、逐事件双语解说、聚合双语解说 JSON、进度日志、API 响应缓存和 checkpoint 复用。
+
+EN: This is useful for the pitch because it makes "harness" visible: the model is only one component; the surrounding system schedules stages, records progress, limits repeated calls, and can resume after interruption.
+
+ZH: 这对路演很有用，因为它让“harness”可见：模型只是其中一个组件，外围系统负责任务阶段调度、进度记录、减少重复调用，并在中断后恢复。
+
 ## Why Intern-S2-Preview Matters / Intern-S2-Preview 的角色
 
 EN: Intern-S2-Preview is the core reasoning and generation model in the final run. It should not be asked to magically understand a two-hour video directly. The harness prepares structured evidence and asks the model to reason and write from that evidence.
@@ -67,6 +77,7 @@ EN:
 
 - We separate video time from match clock.
 - We ground commentary in frame evidence and known facts.
+- We provide resumable long-running execution instead of a one-shot prompt.
 - We record failures and costs as part of the harness.
 - We treat our own coding-agent workflow as a parallel harness, learning from mistakes such as Git object bloat and large-file isolation.
 
@@ -74,6 +85,7 @@ ZH:
 
 - 区分视频时间和比赛计时。
 - 解说内容基于帧证据和已知事实。
+- 提供可续跑的长任务执行，而不是一次性 prompt。
 - 把失败、成本和修正过程作为 Harness 的一部分记录。
 - 把协作 coding agent 工作流也视作一个并行 Harness，从 Git 大对象事故、大文件隔离等问题中沉淀方法。
 

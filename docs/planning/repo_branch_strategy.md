@@ -28,9 +28,15 @@ ZH:
 
 | Branch | Purpose | Content |
 | --- | --- | --- |
-| `public/demo-placeholder` | Public-safe neutral branch. / 中性公开分支。 | Minimal unrelated development demo, basic README, no contest material. / 简单无关 demo，不放赛题材料。 |
-| `team/worldcup-commentary` | Our main work branch. / 我们的主要工作分支。 | Docs, harness code, configs, manifests, submission materials. / 文档、Harness 代码、配置、manifest、提交材料。 |
+| `public/demo-placeholder` | Public-safe neutral branch. / 中性公开分支。 | Minimal unrelated development demo, basic README, no contest material. Prepared and pushed on 2026-07-04. / 简单无关 demo，不放赛题材料。已于 2026-07-04 准备并推送。 |
+| `team/worldcup-commentary` | Our main work branch. / 我们的主要工作分支。 | Docs, harness code, configs, manifests, submission materials. Rebase from `origin/main` frequently; never push to `main`. / 文档、Harness 代码、配置、manifest、提交材料。频繁从 `origin/main` rebase，但绝不推送 `main`。 |
 | `team/worldcup-docs-night` | Optional overnight docs branch. / 夜间文档分支。 | Text-only docs and presentation materials that do not need local video. / 不依赖本地视频的纯文档和汇报材料。 |
+
+## Main Tracking / main 跟踪策略
+
+EN: `main` may keep receiving teammate updates such as smoke tests, resume, progress runner, and concurrency work. Our rule is: fetch and inspect `origin/main`, rebase `team/worldcup-commentary` when needed, record new capabilities in planning docs, but never commit or push directly to `main`.
+
+ZH: `main` 可能持续收到队友更新，例如 smoke 测试、续跑、进度 runner 和并发等。我们的规则是：拉取并检查 `origin/main`，必要时把 `team/worldcup-commentary` rebase 到最新，更新规划文档中的能力记录，但绝不直接向 `main` commit 或 push。
 
 ## Safe Public Branch Content / 公开分支可放内容
 
