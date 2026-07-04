@@ -19,6 +19,7 @@ from .scanner import (
     scan_result_to_dict,
 )
 from .styles import StyleProfile, load_style
+from .tracing import NullTracker, StepTracker, TraceRecorder, TraceStep
 
 __all__ = [
     "CommentaryResult",
@@ -35,6 +36,10 @@ __all__ = [
     "ScanConfig",
     "ScanResult",
     "StyleProfile",
+    "StepTracker",
+    "TraceRecorder",
+    "TraceStep",
+    "NullTracker",
     "commentary_result_to_dict",
     "dump_commentary_result",
     "dump_scan_result",

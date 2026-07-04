@@ -11,6 +11,7 @@ from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .styles import StyleProfile
 from .time_utils import format_timestamp
+from .tracing import NullTracker, StepTracker
 
 
 class ChatClient(Protocol):
@@ -92,8 +93,22 @@ def scan_events(
     style: StyleProfile,
     config: ScanConfig | None = None,
     client: ChatClient | None = None,
+    tracker: StepTracker | None = None,
 ) -> ScanResult:
+    trace = tracker or NullTracker()
     scan_config = config or ScanConfig()
+    trace.record(
+        "scan_events",
+        "start",
+        {
+            "manifest_path": str(manifest_path),
+            "style_id": style.style_id,
+            "window_size_frames": scan_config.window_size_frames,
+            "stride_frames": scan_config.stride_frames,
+            "merge_gap_sec": scan_config.merge_gap_sec,
+            "goal_replay_merge_gap_sec": scan_config.goal_replay_merge_gap_sec,
+        },
+    )
     registry = load_event_types(scan_config.event_types_path)
     manifest = load_manifest(manifest_path)
     active_client = client or InternClient()
@@ -101,9 +116,27 @@ def scan_events(
     raw_observations: list[FrameObservation] = []
     window_errors: list[str] = []
     windows = build_windows(manifest.frames, scan_config.window_size_frames, scan_config.stride_frames)
+    trace.record(
+        "scan_events",
+        "build_windows",
+        {
+            "frame_count": len(manifest.frames),
+            "window_count": len(windows),
+            "windows": [{"start": start, "end": end} for start, end in windows],
+        },
+    )
 
     for window_index, (start, end) in enumerate(windows):
         frames = manifest.frames[start:end]
+        trace.record(
+            "scan_events.window",
+            "prepare_model_call",
+            {
+                "window_index": window_index,
+                "frame_ids": [frame.frame_id for frame in frames],
+                "time_range": [frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
+            },
+        )
         messages = _build_scan_messages(frames, style, registry)
         data = active_client.chat(
             messages,
@@ -114,18 +147,55 @@ def scan_events(
         )
         text = _response_text(data)
         try:
-            raw_observations.extend(_parse_scan_response(text, frames, registry, window_index))
+            parsed = _parse_scan_response(text, frames, registry, window_index)
+            raw_observations.extend(parsed)
+            trace.record(
+                "scan_events.window",
+                "parsed_model_response",
+                {
+                    "window_index": window_index,
+                    "observation_count": len(parsed),
+                    "positive_count": sum(1 for item in parsed if item.needs_commentary),
+                },
+            )
         except Exception as exc:
+            trace.record("scan_events.window", "parse_failed_try_repair", {"window_index": window_index, "error": str(exc)})
             repaired = _try_repair_scan_response(
                 active_client, text, str(exc), frames, registry, window_index, scan_config.repair_attempts
             )
             if repaired is None:
                 window_errors.append(f"window={window_index}: {exc}")
+                trace.record("scan_events.window", "repair_failed", {"window_index": window_index, "error": str(exc)})
             else:
                 raw_observations.extend(repaired)
+                trace.record(
+                    "scan_events.window",
+                    "repair_succeeded",
+                    {
+                        "window_index": window_index,
+                        "observation_count": len(repaired),
+                        "positive_count": sum(1 for item in repaired if item.needs_commentary),
+                    },
+                )
 
     observations = _aggregate_observations(manifest, raw_observations, registry)
-    events = _merge_event_candidates(_build_event_candidates(manifest, observations, registry), scan_config, registry)
+    trace.record(
+        "scan_events",
+        "aggregate_frame_observations",
+        {
+            "raw_observation_count": len(raw_observations),
+            "frame_observation_count": len(observations),
+            "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
+        },
+    )
+    initial_events = _build_event_candidates(manifest, observations, registry)
+    events = _merge_event_candidates(initial_events, scan_config, registry)
+    trace.record(
+        "scan_events",
+        "merge_event_candidates",
+        {"initial_event_count": len(initial_events), "merged_event_count": len(events)},
+    )
+    trace.record("scan_events", "finish", {"window_errors": len(window_errors), "event_count": len(events)})
     return ScanResult(
         manifest=manifest,
         observations=tuple(observations),

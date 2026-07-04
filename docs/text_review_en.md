@@ -10,6 +10,7 @@ This document organizes the current non-code text that affects model behavior, u
 - Repair prompt: instructions used when the model returns invalid JSON or unsupported event types.
 - Commentary prompt: instructions used to generate commentary for detected event intervals.
 - Manual configuration parameters: manifest format, sliding-window parameters, style parameters, event type parameters, and output fields.
+- Step tracing: records how the pipeline moves across modules and what each step calls.
 
 ## 2. Style Profiles
 
@@ -281,6 +282,7 @@ Return JSON only:
 |---|---|---|
 | `events.json` | `event_id/event_type/start_sec/end_sec/evidence_frames/confidence/evidence_summary/phases` | Event evidence chain |
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | Commentary and subtitle candidates |
+| `trace.json` | `index/elapsed_sec/step/action/detail` | Step trace and module transition log |
 
 ### Composite event phases
 

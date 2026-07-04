@@ -10,6 +10,7 @@
 - 修复阶段 Prompt：模型输出非法 JSON 或非法事件类型时的修复说明。
 - 精细解说 Prompt：针对已识别事件生成解说片段时发送给模型的说明。
 - 人工配置参数：manifest 格式、滑块参数、风格参数、事件类型参数、输出字段。
+- 步骤跟踪：记录 pipeline 如何在各模块之间跳转、每一步调用了什么。
 
 ## 2. 风格配置（待审核）
 
@@ -287,6 +288,7 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 |---|---|---|
 | `events.json` | `event_id/event_type/start_sec/end_sec/evidence_frames/confidence/evidence_summary/phases` | 事件证据链 |
 | `commentary.json` | `event_id/talk_start_sec/talk_end_sec/commentary_text/subtitle_lines` | 解说与字幕候选 |
+| `trace.json` | `index/elapsed_sec/step/action/detail` | 步骤跟踪和模块跳转记录 |
 
 ### 复合事件 phases
 

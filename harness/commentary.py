@@ -11,6 +11,7 @@ from .manifest import FramesManifest
 from .scanner import EventCandidate
 from .styles import StyleProfile
 from .time_utils import format_timestamp
+from .tracing import NullTracker, StepTracker
 
 
 class ChatClient(Protocol):
@@ -47,10 +48,27 @@ def generate_commentary(
     manifest: FramesManifest,
     style: StyleProfile,
     client: ChatClient | None = None,
+    tracker: StepTracker | None = None,
 ) -> CommentaryResult:
     active_client = client or InternClient()
+    trace = tracker or NullTracker()
+    trace.record(
+        "generate_commentary",
+        "start",
+        {"video_id": manifest.video_id, "style_id": style.style_id, "event_count": len(events)},
+    )
     segments: list[CommentarySegment] = []
     for event in events:
+        trace.record(
+            "generate_commentary.event",
+            "prepare_model_call",
+            {
+                "event_id": event.event_id,
+                "event_type": event.event_type,
+                "time_range": [event.start_sec, event.end_sec],
+                "phase_types": [phase.phase_type for phase in event.phases],
+            },
+        )
         data = active_client.chat(
             _build_commentary_messages(event, manifest, style),
             temperature=style.temperature,
@@ -60,7 +78,9 @@ def generate_commentary(
         )
         text = data["choices"][0]["message"].get("content") or ""
         segments.append(_parse_commentary_response(text, event))
+        trace.record("generate_commentary.event", "parsed_model_response", {"event_id": event.event_id})
 
+    trace.record("generate_commentary", "finish", {"segment_count": len(segments)})
     return CommentaryResult(video_id=manifest.video_id, style_id=style.style_id, segments=tuple(segments))
 
 

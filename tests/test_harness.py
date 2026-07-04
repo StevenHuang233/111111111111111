@@ -13,6 +13,7 @@ from harness import (
     EventCandidate,
     EventPhase,
     ScanConfig,
+    TraceRecorder,
     generate_commentary,
     load_event_types,
     load_manifest,
@@ -279,6 +280,35 @@ class HarnessTests(unittest.TestCase):
             )
             self.assertEqual(len(result.scan.events), 1)
             self.assertEqual(len(result.commentary.segments), 1)
+
+    def test_pipeline_trace_records_step_jumps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=3)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "dangerous_attack", "confidence": 0.75, "evidence": "attack near box"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "Pressure builds near the box.", "subtitle_lines": []})
+            tracker = TraceRecorder()
+            result = run_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=3, stride_frames=3),
+                FakeClient([scan_response, commentary_response]),
+                tracker,
+            )
+            actions = [(step.step, step.action) for step in tracker.steps]
+            self.assertIn(("run_pipeline", "load_style"), actions)
+            self.assertIn(("scan_events", "build_windows"), actions)
+            self.assertIn(("scan_events.window", "prepare_model_call"), actions)
+            self.assertIn(("scan_events", "merge_event_candidates"), actions)
+            self.assertIn(("generate_commentary.event", "prepare_model_call"), actions)
+            self.assertIs(result.trace, tracker)
 
     @unittest.skipUnless(
         os.getenv("INTERN_API_KEY") and os.getenv("RUN_REAL_API_TESTS") == "1",

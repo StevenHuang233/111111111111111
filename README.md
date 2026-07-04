@@ -45,19 +45,23 @@ For text and configuration review, see:
 ```python
 from harness import (
     ScanConfig,
+    TraceRecorder,
     dump_commentary_result,
     dump_scan_result,
     run_pipeline,
 )
 
+tracker = TraceRecorder()
 result = run_pipeline(
     manifest_path="frames_manifest.json",
     style_id_or_path="broadcast_professional",
     scan_config=ScanConfig(window_size_frames=6, stride_frames=3),
+    tracker=tracker,
 )
 
 dump_scan_result(result.scan, "outputs/events.json")
 dump_commentary_result(result.commentary, "outputs/commentary.json")
+tracker.dump("outputs/trace.json")
 ```
 
 You can also call the modules separately:
@@ -72,6 +76,31 @@ manifest = load_manifest("frames_manifest.json")
 scan = scan_events(manifest.manifest_path, style, client=client)
 commentary = generate_commentary(scan.events, manifest, style, client=client)
 ```
+
+## Step tracing
+
+Use `TraceRecorder` when you want to inspect how the harness jumps through the pipeline:
+
+```python
+from harness import TraceRecorder, run_pipeline
+
+tracker = TraceRecorder()
+result = run_pipeline("frames_manifest.json", tracker=tracker)
+tracker.dump("outputs/trace.json")
+```
+
+The trace records high-level and module-level steps such as:
+
+- `run_pipeline -> load_style`
+- `run_pipeline -> load_manifest`
+- `scan_events -> build_windows`
+- `scan_events.window -> prepare_model_call`
+- `scan_events.window -> parsed_model_response`
+- `scan_events -> aggregate_frame_observations`
+- `scan_events -> merge_event_candidates`
+- `generate_commentary.event -> prepare_model_call`
+
+Each step includes an index, elapsed seconds, action name, and structured details such as frame IDs, window ranges, event counts, phase types, and merge counts.
 
 ## Frame manifest
 
