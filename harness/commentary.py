@@ -9,7 +9,7 @@ from intern_client import InternClient, image_source_to_url
 from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FrameInfo, FramesManifest
 from .scanner import EventCandidate
-from .styles import StyleProfile
+from .styles import StyleProfile, style_instruction_block
 from .time_utils import format_timestamp
 from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
 
@@ -242,10 +242,12 @@ def _build_commentary_messages(
 You are generating football commentary for one detected event.
 
 Use this style exactly:
-{style.prompt_injection}
+{style_instruction_block(style, "english_generation")}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Do not invent player names, teams, scores, or facts that are not present in the event evidence.
+If an exact name, team, or score is uncertain, describe it visually instead of guessing.
+Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal timeline consolidation note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 {phase_instruction}
 
 Event data:
@@ -283,10 +285,12 @@ def _build_visual_commentary_messages(
 You are generating football commentary for one detected event using both structured event data and selected visual frames.
 
 Use this style exactly:
-{style.prompt_injection}
+{style_instruction_block(style, "english_generation")}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Use the provided frames to enrich visual details, but do not invent player names, teams, scores, or facts that are not present in the event data or visible frames.
+If an exact name, team, or score is uncertain, describe it visually instead of guessing.
+Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal timeline consolidation note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 Treat selected frames as representative samples from the event and phase intervals, not as a complete video clip.
 {phase_instruction}
 
@@ -464,7 +468,7 @@ def _unique_frames(frames: list[FrameInfo]) -> list[FrameInfo]:
 def _parse_commentary_response(text: str, event: EventCandidate) -> CommentarySegment:
     try:
         payload = extract_json_object(text)
-        commentary_text = str(payload.get("commentary_text", "")).strip() or text.strip()
+        commentary_text = _first_text_value(payload, ("commentary_text", "commentation_text", "commentary", "text")) or text.strip()
         subtitle_rows = payload.get("subtitle_lines", [])
         subtitles: list[SubtitleLine] = []
         if isinstance(subtitle_rows, list):
@@ -490,6 +494,17 @@ def _parse_commentary_response(text: str, event: EventCandidate) -> CommentarySe
         commentary_text=commentary_text,
         subtitle_lines=tuple(subtitles),
     )
+
+
+def _first_text_value(payload: dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    for value in payload.values():
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
 
 
 def commentary_result_to_dict(result: CommentaryResult) -> dict[str, Any]:

@@ -19,14 +19,19 @@ from harness import (
     CommentaryUnitConfig,
     EventCandidate,
     EventPhase,
+    GOAL_VERIFICATION_VERSION,
+    GoalVerificationConfig,
+    GoalVerificationResult,
     LocalizedCommentary,
     ScanConfig,
     SubtitleLine,
     TraceRecorder,
     TranslationConfig,
     VisualCommentaryConfig,
+    consolidate_goal_timeline,
     dump_bilingual_commentary_result,
     dump_commentary_units,
+    dump_goal_verification_result,
     dump_scan_result,
     build_commentary_units,
     generate_visual_commentary,
@@ -50,6 +55,9 @@ from harness.scanner import (
 )
 from harness.tracing import clip_text, should_record_model_io, tracker_text_limit
 from intern_client import InternClient
+
+
+EVENT_CACHE_VERSION = 3
 
 
 class ProgressLogger:
@@ -301,6 +309,15 @@ def main() -> None:
     parser.add_argument("--exclude-generation-event-types", default="", help="Comma-separated event types to skip during generation.")
     parser.add_argument("--min-generation-confidence", type=float, default=0.0)
     parser.add_argument("--max-generation-events", type=int, default=0, help="Limit generation to the first N commentary units for smoke tests. 0 means no limit.")
+    parser.add_argument("--verify-goals-with-model", action="store_true", help="Use a visual model pass to confirm or downgrade goal commentary units before generation.")
+    parser.add_argument("--goal-verify-sample-fps", type=float, default=0.5)
+    parser.add_argument("--goal-verify-max-frames", type=int, default=18)
+    parser.add_argument("--goal-verify-max-frames-per-phase", type=int, default=4)
+    parser.add_argument("--goal-timeline-max-frames-per-candidate", type=int, default=4)
+    parser.add_argument("--goal-verify-context-frames", type=int, default=1)
+    parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
+    parser.add_argument("--expected-goal-count", type=int, default=0, help="Known total scored goals for timeline consolidation. 0 means no trusted count.")
+    parser.add_argument("--disable-goal-duplicate-merge", action="store_true", help="Keep duplicate goal/replay candidates as downgraded standalone events instead of merging them into the nearest actual goal.")
     parser.add_argument("--dense-padding-sec", type=float, default=2.0)
     parser.add_argument("--max-frames-per-event", type=int, default=12)
     parser.add_argument("--max-frames-per-phase", type=int, default=4)
@@ -414,6 +431,73 @@ def main() -> None:
         )
         return
 
+    if args.verify_goals_with_model:
+        goal_verify_config = GoalVerificationConfig(
+            sample_fps=args.goal_verify_sample_fps,
+            max_frames_per_goal=args.goal_verify_max_frames,
+            max_frames_per_phase=args.goal_verify_max_frames_per_phase,
+            timeline_max_frames_per_goal=args.goal_timeline_max_frames_per_candidate,
+            context_frames_each_side=args.goal_verify_context_frames,
+            downgrade_uncertain=args.goal_verify_downgrade_uncertain,
+            expected_goal_count=args.expected_goal_count or None,
+            merge_duplicate_goals=not args.disable_goal_duplicate_merge,
+        )
+        goal_validation_dir = run_dir / "goal_validation"
+        goal_validation_dir.mkdir(parents=True, exist_ok=True)
+        refined_events_path = goal_validation_dir / "refined_events.json"
+        expected_ids = [event.event_id for event in generation_events]
+        if args.resume and refined_events_path.exists() and goal_validation_checkpoint_valid(
+            refined_events_path,
+            goal_verify_config,
+            expected_ids,
+        ):
+            generation_events = load_event_candidates(refined_events_path)
+            logger.record("checkpoint_hit", stage="goal_verification", extra=f"events={len(generation_events)}")
+        else:
+            goal_count = sum(1 for event in generation_events if event.event_type == "goal")
+            if goal_count:
+                active_client = get_client()
+                active_client.set_stage(
+                    "goal_timeline_consolidation",
+                    1,
+                    extra=f"goal_candidates={goal_count} events={len(generation_events)} expected_goal_count={args.expected_goal_count or 'unknown'}",
+                    workers=1,
+                )
+                verification = verify_goals_parallel(
+                    generation_events,
+                    full_manifest,
+                    style,
+                    active_client,
+                    goal_verify_config,
+                    args.concurrency,
+                    goal_validation_dir,
+                    args.trace_max_text_chars,
+                )
+                dump_goal_verification_result(verification, full_manifest, refined_events_path)
+                generation_events = list(verification.events)
+                write_event_candidates_summary(
+                    goal_validation_dir / "summary.txt",
+                    generation_events,
+                    header=f"input_events={len(expected_ids)} verified_goals={len(verification.records)}",
+                )
+                write_goal_verification_report(goal_validation_dir / "flagged_goals.md", verification)
+                logger.record(
+                    "goal_verification_finished",
+                    extra=f"records={len(verification.records)} actual_goals={sum(1 for event in generation_events if event.event_type == 'goal')} output={refined_events_path}",
+                )
+            else:
+                dump_goal_verification_result(
+                    GoalVerificationResult(
+                        events=tuple(generation_events),
+                        records=(),
+                        config=goal_verify_config,
+                        input_event_ids=tuple(event.event_id for event in generation_events),
+                    ),
+                    full_manifest,
+                    refined_events_path,
+                )
+                logger.record("goal_verification_skipped", extra="goals=0")
+
     visual_config = VisualCommentaryConfig(
         max_frames_per_event=args.max_frames_per_event,
         max_frames_per_phase=args.max_frames_per_phase,
@@ -427,7 +511,8 @@ def main() -> None:
     commentary_root.mkdir(parents=True, exist_ok=True)
 
     if args.coarse_only_generation:
-        event_commentary_dir = commentary_root / "coarse_events"
+        commentary_stage_label = f"coarse_events_verified_v{EVENT_CACHE_VERSION}" if args.verify_goals_with_model else "coarse_events"
+        event_commentary_dir = commentary_root / commentary_stage_label
         event_commentary_dir.mkdir(parents=True, exist_ok=True)
         bilingual_path = event_commentary_dir / "commentary_bilingual.json"
         if args.resume and bilingual_path.exists() and bilingual_checkpoint_valid(
@@ -436,11 +521,11 @@ def main() -> None:
             [event.event_id for event in generation_events],
         ):
             bilingual = load_bilingual_result(bilingual_path)
-            logger.record("checkpoint_hit", stage="bilingual_generation:coarse_events", extra=f"segments={len(bilingual.segments)}")
+            logger.record("checkpoint_hit", stage=f"bilingual_generation:{commentary_stage_label}", extra=f"segments={len(bilingual.segments)}")
         else:
             active_client = get_client()
             active_client.set_stage(
-                "bilingual_generation:coarse_events",
+                f"bilingual_generation:{commentary_stage_label}",
                 len(generation_events) * 2,
                 extra=f"events={len(generation_events)} source=commentary_units",
                 workers=min(args.concurrency, max(1, len(generation_events))),
@@ -459,7 +544,7 @@ def main() -> None:
             dump_bilingual_commentary_result(bilingual, bilingual_path)
             logger.record(
                 "bilingual_generation_finished",
-                stage="bilingual_generation:coarse_events",
+                stage=f"bilingual_generation:{commentary_stage_label}",
                 extra=f"segments={len(bilingual.segments)}",
             )
         all_segments.extend(bilingual.segments)
@@ -903,6 +988,35 @@ def generate_bilingual_parallel(
     )
 
 
+def verify_goals_parallel(
+    events: list[EventCandidate],
+    manifest: Any,
+    style: Any,
+    client: ProgressClient,
+    config: GoalVerificationConfig,
+    concurrency: int,
+    trace_dir: Path,
+    trace_max_text_chars: int,
+) -> GoalVerificationResult:
+    trace_dir.mkdir(parents=True, exist_ok=True)
+    tracker = TraceRecorder(record_model_io=True, max_text_chars=trace_max_text_chars)
+    result = consolidate_goal_timeline(
+        events,
+        manifest,
+        style,
+        FixedKeyClient(client, f"goal_timeline_{events_fingerprint(events)}"),
+        tracker,
+        config,
+    )
+    trace = tracker.to_dict()
+    (trace_dir / "trace_goal_timeline.json").write_text(
+        json.dumps(trace, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (trace_dir / "trace.json").write_text(json.dumps({"timeline": trace}, ensure_ascii=False, indent=2), encoding="utf-8")
+    return result
+
+
 def build_dense_manifests(
     full_manifest: Any,
     coarse_events: Any,
@@ -1039,6 +1153,29 @@ def bilingual_checkpoint_valid(
     return True
 
 
+def goal_validation_checkpoint_valid(
+    path: Path,
+    config: GoalVerificationConfig,
+    expected_event_ids: list[str],
+) -> bool:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return False
+    if payload.get("goal_verification_version") != GOAL_VERIFICATION_VERSION:
+        return False
+    if payload.get("config") != goal_verify_config_to_dict(config):
+        return False
+    input_event_ids = payload.get("input_event_ids")
+    if isinstance(input_event_ids, list):
+        return [str(event_id) for event_id in input_event_ids] == expected_event_ids
+    events = payload.get("events", [])
+    if not isinstance(events, list):
+        return False
+    event_ids = [str(event.get("event_id", "")) for event in events if isinstance(event, dict)]
+    return event_ids == expected_event_ids
+
+
 def _first_trace_detail(payload: dict[str, Any], action: str, step: str | None = None) -> dict[str, Any] | None:
     for row in payload.get("steps", []):
         if step is not None and row.get("step") != step:
@@ -1087,12 +1224,36 @@ def write_event_candidates_summary(path: Path, events: list[EventCandidate], hea
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def write_goal_verification_report(path: Path, result: GoalVerificationResult) -> None:
+    actual_goals = sum(1 for event in result.events if event.event_type == "goal")
+    merged_records = sum(1 for record in result.records if record.refined_event_type == "merged_into_goal")
+    lines = [
+        "# Goal Verification Report",
+        "",
+        f"- candidate_records={len(result.records)}",
+        f"- actual_goal_events={actual_goals}",
+        f"- merged_duplicate_records={merged_records}",
+        "",
+        "| Event | Verdict | Refined Type | Confidence | Warnings | Rationale |",
+        "|---|---|---|---:|---|---|",
+    ]
+    for record in result.records:
+        warnings = ", ".join(record.warnings)
+        rationale = record.rationale.replace("|", "\\|").replace("\n", " ")
+        lines.append(
+            f"| {record.event_id} | {record.verdict} | {record.refined_event_type} | "
+            f"{record.confidence:.2f} | {warnings} | {rationale} |"
+        )
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def sanitize_filename(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", value).strip("_") or "event"
 
 
 def event_fingerprint(event: EventCandidate) -> str:
     payload = {
+        "event_cache_version": EVENT_CACHE_VERSION,
         "event_type": event.event_type,
         "start_sec": event.start_sec,
         "end_sec": event.end_sec,
@@ -1109,6 +1270,34 @@ def event_fingerprint(event: EventCandidate) -> str:
     }
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def events_fingerprint(events: list[EventCandidate]) -> str:
+    digest = hashlib.sha1()
+    digest.update(str(EVENT_CACHE_VERSION).encode("ascii"))
+    digest.update(b"\0")
+    for event in events:
+        digest.update(event_fingerprint(event).encode("ascii"))
+        digest.update(b"\0")
+    return digest.hexdigest()[:12]
+
+
+def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]:
+    return {
+        "sample_fps": config.sample_fps,
+        "max_frames_per_goal": config.max_frames_per_goal,
+        "max_frames_per_phase": config.max_frames_per_phase,
+        "timeline_max_frames_per_goal": config.timeline_max_frames_per_goal,
+        "context_frames_each_side": config.context_frames_each_side,
+        "temperature": config.temperature,
+        "top_p": config.top_p,
+        "max_tokens": config.max_tokens,
+        "thinking_mode": config.thinking_mode,
+        "downgrade_not_goal": config.downgrade_not_goal,
+        "downgrade_uncertain": config.downgrade_uncertain,
+        "expected_goal_count": config.expected_goal_count,
+        "merge_duplicate_goals": config.merge_duplicate_goals,
+    }
 
 
 def is_retryable_rate_limit(exc: Exception) -> bool:

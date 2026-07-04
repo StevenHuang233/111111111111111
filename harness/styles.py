@@ -69,3 +69,35 @@ def load_style(style_id_or_path: str = "broadcast_professional") -> StyleProfile
         available = ", ".join(sorted(styles))
         raise KeyError(f"Unknown style '{style_id_or_path}'. Available styles: {available}")
     return styles[style_id_or_path]
+
+
+def style_instruction_block(style: StyleProfile, purpose: str) -> str:
+    extra = style.extra or {}
+    key = f"{purpose}_rules"
+    rules = extra.get(key)
+    if not isinstance(rules, list) or not all(isinstance(rule, str) for rule in rules):
+        rules = _default_style_rules(style, purpose)
+
+    lines = [
+        f"Style profile: {style.name} ({style.style_id})",
+        f"Core style: {style.prompt_injection}",
+        "Mandatory style rules:",
+    ]
+    lines.extend(f"- {rule}" for rule in rules)
+    return "\n".join(lines)
+
+
+def _default_style_rules(style: StyleProfile, purpose: str) -> list[str]:
+    if purpose == "chinese_translation":
+        return [
+            "Use natural spoken Mandarin football commentary, not literal translation.",
+            "Keep facts and uncertainty exactly, but improve rhythm, cadence, and broadcast readability.",
+            "Avoid English words unless they are standard terms such as VAR.",
+            "Use short punchy clauses for decisive moments and smoother context sentences for buildup or replay.",
+        ]
+    return [
+        "Write as spoken football commentary, not a neutral caption.",
+        "Use vivid but factual verbs grounded in visible evidence.",
+        "Vary sentence rhythm; do not make every segment flat or report-like.",
+        "Do not invent names, teams, scores, or tactical details.",
+    ]

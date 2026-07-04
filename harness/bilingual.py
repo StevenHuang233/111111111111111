@@ -16,7 +16,7 @@ from .commentary import (
 from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FramesManifest
 from .scanner import EventCandidate
-from .styles import StyleProfile
+from .styles import StyleProfile, style_instruction_block
 from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
 
 
@@ -200,14 +200,17 @@ def _build_translation_messages(
 You are translating football commentary from English into {config.target_language}.
 
 Meaning fidelity is the first priority. Preserve the exact factual meaning, timing, numbers, names, teams, score references, and uncertainty.
-Apply this commentary style only after preserving meaning:
-{style.prompt_injection}
+Apply this commentary style strongly after preserving meaning:
+{style_instruction_block(style, "chinese_translation")}
 
 Translation rules:
 - Do not add facts, player names, team names, scores, or tactical details that are not in the English source.
 - Keep the same event_id, event_type, talk_start_sec, talk_end_sec, and subtitle timing.
-- Translate naturally for spoken football commentary in {config.target_language}.
-- If style and meaning conflict, choose meaning.
+- Translate as a polished Chinese football commentator would speak, not as a literal subtitle translator.
+- Preserve factual meaning, but you may reshape sentence order, rhythm, connectives, and exclamatory cadence to fit the selected style.
+- Avoid flat phrases like "a player takes a shot" when the source allows a more vivid but still faithful Chinese rendering.
+- Do not leave stray English words in Chinese text except standard football/broadcast terms such as VAR.
+- If style and meaning conflict, choose meaning, then recover style through rhythm and wording.
 - Return JSON only.
 
 English source:
@@ -227,7 +230,7 @@ Return JSON only:
 def _parse_translation_response(text: str, source: CommentarySegment) -> LocalizedCommentary:
     try:
         payload = extract_json_object(text)
-        commentary_text = str(payload.get("commentary_text", "")).strip() or text.strip()
+        commentary_text = _first_text_value(payload, ("commentary_text", "commentation_text", "commentary", "text")) or text.strip()
         subtitle_rows = payload.get("subtitle_lines", [])
         subtitles: list[SubtitleLine] = []
         if isinstance(subtitle_rows, list):
@@ -245,6 +248,17 @@ def _parse_translation_response(text: str, source: CommentarySegment) -> Localiz
         commentary_text = text.strip()
         subtitles = ()
     return LocalizedCommentary(commentary_text=commentary_text, subtitle_lines=tuple(subtitles))
+
+
+def _first_text_value(payload: dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    for value in payload.values():
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
 
 
 def bilingual_commentary_result_to_dict(result: BilingualCommentaryResult) -> dict[str, Any]:

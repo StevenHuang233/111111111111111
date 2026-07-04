@@ -21,6 +21,17 @@ from .commentary import (
 )
 from .event_types import DEFAULT_EVENT_TYPES, EventTypeDefinition, EventTypeRegistry, load_event_types
 from .event_units import CommentaryUnitConfig, build_commentary_units, dump_commentary_units
+from .goal_verifier import (
+    GOAL_VERIFICATION_VERSION,
+    GoalVerificationConfig,
+    GoalVerificationRecord,
+    GoalVerificationResult,
+    consolidate_goal_timeline,
+    dump_goal_verification_result,
+    goal_verification_result_to_dict,
+    verify_goal_event,
+    verify_goal_events,
+)
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
 from .scanner import (
@@ -40,6 +51,7 @@ __all__ = [
     "CommentaryResult",
     "CommentarySegment",
     "CommentaryUnitConfig",
+    "GOAL_VERIFICATION_VERSION",
     "SubtitleLine",
     "BilingualCommentaryResult",
     "BilingualCommentarySegment",
@@ -52,6 +64,9 @@ __all__ = [
     "FrameInfo",
     "FrameObservation",
     "FramesManifest",
+    "GoalVerificationConfig",
+    "GoalVerificationRecord",
+    "GoalVerificationResult",
     "LocalizedCommentary",
     "PipelineResult",
     "ScanConfig",
@@ -65,15 +80,18 @@ __all__ = [
     "VisualCommentaryConfig",
     "bilingual_commentary_result_to_dict",
     "commentary_result_to_dict",
+    "consolidate_goal_timeline",
     "dump_bilingual_commentary_result",
     "dump_commentary_result",
     "dump_commentary_units",
+    "dump_goal_verification_result",
     "dump_scan_result",
     "generate_bilingual_commentary",
     "build_commentary_units",
     "generate_commentary",
     "generate_commentary_from_summary",
     "generate_visual_commentary",
+    "goal_verification_result_to_dict",
     "load_event_types",
     "load_manifest",
     "load_style",
@@ -82,4 +100,6 @@ __all__ = [
     "scan_events",
     "scan_result_to_dict",
     "translate_commentary_to_chinese",
+    "verify_goal_event",
+    "verify_goal_events",
 ]

@@ -3,9 +3,9 @@
     {
       "id": "goal",
       "name": "Goal",
-      "description": "The ball appears to cross the goal line, the scoreboard changes, or players clearly celebrate a scored goal.",
-      "positive_cues": ["ball inside or behind the net", "goalkeeper beaten", "players running away celebrating", "scoreboard increment", "replay of a finish"],
-      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration"]
+      "description": "A live scoring action where the ball clearly enters the goal or the immediate live sequence proves that a goal has just been scored.",
+      "positive_cues": ["ball crossing the goal line during live play", "ball inside or behind the net immediately after the finish", "net rippling from the shot", "goalkeeper beaten in the live scoring action", "unmistakable immediate scored-goal reaction tied to the live finish"],
+      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration", "scoreboard graphic alone", "replay of an earlier finish without the live scoring action", "celebration-only frame"]
     },
     {
       "id": "shot",
