@@ -382,6 +382,147 @@ python run_full_bilingual_with_progress.py `
 
 The runner also staggers request starts and retries rate-limit errors by default. Tune this with `--request-stagger-sec`, `--max-retries`, `--retry-base-sec`, and `--retry-max-sec` if the API reports requests are too frequent.
 
+## Current full-video workflow
+
+This is the main workflow used for the current World Cup commentary demo. It is designed to keep every step decoupled and resumable: raw frame manifests stay separate from coarse scan results, coarse scan results stay separate from commentary units, goal verification stays separate from final generation, and final bilingual generation reads structured inputs plus sampled visual frames.
+
+### Step 1: Prepare manifests
+
+The runner expects two manifests:
+
+- `--full-manifest`: all available frames, currently 4fps for the provided video.
+- `--coarse-manifest`: sparse frames for rough scanning, currently one frame every 4 seconds.
+
+Build them from a frame directory:
+
+```powershell
+python build_frame_manifest.py "C:\path\to\frames" --fps 4 --output "C:\path\to\frames\frames_manifest.json"
+python build_frame_manifest.py "C:\path\to\frames" --fps 4 --every-n 16 --output "C:\path\to\frames\frames_manifest_coarse_4s.json"
+```
+
+### Step 2: Coarse scan
+
+Coarse scan reads the sparse manifest and sends sliding windows to the model. The current default for this runner is:
+
+- `--coarse-window 6`
+- `--coarse-stride 6`
+- `--coarse-merge-gap-sec 8`
+- `--goal-replay-merge-gap-sec 40`
+
+Each model response is parsed into frame-level labels first. Then the scanner merges compatible labels by time, event type, overlap, and gaps. A `no_event` frame breaks the sequence, and a change of event type also acts as a boundary. The output is written to:
+
+```text
+outputs/<run-name>/coarse/events.json
+```
+
+This file is raw scan evidence. It should be kept for audit and should not be overwritten unless you intentionally rerun coarse scanning with new parameters.
+
+### Step 3: Build commentary units
+
+Before generation, the runner converts raw coarse events into commentary-facing units:
+
+```text
+outputs/<run-name>/commentary_units/events.json
+```
+
+This step does not call the model. It groups events for narration while preserving the raw coarse scan result.
+
+For goal candidates, the packaging logic is per seed goal, not global comparison:
+
+1. Take one `goal` seed.
+2. Look backward by `--goal-unit-before-sec` for buildup context.
+3. Look forward by `--goal-unit-after-sec` for celebration, replay, VAR, saves, shots, and other related phases.
+4. Merge only nearby related events into that one goal package.
+5. Label later goal-looking frames inside the package as `replay` when they are after the first live goal phase.
+
+The goal package can therefore contain phases such as `buildup`, `live_goal`, `replay`, `celebration`, and `var_review`. This supports dual commentary for a goal: first call the live scoring moment, then use replay frames for technical or tactical detail.
+
+### Step 4: Optional per-goal verification
+
+Use `--verify-goals-with-model` to run a visual verification pass on each goal package independently:
+
+```text
+outputs/<run-name>/goal_validation/refined_events.json
+outputs/<run-name>/goal_validation/flagged_goals.md
+```
+
+The verifier treats `event_type=goal` as a candidate label, not proof. It can keep the event as `goal` or downgrade it to `shot`, `save`, `dangerous_attack`, `celebration_or_replay`, or another allowed type when the visual evidence does not support a real scored goal. It does not enforce a fixed number of goals for the match.
+
+### Step 5: Generate all coarse-derived commentary
+
+For the current "generate everything after coarse scan" mode, use `--coarse-only-generation` and do not set `--generation-event-types`, `--exclude-generation-event-types`, or `--max-generation-events`. This means every commentary unit produced from the coarse scan is sent to bilingual generation.
+
+Recommended command:
+
+```powershell
+$env:INTERN_API_KEY="your_key"
+
+python run_full_bilingual_with_progress.py `
+  --run-name "coarse_new_boundary_20260704_223738" `
+  --coarse-only-generation `
+  --verify-goals-with-model `
+  --concurrency 16 `
+  --request-stagger-sec 2 `
+  --commentary-sample-fps 0.5 `
+  --max-frames-per-event 12 `
+  --max-frames-per-phase 4
+```
+
+With `--coarse-only-generation`, dense scanning is skipped. The generation module reads the coarse-derived event unit, its phases, evidence summary, event definitions, style profile, and sampled visual frames from the full 4fps manifest. `--commentary-sample-fps 0.5` means final generation samples about one frame every 2 seconds inside each event or phase, up to the configured frame caps.
+
+The final output is:
+
+```text
+outputs/<run-name>/commentary/coarse_events_verified_v9/commentary_bilingual.json
+outputs/<run-name>/commentary_bilingual.json
+```
+
+Each segment contains the event ID, event type, start/end speaking time, English commentary, Chinese commentary, and optional subtitle lines. The speaking time is explicit through `talk_start_sec` and `talk_end_sec`.
+
+### Step 6: Resume and inspect progress
+
+Resume is enabled by default. Rerun the same command with the same `--run-name` to reuse:
+
+- coarse scan checkpoint
+- commentary unit packing output
+- goal verification output
+- cached English and Chinese model calls
+
+Progress and trace files live in the run directory:
+
+```text
+outputs/<run-name>/progress.log
+outputs/<run-name>/progress.jsonl
+outputs/<run-name>/cache/
+```
+
+If launching from PowerShell and you want separate driver logs, redirect stdout and stderr:
+
+```powershell
+$runDir = Join-Path (Get-Location) "outputs\coarse_new_boundary_20260704_223738"
+$stdout = Join-Path $runDir "driver_stdout.log"
+$stderr = Join-Path $runDir "driver_stderr.log"
+
+Start-Process -FilePath ".\.venv\Scripts\python.exe" `
+  -ArgumentList @(
+    "run_full_bilingual_with_progress.py",
+    "--run-name", "coarse_new_boundary_20260704_223738",
+    "--coarse-only-generation",
+    "--verify-goals-with-model",
+    "--concurrency", "16",
+    "--request-stagger-sec", "2",
+    "--commentary-sample-fps", "0.5",
+    "--max-frames-per-event", "12",
+    "--max-frames-per-phase", "4"
+  ) `
+  -WorkingDirectory (Get-Location) `
+  -RedirectStandardOutput $stdout `
+  -RedirectStandardError $stderr `
+  -WindowStyle Hidden
+```
+
+If rate-limit retries become frequent, keep the same run name and restart with a larger `--request-stagger-sec` or lower `--concurrency`. Completed calls remain cached.
+
 ## Tests
 
 Run local tests without a real API key:
