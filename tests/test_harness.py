@@ -28,6 +28,7 @@ from harness import (
     run_bilingual_pipeline,
     load_event_types,
     load_manifest,
+    load_match_context,
     load_style,
     run_pipeline,
     scan_events,
@@ -147,6 +148,40 @@ class HarnessTests(unittest.TestCase):
             prompt_content = fake.calls[0]["messages"][0]["content"][0]["text"]
             self.assertIn("Event definitions and decision cues", prompt_content)
             self.assertIn("A live scoring action where the ball clearly enters the goal", prompt_content)
+
+    def test_match_context_loading_and_prompt_injection(self) -> None:
+        context = load_match_context("germany_curacao_world_cup_2026")
+        self.assertIsNotNone(context)
+        self.assertEqual(context.context_id, "germany_curacao_world_cup_2026")
+        self.assertIn("Curacao", context.team_names)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = load_manifest(write_manifest(Path(tmp), count=1))
+            event = EventCandidate(
+                "E010",
+                "shot",
+                0.0,
+                2.0,
+                ("f0",),
+                0.9,
+                "blue and yellow player shoots",
+                (EventPhase("shot", 0.0, 2.0, ("f0",), "shot visible"),),
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "Curacao attack with a shot.", "subtitle_lines": []})])
+
+            generate_commentary(
+                [event],
+                manifest,
+                load_style("broadcast_professional"),
+                fake,
+                match_context=context,
+            )
+
+            prompt = fake.calls[0]["messages"][0]["content"][0]["text"]
+            self.assertIn("Match context for factual disambiguation", prompt)
+            self.assertIn("Germany vs Curacao", prompt)
+            self.assertIn("not Colombia", prompt)
+            self.assertIn("Colombia or Paraguay", prompt)
 
     def test_sliding_windows(self) -> None:
         frames = tuple(FrameInfo(f"f{i}", Path(f"f{i}.png"), float(i)) for i in range(10))

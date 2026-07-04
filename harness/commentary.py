@@ -8,6 +8,7 @@ from intern_client import InternClient, image_source_to_url
 
 from .event_types import EventTypeDefinition, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
+from .match_context import MatchContext, match_context_block
 from .manifest import FrameInfo, FramesManifest
 from .scanner import EventCandidate
 from .styles import StyleProfile, style_instruction_block
@@ -59,8 +60,9 @@ def generate_commentary(
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
     visual_config: VisualCommentaryConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> CommentaryResult:
-    return generate_visual_commentary(events, manifest, style, client, tracker, visual_config)
+    return generate_visual_commentary(events, manifest, style, client, tracker, visual_config, match_context)
 
 
 def generate_commentary_from_summary(
@@ -69,13 +71,19 @@ def generate_commentary_from_summary(
     style: StyleProfile,
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
+    match_context: MatchContext | None = None,
 ) -> CommentaryResult:
     active_client = client or InternClient()
     trace = tracker or NullTracker()
     trace.record(
         "generate_commentary_from_summary",
         "start",
-        {"video_id": manifest.video_id, "style_id": style.style_id, "event_count": len(events)},
+        {
+            "video_id": manifest.video_id,
+            "style_id": style.style_id,
+            "event_count": len(events),
+            "match_context_id": match_context.context_id if match_context else None,
+        },
     )
     segments: list[CommentarySegment] = []
     for event in events:
@@ -89,7 +97,7 @@ def generate_commentary_from_summary(
                 "phase_types": [phase.phase_type for phase in event.phases],
             },
         )
-        messages = _build_commentary_messages(event, manifest, style)
+        messages = _build_commentary_messages(event, manifest, style, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "generate_commentary_from_summary.event",
@@ -127,6 +135,7 @@ def generate_visual_commentary(
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
     config: VisualCommentaryConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> CommentaryResult:
     visual_config = config or VisualCommentaryConfig()
     active_client = client or InternClient()
@@ -142,6 +151,7 @@ def generate_visual_commentary(
             "max_frames_per_phase": visual_config.max_frames_per_phase,
             "context_frames_each_side": visual_config.context_frames_each_side,
             "sample_fps": visual_config.sample_fps,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
 
@@ -159,7 +169,7 @@ def generate_visual_commentary(
                 "selected_frame_ids": [frame.frame_id for frame in selected_frames],
             },
         )
-        messages = _build_visual_commentary_messages(event, manifest, style, selected_frames)
+        messages = _build_visual_commentary_messages(event, manifest, style, selected_frames, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "generate_visual_commentary.event",
@@ -204,6 +214,7 @@ def _build_commentary_messages(
     event: EventCandidate,
     manifest: FramesManifest,
     style: StyleProfile,
+    match_context: MatchContext | None = None,
 ) -> list[dict[str, str]]:
     event_json = {
         "video_id": manifest.video_id,
@@ -245,10 +256,14 @@ You are generating football commentary for one detected event.
 Use this style exactly:
 {style_instruction_block(style, "english_generation")}
 
+Match context for factual disambiguation:
+{match_context_block(match_context)}
+
 Event type reference for this candidate:
 {_event_type_reference_block(event.event_type)}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
+Write all returned commentary_text and subtitle_lines in English only.
 Do not invent player names, teams, scores, or facts that are not present in the event evidence.
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
 Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
@@ -273,6 +288,7 @@ def _build_visual_commentary_messages(
     manifest: FramesManifest,
     style: StyleProfile,
     frames: tuple[FrameInfo, ...],
+    match_context: MatchContext | None = None,
 ) -> list[dict[str, Any]]:
     event_json = _event_to_prompt_dict(event, manifest)
     phase_instruction = ""
@@ -291,10 +307,14 @@ You are generating football commentary for one detected event using both structu
 Use this style exactly:
 {style_instruction_block(style, "english_generation")}
 
+Match context for factual disambiguation:
+{match_context_block(match_context)}
+
 Event type reference for this candidate:
 {_event_type_reference_block(event.event_type)}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
+Write all returned commentary_text and subtitle_lines in English only.
 Use the provided frames to enrich visual details, but do not invent player names, teams, scores, or facts that are not present in the event data or visible frames.
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
 Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.

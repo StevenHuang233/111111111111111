@@ -8,6 +8,7 @@ from intern_client import InternClient, image_source_to_url
 
 from .event_types import EventTypeRegistry, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
+from .match_context import MatchContext, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .styles import StyleProfile
 from .time_utils import format_timestamp
@@ -97,6 +98,7 @@ def scan_events(
     config: ScanConfig | None = None,
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
+    match_context: MatchContext | None = None,
 ) -> ScanResult:
     trace = tracker or NullTracker()
     scan_config = config or ScanConfig()
@@ -111,6 +113,7 @@ def scan_events(
             "merge_gap_sec": scan_config.merge_gap_sec,
             "goal_replay_merge_gap_sec": scan_config.goal_replay_merge_gap_sec,
             "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
     registry = load_event_types(scan_config.event_types_path)
@@ -141,7 +144,7 @@ def scan_events(
                 "time_range": [frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
             },
         )
-        messages = _build_scan_messages(frames, style, registry)
+        messages = _build_scan_messages(frames, style, registry, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "scan_events.window",
@@ -223,7 +226,12 @@ def scan_events(
     )
 
 
-def _build_scan_messages(frames: Iterable[FrameInfo], style: StyleProfile, registry: EventTypeRegistry) -> list[dict[str, Any]]:
+def _build_scan_messages(
+    frames: Iterable[FrameInfo],
+    style: StyleProfile,
+    registry: EventTypeRegistry,
+    match_context: MatchContext | None = None,
+) -> list[dict[str, Any]]:
     frame_list = list(frames)
     allowed_types = ", ".join(registry.event_types)
     event_reference = registry.prompt_reference()
@@ -233,6 +241,9 @@ You are a football video event scanner.
 
 Style context for salience only:
 {style.prompt_injection}
+
+Match context for team and kit disambiguation:
+{match_context_block(match_context)}
 
 Allowed event_type values:
 {allowed_types}

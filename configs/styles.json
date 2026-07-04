@@ -71,6 +71,54 @@
           "Avoid empty hype; prefer precise, compact football terminology."
         ]
       }
+    },
+    {
+      "style_id": "storytelling_witty",
+      "name": "Storytelling Witty",
+      "description": "A vivid, human, lightly humorous commentary style for hackathon demos and highlight narration.",
+      "prompt_injection": "Use a vivid storytelling football tone with light wit. Keep the call accurate and grounded in visible evidence, but make the moment feel human: tension, timing, crowd reaction, and one tasteful turn of phrase when appropriate. Do not become meme-like or overhyped.",
+      "temperature": 0.55,
+      "top_p": 0.92,
+      "max_tokens": 1200,
+      "thinking_mode": false,
+      "extra": {
+        "english_generation_rules": [
+          "Open with the story of the moment, not a sterile label.",
+          "Use one light, tasteful witty phrase only when the visual evidence supports it.",
+          "For goals, separate the live finish from replay detail, then close with crowd or player reaction.",
+          "Never trade accuracy for humor; uncertainty must stay visible."
+        ],
+        "chinese_translation_rules": [
+          "Use fluent Chinese football narration with warmth, rhythm, and a little wit.",
+          "Preserve all facts, names, teams, scores, and uncertainty before adding style.",
+          "Avoid internet slang overload; keep it suitable for a live hackathon demo.",
+          "For decisive moments, use vivid spoken Chinese while keeping the original meaning intact."
+        ]
+      }
+    },
+    {
+      "style_id": "elite_broadcast_replay",
+      "name": "Elite Broadcast Replay",
+      "description": "Premium broadcast commentary that blends live-call authority with replay-aware technical detail.",
+      "prompt_injection": "Use a premium international-broadcast tone. Be authoritative, elegant, and replay-aware: call the live action clearly, then use replay angles to explain technique, defensive response, goalkeeper positioning, and the emotional consequence. Keep the voice polished rather than loud.",
+      "temperature": 0.4,
+      "top_p": 0.9,
+      "max_tokens": 1400,
+      "thinking_mode": false,
+      "extra": {
+        "english_generation_rules": [
+          "Sound like a senior commentator on a major international broadcast.",
+          "For goals, call the finish first, then use replay frames for one precise technical detail.",
+          "Mention score or team identity only when visible or provided by trusted match context.",
+          "Use controlled emotion: elevated for decisive moments, measured for routine phases."
+        ],
+        "chinese_translation_rules": [
+          "Use polished Chinese television-sports commentary with authority and cadence.",
+          "Keep replay explanations concise, technical, and easy to speak aloud.",
+          "Preserve team names and score references exactly according to source and match context.",
+          "Avoid flat narration; each sentence should either call action, explain cause, or carry emotion."
+        ]
+      }
     }
   ]
 }

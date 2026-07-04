@@ -34,11 +34,13 @@ from harness import (
     dump_scan_result,
     build_commentary_units,
     generate_visual_commentary,
+    load_match_context,
     load_manifest,
     load_style,
     translate_commentary_to_chinese,
     verify_goal_event,
 )
+from harness.match_context import MatchContext
 from harness.event_types import load_event_types
 from harness.scanner import (
     FrameObservation,
@@ -293,6 +295,7 @@ def main() -> None:
     parser.add_argument("--output-root", default="outputs")
     parser.add_argument("--run-name", default="")
     parser.add_argument("--style", default="broadcast_professional")
+    parser.add_argument("--match-context", default="", help="Match context id or JSON path for team names, kits, score metadata, and prompt guardrails.")
     parser.add_argument("--coarse-window", type=int, default=6)
     parser.add_argument("--coarse-stride", type=int, default=6)
     parser.add_argument("--dense-window", type=int, default=8)
@@ -344,6 +347,7 @@ def main() -> None:
     write_run_config(args, run_dir)
 
     style = load_style(args.style)
+    match_context = load_match_context(args.match_context)
     full_manifest = load_manifest(args.full_manifest)
     coarse_manifest = load_manifest(args.coarse_manifest)
     client: ProgressClient | None = None
@@ -373,7 +377,12 @@ def main() -> None:
     coarse_dir = run_dir / "coarse"
     coarse_dir.mkdir(parents=True, exist_ok=True)
     coarse_events_path = coarse_dir / "events.json"
-    if args.resume and coarse_events_path.exists() and scan_checkpoint_valid(coarse_dir / "trace.json", len(coarse_manifest.frames), coarse_config):
+    if args.resume and coarse_events_path.exists() and scan_checkpoint_valid(
+        coarse_dir / "trace.json",
+        len(coarse_manifest.frames),
+        coarse_config,
+        match_context,
+    ):
         coarse_events = load_event_candidates(coarse_events_path)
         logger.record("checkpoint_hit", stage="coarse_scan", extra=f"events={len(coarse_events)}")
     else:
@@ -385,7 +394,15 @@ def main() -> None:
             workers=args.concurrency,
         )
         coarse_tracker = TraceRecorder(record_model_io=True, max_text_chars=args.trace_max_text_chars)
-        coarse = scan_events_parallel(args.coarse_manifest, style, coarse_config, active_client, coarse_tracker, args.concurrency)
+        coarse = scan_events_parallel(
+            args.coarse_manifest,
+            style,
+            coarse_config,
+            active_client,
+            coarse_tracker,
+            args.concurrency,
+            match_context,
+        )
         dump_scan_result(coarse, coarse_events_path)
         coarse_tracker.dump(coarse_dir / "trace.json")
         write_summary(coarse_dir / "summary.txt", coarse)
@@ -517,6 +534,8 @@ def main() -> None:
             event_commentary_dir / "trace.json",
             visual_config,
             [event.event_id for event in generation_events],
+            style.style_id,
+            match_context,
         ):
             bilingual = load_bilingual_result(bilingual_path)
             logger.record("checkpoint_hit", stage=f"bilingual_generation:{commentary_stage_label}", extra=f"segments={len(bilingual.segments)}")
@@ -538,6 +557,7 @@ def main() -> None:
                 args.concurrency,
                 event_commentary_dir,
                 args.trace_max_text_chars,
+                match_context,
             )
             dump_bilingual_commentary_result(bilingual, bilingual_path)
             logger.record(
@@ -598,12 +618,21 @@ def main() -> None:
             event_dense_dir / "trace.json",
             len(dense_manifest.frames),
             dense_config,
+            match_context,
         ):
             dense_events = load_event_candidates(dense_events_path)
             logger.record("checkpoint_hit", stage=f"dense_scan:{event_label}", extra=f"events={len(dense_events)}")
         else:
             dense_tracker = TraceRecorder(record_model_io=True, max_text_chars=args.trace_max_text_chars)
-            dense = scan_events_parallel(manifest_path, style, dense_config, active_client, dense_tracker, args.concurrency)
+            dense = scan_events_parallel(
+                manifest_path,
+                style,
+                dense_config,
+                active_client,
+                dense_tracker,
+                args.concurrency,
+                match_context,
+            )
             dump_scan_result(dense, dense_events_path)
             dense_tracker.dump(event_dense_dir / "trace.json")
             write_summary(event_dense_dir / "summary.txt", dense)
@@ -624,6 +653,8 @@ def main() -> None:
             event_commentary_dir / "trace.json",
             visual_config,
             [event.event_id for event in dense_events],
+            style.style_id,
+            match_context,
         ):
             bilingual = load_bilingual_result(bilingual_path)
             logger.record(
@@ -649,6 +680,7 @@ def main() -> None:
                 args.concurrency,
                 event_commentary_dir,
                 args.trace_max_text_chars,
+                match_context,
             )
             dump_bilingual_commentary_result(bilingual, bilingual_path)
             logger.record(
@@ -677,6 +709,7 @@ def scan_events_parallel(
     client: ProgressClient,
     tracker: TraceRecorder,
     concurrency: int,
+    match_context: MatchContext | None = None,
 ) -> ScanResult:
     trace = tracker
     trace.record(
@@ -691,6 +724,7 @@ def scan_events_parallel(
             "goal_replay_merge_gap_sec": config.goal_replay_merge_gap_sec,
             "concurrency": concurrency,
             "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
     registry = load_event_types(config.event_types_path)
@@ -708,7 +742,7 @@ def scan_events_parallel(
 
     def run_window(window_index: int, start: int, end: int) -> WindowResult:
         frames = manifest.frames[start:end]
-        messages = _build_scan_messages(frames, style, registry)
+        messages = _build_scan_messages(frames, style, registry, match_context)
         model_input = _scan_model_input_detail(messages, frames, window_index, trace)
         data = client.chat_with_key(
             f"window_{window_index:06d}_{window_fingerprint(frames)}",
@@ -938,6 +972,7 @@ def generate_bilingual_parallel(
     concurrency: int,
     trace_dir: Path,
     trace_max_text_chars: int,
+    match_context: MatchContext | None = None,
 ) -> BilingualCommentaryResult:
     trace_dir.mkdir(parents=True, exist_ok=True)
 
@@ -947,16 +982,18 @@ def generate_bilingual_parallel(
             [event],
             manifest,
             style,
-            FixedKeyClient(client, f"event_{event.event_id}_{event_fingerprint(event)}_english"),
+            FixedKeyClient(client, f"event_{event.event_id}_{style_context_fingerprint(style, match_context)}_{event_fingerprint(event)}_english"),
             tracker,
             visual_config,
+            match_context,
         )
         bilingual = translate_commentary_to_chinese(
             english,
             style,
-            FixedKeyClient(client, f"event_{event.event_id}_{event_fingerprint(event)}_chinese"),
+            FixedKeyClient(client, f"event_{event.event_id}_{style_context_fingerprint(style, match_context)}_{event_fingerprint(event)}_chinese"),
             tracker,
             translation_config,
+            match_context,
         )
         return bilingual.segments[0], tracker.to_dict()
 
@@ -1122,7 +1159,12 @@ def window_fingerprint(frames: Any) -> str:
     return digest.hexdigest()[:16]
 
 
-def scan_checkpoint_valid(trace_path: Path, frame_count: int, config: ScanConfig) -> bool:
+def scan_checkpoint_valid(
+    trace_path: Path,
+    frame_count: int,
+    config: ScanConfig,
+    match_context: MatchContext | None = None,
+) -> bool:
     try:
         payload = json.loads(trace_path.read_text(encoding="utf-8"))
     except Exception:
@@ -1139,6 +1181,7 @@ def scan_checkpoint_valid(trace_path: Path, frame_count: int, config: ScanConfig
         and start_detail.get("stride_frames") == config.stride_frames
         and start_detail.get("merge_gap_sec") == config.merge_gap_sec
         and start_detail.get("goal_replay_merge_gap_sec") == config.goal_replay_merge_gap_sec
+        and start_detail.get("match_context_id") == (match_context.context_id if match_context else None)
         and windows_detail.get("frame_count") == frame_count
     )
 
@@ -1147,6 +1190,8 @@ def bilingual_checkpoint_valid(
     trace_path: Path,
     visual_config: VisualCommentaryConfig,
     expected_event_ids: list[str] | None = None,
+    expected_style_id: str | None = None,
+    match_context: MatchContext | None = None,
 ) -> bool:
     try:
         payload = json.loads(trace_path.read_text(encoding="utf-8"))
@@ -1162,6 +1207,10 @@ def bilingual_checkpoint_valid(
     for event_trace in event_traces.values():
         detail = _first_trace_detail(event_trace, step="generate_visual_commentary", action="start")
         if not detail:
+            return False
+        if expected_style_id is not None and detail.get("style_id") != expected_style_id:
+            return False
+        if detail.get("match_context_id") != (match_context.context_id if match_context else None):
             return False
         if detail.get("max_frames_per_event") != visual_config.max_frames_per_event:
             return False
@@ -1291,6 +1340,16 @@ def event_fingerprint(event: EventCandidate) -> str:
     }
     raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def style_context_fingerprint(style: Any, match_context: MatchContext | None) -> str:
+    payload = {
+        "style_id": getattr(style, "style_id", ""),
+        "style_name": getattr(style, "name", ""),
+        "match_context_id": match_context.context_id if match_context else None,
+    }
+    raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:10]
 
 
 def events_fingerprint(events: list[EventCandidate]) -> str:

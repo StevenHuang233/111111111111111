@@ -14,6 +14,7 @@ from .commentary import (
     generate_visual_commentary,
 )
 from .json_utils import extract_json_object, to_pretty_json
+from .match_context import MatchContext, match_context_block
 from .manifest import FramesManifest
 from .scanner import EventCandidate
 from .styles import StyleProfile, style_instruction_block
@@ -69,21 +70,27 @@ def generate_bilingual_commentary(
     tracker: StepTracker | None = None,
     visual_config: VisualCommentaryConfig | None = None,
     translation_config: TranslationConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> BilingualCommentaryResult:
     active_client = client or InternClient()
     trace = tracker or NullTracker()
     trace.record(
         "generate_bilingual_commentary",
         "start",
-        {"video_id": manifest.video_id, "style_id": style.style_id, "event_count": len(events)},
+        {
+            "video_id": manifest.video_id,
+            "style_id": style.style_id,
+            "event_count": len(events),
+            "match_context_id": match_context.context_id if match_context else None,
+        },
     )
-    english = generate_visual_commentary(events, manifest, style, active_client, trace, visual_config)
+    english = generate_visual_commentary(events, manifest, style, active_client, trace, visual_config, match_context)
     trace.record(
         "generate_bilingual_commentary",
         "english_generated",
         {"segment_count": len(english.segments)},
     )
-    bilingual = translate_commentary_to_chinese(english, style, active_client, trace, translation_config)
+    bilingual = translate_commentary_to_chinese(english, style, active_client, trace, translation_config, match_context)
     trace.record(
         "generate_bilingual_commentary",
         "finish",
@@ -98,6 +105,7 @@ def translate_commentary_to_chinese(
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
     config: TranslationConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> BilingualCommentaryResult:
     translation_config = config or TranslationConfig()
     active_client = client or InternClient()
@@ -110,6 +118,7 @@ def translate_commentary_to_chinese(
             "style_id": style.style_id,
             "segment_count": len(commentary.segments),
             "target_language_code": translation_config.target_language_code,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
 
@@ -125,7 +134,7 @@ def translate_commentary_to_chinese(
                 "subtitle_count": len(segment.subtitle_lines),
             },
         )
-        messages = _build_translation_messages(segment, style, translation_config)
+        messages = _build_translation_messages(segment, style, translation_config, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "translate_commentary_to_chinese.segment",
@@ -180,6 +189,7 @@ def _build_translation_messages(
     segment: CommentarySegment,
     style: StyleProfile,
     config: TranslationConfig,
+    match_context: MatchContext | None = None,
 ) -> list[dict[str, str]]:
     source = {
         "event_id": segment.event_id,
@@ -203,8 +213,14 @@ Meaning fidelity is the first priority. Preserve the exact factual meaning, timi
 Apply this commentary style strongly after preserving meaning:
 {style_instruction_block(style, "chinese_translation")}
 
+Match context for factual disambiguation:
+{match_context_block(match_context)}
+
 Translation rules:
 - Do not add facts, player names, team names, scores, or tactical details that are not in the English source.
+- Use the match context to preserve team identity and avoid wrong team substitutions; for this video, do not translate Curacao/Curaçao as Colombia or Paraguay.
+- The returned commentary_text and subtitle_lines must be written in {config.target_language}; do not copy the English source into the translated fields.
+- Translate an in-match "penalty kick" as "点球" or "主罚点球"; do not call it "点球大战" unless the source explicitly says penalty shootout.
 - Keep the same event_id, event_type, talk_start_sec, talk_end_sec, and subtitle timing.
 - Translate as a polished Chinese football commentator would speak, not as a literal subtitle translator.
 - Preserve factual meaning, but you may reshape sentence order, rhythm, connectives, and exclamatory cadence to fit the selected style.

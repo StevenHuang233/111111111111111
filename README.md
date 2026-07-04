@@ -187,6 +187,8 @@ Built-in styles live in `configs/styles.json`:
 - `broadcast_professional`: calm professional broadcast style.
 - `short_passionate`: high-energy short-video style.
 - `tactical_analysis`: tactical review style.
+- `storytelling_witty`: vivid story-driven commentary with light, controlled humor.
+- `elite_broadcast_replay`: premium broadcast commentary with replay-aware technical detail.
 
 To create your own style, copy one JSON object from `configs/styles.json` into a new file and change:
 
@@ -199,6 +201,39 @@ To create your own style, copy one JSON object from `configs/styles.json` into a
 - `thinking_mode`
 
 Then pass that file path to `load_style()` or `run_pipeline(..., style_id_or_path="my_style.json")`.
+
+## Match Context Injection
+
+Optional match context lives in `configs/match_contexts.json`. It is separate from style and event types. Use it to inject stable facts such as teams, kits, competition, final-score metadata, and team-name guardrails.
+
+Current built-in context:
+
+- `germany_curacao_world_cup_2026`: Germany vs Curacao, with a guardrail that the blue/yellow team is Curacao, not Colombia or Paraguay.
+
+Python API:
+
+```python
+from harness import load_match_context, run_bilingual_pipeline
+
+result = run_bilingual_pipeline(
+    "frames_manifest.json",
+    style_id_or_path="elite_broadcast_replay",
+    match_context_id_or_path="germany_curacao_world_cup_2026",
+)
+```
+
+Full runner:
+
+```powershell
+python run_full_bilingual_with_progress.py `
+  --run-name "nightwork_context_full" `
+  --match-context germany_curacao_world_cup_2026 `
+  --style elite_broadcast_replay `
+  --coarse-only-generation `
+  --verify-goals-with-model
+```
+
+If `--match-context` is omitted, the old behavior is preserved.
 
 ## Low-frame-rate scanning
 

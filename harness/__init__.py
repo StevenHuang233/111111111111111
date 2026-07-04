@@ -31,6 +31,7 @@ from .goal_verifier import (
     verify_goal_event,
     verify_goal_events,
 )
+from .match_context import MatchContext, TeamContext, load_match_context, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
 from .scanner import (
@@ -67,10 +68,12 @@ __all__ = [
     "GoalVerificationRecord",
     "GoalVerificationResult",
     "LocalizedCommentary",
+    "MatchContext",
     "PipelineResult",
     "ScanConfig",
     "ScanResult",
     "StyleProfile",
+    "TeamContext",
     "StepTracker",
     "TraceRecorder",
     "TraceStep",
@@ -92,7 +95,9 @@ __all__ = [
     "goal_verification_result_to_dict",
     "load_event_types",
     "load_manifest",
+    "load_match_context",
     "load_style",
+    "match_context_block",
     "run_bilingual_pipeline",
     "run_pipeline",
     "scan_events",
