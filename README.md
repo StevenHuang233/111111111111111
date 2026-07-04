@@ -119,6 +119,18 @@ Use `frames_manifest.json` as the boundary between your frame extraction step an
 
 Relative frame paths are resolved relative to the manifest file. Each frame is sent to the model with a text prefix like `[frame_id=f000001, timestamp=00:00.00]`.
 
+You can build a manifest from a frame directory:
+
+```powershell
+python build_frame_manifest.py "C:\path\to\frames" --fps 4 --video-id "demo_video"
+```
+
+For a quick smoke test, create a smaller manifest:
+
+```powershell
+python build_frame_manifest.py "C:\path\to\frames" --fps 4 --every-n 4 --max-frames 30 --output "C:\path\to\frames\frames_manifest_smoke.json"
+```
+
 ## Style control
 
 Built-in styles live in `configs/styles.json`:
