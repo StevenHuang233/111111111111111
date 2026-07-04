@@ -14,6 +14,7 @@ from harness import (
     EventPhase,
     ScanConfig,
     TraceRecorder,
+    VisualCommentaryConfig,
     generate_commentary,
     load_event_types,
     load_manifest,
@@ -277,9 +278,66 @@ class HarnessTests(unittest.TestCase):
                 "broadcast_professional",
                 ScanConfig(window_size_frames=3, stride_frames=3),
                 FakeClient([scan_response, commentary_response]),
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=2, max_frames_per_phase=2),
             )
             self.assertEqual(len(result.scan.events), 1)
             self.assertEqual(len(result.commentary.segments), 1)
+
+    def test_visual_commentary_receives_selected_frames(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=3)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "shot", "confidence": 0.75, "evidence": "shot toward goal"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "A shot flashes toward goal.", "subtitle_lines": []})
+            fake = FakeClient([scan_response, commentary_response])
+            run_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=3, stride_frames=3),
+                fake,
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=2, max_frames_per_phase=2),
+            )
+            commentary_call = fake.calls[-1]
+            content = commentary_call["messages"][0]["content"]
+            self.assertIsInstance(content, list)
+            self.assertTrue(any(part.get("type") == "image_url" for part in content if isinstance(part, dict)))
+            self.assertIn("selected visual frames", content[0]["text"])
+
+    def test_visual_commentary_samples_interval_context_frames(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=5)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f1", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f2", "needs_commentary": True, "event_type": "shot", "confidence": 0.75, "evidence": "shot toward goal"},
+                        {"frame_id": "f3", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f4", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "The shot is taken after a short buildup.", "subtitle_lines": []})
+            fake = FakeClient([scan_response, commentary_response])
+            run_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=5, stride_frames=5),
+                fake,
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=4, max_frames_per_phase=3),
+            )
+            content = fake.calls[-1]["messages"][0]["content"]
+            sent_text = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
+            self.assertIn("frame_id=f1", sent_text)
+            self.assertIn("frame_id=f2", sent_text)
+            self.assertIn("frame_id=f3", sent_text)
 
     def test_pipeline_trace_records_step_jumps(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -301,13 +359,14 @@ class HarnessTests(unittest.TestCase):
                 ScanConfig(window_size_frames=3, stride_frames=3),
                 FakeClient([scan_response, commentary_response]),
                 tracker,
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=2, max_frames_per_phase=2),
             )
             actions = [(step.step, step.action) for step in tracker.steps]
             self.assertIn(("run_pipeline", "load_style"), actions)
             self.assertIn(("scan_events", "build_windows"), actions)
             self.assertIn(("scan_events.window", "prepare_model_call"), actions)
             self.assertIn(("scan_events", "merge_event_candidates"), actions)
-            self.assertIn(("generate_commentary.event", "prepare_model_call"), actions)
+            self.assertIn(("generate_visual_commentary.event", "prepare_model_call"), actions)
             self.assertIs(result.trace, tracker)
 
     @unittest.skipUnless(

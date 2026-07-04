@@ -6,7 +6,7 @@ from typing import Any
 
 from intern_client import InternClient
 
-from .commentary import CommentaryResult, generate_commentary
+from .commentary import CommentaryResult, VisualCommentaryConfig, generate_visual_commentary
 from .manifest import FramesManifest, load_manifest
 from .scanner import ScanConfig, ScanResult, scan_events
 from .styles import StyleProfile, load_style
@@ -28,6 +28,7 @@ def run_pipeline(
     scan_config: ScanConfig | None = None,
     client: Any | None = None,
     tracker: StepTracker | None = None,
+    visual_commentary_config: VisualCommentaryConfig | None = None,
 ) -> PipelineResult:
     trace = tracker or NullTracker()
     trace.record("run_pipeline", "start", {"manifest_path": str(manifest_path), "style_id_or_path": style_id_or_path})
@@ -39,6 +40,6 @@ def run_pipeline(
     trace.record("run_pipeline", "load_manifest", {"video_id": manifest.video_id, "frame_count": len(manifest.frames)})
     scan = scan_events(manifest_path, style, scan_config, active_client, trace)
     trace.record("run_pipeline", "scan_complete", {"event_count": len(scan.events)})
-    commentary = generate_commentary(scan.events, manifest, style, active_client, trace)
+    commentary = generate_visual_commentary(scan.events, manifest, style, active_client, trace, visual_commentary_config)
     trace.record("run_pipeline", "finish", {"segment_count": len(commentary.segments)})
     return PipelineResult(manifest=manifest, style=style, scan=scan, commentary=commentary, trace=tracker)

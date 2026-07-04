@@ -46,6 +46,7 @@ For text and configuration review, see:
 from harness import (
     ScanConfig,
     TraceRecorder,
+    VisualCommentaryConfig,
     dump_commentary_result,
     dump_scan_result,
     run_pipeline,
@@ -57,6 +58,7 @@ result = run_pipeline(
     style_id_or_path="broadcast_professional",
     scan_config=ScanConfig(window_size_frames=6, stride_frames=3),
     tracker=tracker,
+    visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=12, max_frames_per_phase=4),
 )
 
 dump_scan_result(result.scan, "outputs/events.json")
@@ -98,7 +100,7 @@ The trace records high-level and module-level steps such as:
 - `scan_events.window -> parsed_model_response`
 - `scan_events -> aggregate_frame_observations`
 - `scan_events -> merge_event_candidates`
-- `generate_commentary.event -> prepare_model_call`
+- `generate_visual_commentary.event -> prepare_model_call`
 
 Each step includes an index, elapsed seconds, action name, and structured details such as frame IDs, window ranges, event counts, phase types, and merge counts.
 
@@ -228,12 +230,13 @@ When adding event types, update `configs/event_types.json` and keep `no_event`. 
 
 ## Commentary generation
 
-`generate_commentary()` reads:
+The default pipeline and `generate_commentary()` now use visual commentary generation. It reads:
 
 - event type
 - event start/end seconds
 - evidence frame IDs
 - evidence summary
+- selected keyframes from the event interval and each phase interval
 - selected style profile
 
 It returns segments with:
@@ -244,6 +247,17 @@ It returns segments with:
 - optional `subtitle_lines`
 
 By default, the speaking interval equals the detected event interval.
+
+`generate_visual_commentary()` sends structured event data plus selected visual frames to the model. It does not send every frame in a long event; it samples representative frames from each phase interval and the overall event interval, while prioritizing evidence frames. Tune this with:
+
+```python
+VisualCommentaryConfig(
+    max_frames_per_event=12,
+    max_frames_per_phase=4,
+)
+```
+
+The previous summary-only behavior is still available as `generate_commentary_from_summary()`.
 
 ## Tests
 

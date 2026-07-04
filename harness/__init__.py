@@ -1,9 +1,12 @@
 from .commentary import (
     CommentaryResult,
     CommentarySegment,
+    VisualCommentaryConfig,
     commentary_result_to_dict,
     dump_commentary_result,
     generate_commentary,
+    generate_commentary_from_summary,
+    generate_visual_commentary,
 )
 from .event_types import DEFAULT_EVENT_TYPES, EventTypeDefinition, EventTypeRegistry, load_event_types
 from .manifest import FrameInfo, FramesManifest, load_manifest
@@ -40,10 +43,13 @@ __all__ = [
     "TraceRecorder",
     "TraceStep",
     "NullTracker",
+    "VisualCommentaryConfig",
     "commentary_result_to_dict",
     "dump_commentary_result",
     "dump_scan_result",
     "generate_commentary",
+    "generate_commentary_from_summary",
+    "generate_visual_commentary",
     "load_event_types",
     "load_manifest",
     "load_style",

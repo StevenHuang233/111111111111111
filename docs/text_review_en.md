@@ -8,7 +8,7 @@ This document organizes the current non-code text that affects model behavior, u
 - Event type text: event IDs, names, descriptions, positive cues, and negative cues.
 - Scan prompt: instructions sent to the model for low-frame-rate event scanning.
 - Repair prompt: instructions used when the model returns invalid JSON or unsupported event types.
-- Commentary prompt: instructions used to generate commentary for detected event intervals.
+- Commentary prompt: instructions used to generate commentary from structured event data and selected keyframes.
 - Manual configuration parameters: manifest format, sliding-window parameters, style parameters, event type parameters, and output fields.
 - Step tracing: records how the pipeline moves across modules and what each step calls.
 
@@ -290,6 +290,17 @@ When `TraceRecorder(record_model_io=True)` is used, `trace.json` also records ea
 - `model_call_output`: raw model text output.
 
 Image base64 payloads are not written to trace files. Local image paths are recorded instead to keep logs reviewable.
+
+### Visual commentary generation parameters
+
+The default pipeline and `generate_commentary()` now use visual commentary generation: the model receives structured event data, `evidence_summary`, `phases`, and sampled keyframes from the event interval and each phase interval, with evidence frames prioritized.
+
+| Parameter | Default | Purpose |
+|---|---:|---|
+| `max_frames_per_event` | 12 | Maximum images sent to the commentary model for one event |
+| `max_frames_per_phase` | 4 | Maximum representative frames sampled from each phase |
+
+The previous summary-only generation path is still available as `generate_commentary_from_summary()`.
 
 ### Composite event phases
 
