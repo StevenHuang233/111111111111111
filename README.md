@@ -320,7 +320,7 @@ For a full-video run with live progress, ETA, and checkpoint resume:
 
 ```powershell
 $env:INTERN_API_KEY="your_key"
-python run_full_bilingual_with_progress.py --run-name "full_latest_bilingual"
+python run_full_bilingual_with_progress.py --run-name "full_latest_bilingual" --concurrency 16
 ```
 
 The runner writes:
@@ -334,6 +334,10 @@ The runner writes:
 - `commentary_bilingual.json`: aggregated bilingual commentary.
 
 Resume is enabled by default. If the process is interrupted, run the same command with the same `--run-name`; completed stages and cached model calls are reused. Use `--no-resume` only when you want to ignore checkpoints.
+
+`--concurrency` controls independent model calls. Coarse scan windows and dense scan windows run concurrently. For bilingual generation, English must be generated before the matching Chinese translation for the same event, but different events can run concurrently.
+
+The runner also staggers request starts and retries rate-limit errors by default. Tune this with `--request-stagger-sec`, `--max-retries`, `--retry-base-sec`, and `--retry-max-sec` if the API reports requests are too frequent.
 
 ## Tests
 

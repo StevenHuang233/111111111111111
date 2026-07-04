@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
 from harness import (
@@ -21,12 +25,25 @@ from harness import (
     VisualCommentaryConfig,
     dump_bilingual_commentary_result,
     dump_scan_result,
-    generate_bilingual_commentary,
+    generate_visual_commentary,
     load_manifest,
     load_style,
-    scan_events,
+    translate_commentary_to_chinese,
 )
-from harness.scanner import build_windows
+from harness.event_types import load_event_types
+from harness.scanner import (
+    FrameObservation,
+    ScanResult,
+    _aggregate_observations,
+    _build_event_candidates,
+    _build_scan_messages,
+    _merge_event_candidates,
+    _parse_scan_response,
+    _response_text,
+    _scan_model_input_detail,
+    build_windows,
+)
+from harness.tracing import clip_text, should_record_model_io, tracker_text_limit
 from intern_client import InternClient
 
 
@@ -36,6 +53,7 @@ class ProgressLogger:
         self.text_path = run_dir / "progress.log"
         self.jsonl_path = run_dir / "progress.jsonl"
         self.start = time.perf_counter()
+        self.lock = Lock()
 
     def record(self, action: str, **detail: Any) -> None:
         payload = {
@@ -43,13 +61,14 @@ class ProgressLogger:
             "action": action,
             **detail,
         }
-        line = json.dumps(payload, ensure_ascii=False)
-        with self.jsonl_path.open("a", encoding="utf-8") as handle:
-            handle.write(line + "\n")
-        text = self._format_line(payload)
-        with self.text_path.open("a", encoding="utf-8") as handle:
-            handle.write(text + "\n")
-        print(text, flush=True)
+        with self.lock:
+            line = json.dumps(payload, ensure_ascii=False)
+            with self.jsonl_path.open("a", encoding="utf-8") as handle:
+                handle.write(line + "\n")
+            text = self._format_line(payload)
+            with self.text_path.open("a", encoding="utf-8") as handle:
+                handle.write(text + "\n")
+            print(text, flush=True)
 
     @staticmethod
     def _format_line(payload: dict[str, Any]) -> str:
@@ -68,84 +87,190 @@ class ProgressLogger:
 
 
 class ProgressClient:
-    def __init__(self, client: InternClient, logger: ProgressLogger, cache_root: Path, resume: bool = True) -> None:
+    def __init__(
+        self,
+        client: InternClient,
+        logger: ProgressLogger,
+        cache_root: Path,
+        resume: bool = True,
+        max_retries: int = 8,
+        retry_base_sec: float = 10.0,
+        retry_max_sec: float = 120.0,
+        request_stagger_sec: float = 2.0,
+    ) -> None:
         self.client = client
         self.logger = logger
         self.cache_root = cache_root
         self.resume = resume
+        self.max_retries = max_retries
+        self.retry_base_sec = retry_base_sec
+        self.retry_max_sec = retry_max_sec
+        self.request_stagger_sec = request_stagger_sec
         self.stage = "api"
         self.stage_started = time.perf_counter()
         self.stage_cache_dir = cache_root / "api"
         self.total: int | None = None
         self.count = 0
+        self.assigned = 0
+        self.workers = 1
         self.live_durations: list[float] = []
+        self.lock = Lock()
+        self.next_request_start = 0.0
+        self.cooldown_until = 0.0
 
-    def set_stage(self, stage: str, total: int | None = None, extra: str = "") -> None:
+    def set_stage(self, stage: str, total: int | None = None, extra: str = "", workers: int = 1) -> None:
         self.stage = stage
         self.total = total
         self.count = 0
+        self.assigned = 0
+        self.workers = max(1, workers)
         self.live_durations = []
         self.stage_started = time.perf_counter()
         self.stage_cache_dir = self.cache_root / sanitize_filename(stage)
         self.stage_cache_dir.mkdir(parents=True, exist_ok=True)
-        cached = len(list(self.stage_cache_dir.glob("call_*.json"))) if self.resume else 0
+        cached = len(list(self.stage_cache_dir.glob("*.json"))) if self.resume else 0
         cache_note = f" cached_calls={cached}" if cached else ""
-        self.logger.record("stage_start", stage=stage, total=total, extra=extra)
+        concurrency_note = f" concurrency={self.workers}"
+        self.logger.record("stage_start", stage=stage, total=total, extra=(extra + concurrency_note).strip())
         if cache_note:
             self.logger.record("stage_cache_ready", stage=stage, total=total, extra=cache_note.strip())
 
     def chat(self, messages: list[dict[str, Any]], **kwargs: Any) -> dict[str, Any]:
-        index = self.count + 1
-        cache_path = self.stage_cache_dir / f"call_{index:06d}.json"
+        with self.lock:
+            self.assigned += 1
+            index = self.assigned
+        return self.chat_with_key(f"call_{index:06d}", messages, **kwargs)
+
+    def chat_with_key(
+        self,
+        key: str,
+        messages: list[dict[str, Any]],
+        legacy_key: str | None = None,
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        cache_path = self.stage_cache_dir / f"{sanitize_filename(key)}.json"
+        legacy_path = self.stage_cache_dir / f"{sanitize_filename(legacy_key)}.json" if legacy_key else None
         if self.resume and cache_path.exists():
             result = json.loads(cache_path.read_text(encoding="utf-8"))
-            self.count = index
+            current = self._mark_done(None)
+            self.logger.record("api_call_cached", stage=self.stage, current=current, total=self.total, extra=self._progress_extra("cached"))
+            return result
+        if self.resume and legacy_path and legacy_path.exists():
+            result = json.loads(legacy_path.read_text(encoding="utf-8"))
+            cache_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+            current = self._mark_done(None)
             self.logger.record(
                 "api_call_cached",
                 stage=self.stage,
-                current=self.count,
+                current=current,
                 total=self.total,
-                extra=self._progress_extra("cached"),
+                extra=self._progress_extra(f"cached legacy={legacy_path.name}"),
             )
             return result
 
         started = time.perf_counter()
-        try:
-            result = self.client.chat(messages, **kwargs)
-        except Exception as exc:
-            self.logger.record(
-                "api_call_error",
-                stage=self.stage,
-                current=index,
-                total=self.total,
-                extra=str(exc),
-            )
-            raise
-        self.count = index
+        result = self._chat_with_retry(key, messages, **kwargs)
         elapsed = time.perf_counter() - started
-        self.live_durations.append(elapsed)
         tmp_path = cache_path.with_suffix(".tmp")
         tmp_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
         tmp_path.replace(cache_path)
+        current = self._mark_done(elapsed)
         self.logger.record(
             "api_call_done",
             stage=self.stage,
-            current=self.count,
+            current=current,
             total=self.total,
             extra=self._progress_extra(f"call_elapsed={elapsed:.2f}s"),
         )
         return result
 
+    def _chat_with_retry(self, key: str, messages: list[dict[str, Any]], **kwargs: Any) -> dict[str, Any]:
+        attempt = 0
+        while True:
+            self._wait_for_request_slot()
+            try:
+                return self.client.chat(messages, **kwargs)
+            except Exception as exc:
+                retryable = is_retryable_rate_limit(exc)
+                with self.lock:
+                    current = self.count + 1
+                if not retryable or attempt >= self.max_retries:
+                    self.logger.record(
+                        "api_call_error",
+                        stage=self.stage,
+                        current=current,
+                        total=self.total,
+                        extra=f"key={key} attempts={attempt + 1} {exc}",
+                    )
+                    raise
+                delay = min(self.retry_max_sec, self.retry_base_sec * (2 ** attempt))
+                delay += random.uniform(0.0, min(self.retry_base_sec, 5.0))
+                self._set_global_cooldown(delay)
+                self.logger.record(
+                    "api_call_retry",
+                    stage=self.stage,
+                    current=current,
+                    total=self.total,
+                    extra=f"key={key} attempt={attempt + 1}/{self.max_retries} global_wait={delay:.1f}s {exc}",
+                )
+                time.sleep(delay)
+                attempt += 1
+
+    def _wait_for_request_slot(self) -> None:
+        if self.request_stagger_sec <= 0:
+            with self.lock:
+                wait = max(0.0, self.cooldown_until - time.perf_counter())
+            if wait > 0:
+                time.sleep(wait)
+            return
+        with self.lock:
+            now = time.perf_counter()
+            next_allowed = max(self.next_request_start, self.cooldown_until)
+            wait = max(0.0, next_allowed - now)
+            self.next_request_start = max(now, next_allowed) + self.request_stagger_sec
+        if wait > 0:
+            time.sleep(wait)
+
+    def _set_global_cooldown(self, delay: float) -> None:
+        with self.lock:
+            self.cooldown_until = max(self.cooldown_until, time.perf_counter() + delay)
+
+    def _mark_done(self, elapsed: float | None) -> int:
+        with self.lock:
+            self.count += 1
+            if elapsed is not None:
+                self.live_durations.append(elapsed)
+            return self.count
+
     def _progress_extra(self, prefix: str) -> str:
-        if not self.total or self.count <= 0:
+        with self.lock:
+            count = self.count
+            durations = list(self.live_durations)
+            workers = self.workers
+            total = self.total
+        if not total or count <= 0:
             return prefix
-        avg_api = sum(self.live_durations) / len(self.live_durations) if self.live_durations else None
+        avg_api = sum(durations) / len(durations) if durations else None
         elapsed = time.perf_counter() - self.stage_started
-        avg_wall = elapsed / max(1, self.count)
-        remaining = max(0, self.total - self.count)
-        eta = avg_api * remaining if avg_api is not None else avg_wall * remaining
+        avg_wall = elapsed / max(1, count)
+        remaining = max(0, total - count)
+        eta = (avg_api * remaining / workers) if avg_api is not None else (avg_wall * remaining / workers)
         avg_text = f"avg_api={avg_api:.2f}s" if avg_api is not None else f"avg_wall={avg_wall:.2f}s"
-        return f"{prefix} {avg_text} eta={format_duration(eta)}"
+        return f"{prefix} {avg_text} workers={workers} eta={format_duration(eta)}"
+
+
+@dataclass(frozen=True)
+class WindowResult:
+    window_index: int
+    frame_ids: list[str]
+    time_range: list[float]
+    model_input: dict[str, Any]
+    model_output: str
+    observations: tuple[FrameObservation, ...]
+    parse_error: str = ""
+    repair_input: str = ""
+    repair_output: str = ""
+    repaired: bool = False
 
 
 def main() -> None:
@@ -166,6 +291,11 @@ def main() -> None:
     parser.add_argument("--max-frames-per-event", type=int, default=12)
     parser.add_argument("--max-frames-per-phase", type=int, default=4)
     parser.add_argument("--trace-max-text-chars", type=int, default=30000)
+    parser.add_argument("--concurrency", type=int, default=16, help="Maximum concurrent model calls for independent work.")
+    parser.add_argument("--request-stagger-sec", type=float, default=2.0, help="Minimum spacing between new API request starts.")
+    parser.add_argument("--max-retries", type=int, default=8, help="Retries per API call for retryable rate-limit errors.")
+    parser.add_argument("--retry-base-sec", type=float, default=10.0, help="Initial retry delay for rate-limit backoff.")
+    parser.add_argument("--retry-max-sec", type=float, default=120.0, help="Maximum retry delay for rate-limit backoff.")
     parser.add_argument("--no-resume", action="store_false", dest="resume", help="Disable checkpoint reuse for this run.")
     parser.set_defaults(resume=True)
     args = parser.parse_args()
@@ -183,7 +313,16 @@ def main() -> None:
     style = load_style(args.style)
     full_manifest = load_manifest(args.full_manifest)
     coarse_manifest = load_manifest(args.coarse_manifest)
-    client = ProgressClient(InternClient(), logger, run_dir / "cache", resume=args.resume)
+    client = ProgressClient(
+        InternClient(),
+        logger,
+        run_dir / "cache",
+        resume=args.resume,
+        max_retries=args.max_retries,
+        retry_base_sec=args.retry_base_sec,
+        retry_max_sec=args.retry_max_sec,
+        request_stagger_sec=args.request_stagger_sec,
+    )
 
     coarse_config = ScanConfig(
         window_size_frames=args.coarse_window,
@@ -203,9 +342,10 @@ def main() -> None:
             "coarse_scan",
             len(coarse_windows),
             extra=f"frames={len(coarse_manifest.frames)} window={args.coarse_window} stride={args.coarse_stride}",
+            workers=args.concurrency,
         )
         coarse_tracker = TraceRecorder(record_model_io=True, max_text_chars=args.trace_max_text_chars)
-        coarse = scan_events(args.coarse_manifest, style, coarse_config, client, coarse_tracker)
+        coarse = scan_events_parallel(args.coarse_manifest, style, coarse_config, client, coarse_tracker, args.concurrency)
         dump_scan_result(coarse, coarse_events_path)
         coarse_tracker.dump(coarse_dir / "trace.json")
         write_summary(coarse_dir / "summary.txt", coarse)
@@ -249,6 +389,7 @@ def main() -> None:
             f"dense_scan:{event_label}",
             len(dense_windows),
             extra=f"event_manifest={manifest_index}/{len(dense_manifest_paths)} frames={len(dense_manifest.frames)}",
+            workers=args.concurrency,
         )
         event_dense_dir = dense_root / event_label
         event_dense_dir.mkdir(parents=True, exist_ok=True)
@@ -258,7 +399,7 @@ def main() -> None:
             logger.record("checkpoint_hit", stage=f"dense_scan:{event_label}", extra=f"events={len(dense_events)}")
         else:
             dense_tracker = TraceRecorder(record_model_io=True, max_text_chars=args.trace_max_text_chars)
-            dense = scan_events(manifest_path, style, dense_config, client, dense_tracker)
+            dense = scan_events_parallel(manifest_path, style, dense_config, client, dense_tracker, args.concurrency)
             dump_scan_result(dense, dense_events_path)
             dense_tracker.dump(event_dense_dir / "trace.json")
             write_summary(event_dense_dir / "summary.txt", dense)
@@ -287,19 +428,20 @@ def main() -> None:
                 f"bilingual_generation:{event_label}",
                 len(dense_events) * 2,
                 extra=f"events={len(dense_events)}",
+                workers=min(args.concurrency, max(1, len(dense_events))),
             )
-            bilingual_tracker = TraceRecorder(record_model_io=True, max_text_chars=args.trace_max_text_chars)
-            bilingual = generate_bilingual_commentary(
+            bilingual = generate_bilingual_parallel(
                 dense_events,
                 dense_manifest,
                 style,
                 client,
-                bilingual_tracker,
                 visual_config,
                 translation_config,
+                args.concurrency,
+                event_commentary_dir,
+                args.trace_max_text_chars,
             )
             dump_bilingual_commentary_result(bilingual, bilingual_path)
-            bilingual_tracker.dump(event_commentary_dir / "trace.json")
             logger.record(
                 "bilingual_generation_finished",
                 stage=f"bilingual_generation:{event_label}",
@@ -317,6 +459,322 @@ def main() -> None:
     )
     dump_bilingual_commentary_result(aggregate, run_dir / "commentary_bilingual.json")
     logger.record("run_finished", extra=f"segments={len(all_segments)} output={run_dir / 'commentary_bilingual.json'}")
+
+
+def scan_events_parallel(
+    manifest_path: str | Path,
+    style: Any,
+    config: ScanConfig,
+    client: ProgressClient,
+    tracker: TraceRecorder,
+    concurrency: int,
+) -> ScanResult:
+    trace = tracker
+    trace.record(
+        "scan_events_parallel",
+        "start",
+        {
+            "manifest_path": str(manifest_path),
+            "style_id": style.style_id,
+            "window_size_frames": config.window_size_frames,
+            "stride_frames": config.stride_frames,
+            "merge_gap_sec": config.merge_gap_sec,
+            "goal_replay_merge_gap_sec": config.goal_replay_merge_gap_sec,
+            "concurrency": concurrency,
+        },
+    )
+    registry = load_event_types(config.event_types_path)
+    manifest = load_manifest(manifest_path)
+    windows = build_windows(manifest.frames, config.window_size_frames, config.stride_frames)
+    trace.record(
+        "scan_events_parallel",
+        "build_windows",
+        {
+            "frame_count": len(manifest.frames),
+            "window_count": len(windows),
+            "windows": [{"start": start, "end": end} for start, end in windows],
+        },
+    )
+
+    def run_window(window_index: int, start: int, end: int) -> WindowResult:
+        frames = manifest.frames[start:end]
+        messages = _build_scan_messages(frames, style, registry)
+        model_input = _scan_model_input_detail(messages, frames, window_index, trace)
+        data = client.chat_with_key(
+            f"window_{window_index:06d}",
+            messages,
+            legacy_key=f"call_{window_index + 1:06d}",
+            temperature=style.temperature,
+            top_p=style.top_p,
+            max_tokens=style.max_tokens,
+            thinking_mode=style.thinking_mode,
+        )
+        text = _response_text(data)
+        try:
+            parsed = tuple(_parse_scan_response(text, frames, registry, window_index))
+            return WindowResult(
+                window_index=window_index,
+                frame_ids=[frame.frame_id for frame in frames],
+                time_range=[frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
+                model_input=model_input,
+                model_output=text,
+                observations=parsed,
+            )
+        except Exception as exc:
+            repair_input, repair_output, repaired = repair_scan_window(
+                client,
+                text,
+                str(exc),
+                frames,
+                registry,
+                window_index,
+                config.repair_attempts,
+            )
+            if repaired is not None:
+                return WindowResult(
+                    window_index=window_index,
+                    frame_ids=[frame.frame_id for frame in frames],
+                    time_range=[frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
+                    model_input=model_input,
+                    model_output=text,
+                    observations=tuple(repaired),
+                    parse_error=str(exc),
+                    repair_input=repair_input,
+                    repair_output=repair_output,
+                    repaired=True,
+                )
+            return WindowResult(
+                window_index=window_index,
+                frame_ids=[frame.frame_id for frame in frames],
+                time_range=[frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
+                model_input=model_input,
+                model_output=text,
+                observations=(),
+                parse_error=str(exc),
+                repair_input=repair_input,
+                repair_output=repair_output,
+                repaired=False,
+            )
+
+    results: list[WindowResult] = []
+    with ThreadPoolExecutor(max_workers=max(1, concurrency)) as executor:
+        futures = [executor.submit(run_window, index, start, end) for index, (start, end) in enumerate(windows)]
+        for future in as_completed(futures):
+            results.append(future.result())
+
+    raw_observations: list[FrameObservation] = []
+    window_errors: list[str] = []
+    for result in sorted(results, key=lambda item: item.window_index):
+        trace.record(
+            "scan_events_parallel.window",
+            "prepare_model_call",
+            {
+                "window_index": result.window_index,
+                "frame_ids": result.frame_ids,
+                "time_range": result.time_range,
+            },
+        )
+        if should_record_model_io(trace):
+            trace.record("scan_events_parallel.window", "model_call_input", result.model_input)
+            trace.record(
+                "scan_events_parallel.window",
+                "model_call_output",
+                {
+                    "window_index": result.window_index,
+                    "content": clip_text(result.model_output, tracker_text_limit(trace)),
+                },
+            )
+        if result.parse_error:
+            trace.record(
+                "scan_events_parallel.window",
+                "parse_failed_try_repair",
+                {"window_index": result.window_index, "error": result.parse_error},
+            )
+            if should_record_model_io(trace) and result.repair_input:
+                trace.record(
+                    "scan_events_parallel.window.repair",
+                    "model_call_input",
+                    {
+                        "window_index": result.window_index,
+                        "prompt": clip_text(result.repair_input, tracker_text_limit(trace)),
+                    },
+                )
+                trace.record(
+                    "scan_events_parallel.window.repair",
+                    "model_call_output",
+                    {
+                        "window_index": result.window_index,
+                        "content": clip_text(result.repair_output, tracker_text_limit(trace)),
+                    },
+                )
+            if not result.repaired:
+                window_errors.append(f"window={result.window_index}: {result.parse_error}")
+                trace.record(
+                    "scan_events_parallel.window",
+                    "repair_failed",
+                    {"window_index": result.window_index, "error": result.parse_error},
+                )
+                continue
+            trace.record(
+                "scan_events_parallel.window",
+                "repair_succeeded",
+                {
+                    "window_index": result.window_index,
+                    "observation_count": len(result.observations),
+                    "positive_count": sum(1 for item in result.observations if item.needs_commentary),
+                },
+            )
+        else:
+            trace.record(
+                "scan_events_parallel.window",
+                "parsed_model_response",
+                {
+                    "window_index": result.window_index,
+                    "observation_count": len(result.observations),
+                    "positive_count": sum(1 for item in result.observations if item.needs_commentary),
+                },
+            )
+        raw_observations.extend(result.observations)
+
+    observations = _aggregate_observations(manifest, raw_observations, registry)
+    trace.record(
+        "scan_events_parallel",
+        "aggregate_frame_observations",
+        {
+            "raw_observation_count": len(raw_observations),
+            "frame_observation_count": len(observations),
+            "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
+        },
+    )
+    initial_events = _build_event_candidates(manifest, observations, registry)
+    events = _merge_event_candidates(initial_events, config, registry)
+    trace.record(
+        "scan_events_parallel",
+        "merge_event_candidates",
+        {"initial_event_count": len(initial_events), "merged_event_count": len(events)},
+    )
+    trace.record("scan_events_parallel", "finish", {"window_errors": len(window_errors), "event_count": len(events)})
+    return ScanResult(
+        manifest=manifest,
+        observations=tuple(observations),
+        events=tuple(events),
+        window_errors=tuple(window_errors),
+    )
+
+
+def repair_scan_window(
+    client: ProgressClient,
+    bad_text: str,
+    error: str,
+    frames: Any,
+    registry: Any,
+    window_index: int,
+    attempts: int,
+) -> tuple[str, str, list[FrameObservation] | None]:
+    if attempts <= 0:
+        return "", "", None
+
+    repair_prompt = f"""
+Fix this football event scan response into valid JSON.
+Error: {error}
+Allowed event_type values: {", ".join(registry.event_types)}
+Event definitions and decision cues:
+{registry.prompt_reference()}
+Required frame_ids: {", ".join(frame.frame_id for frame in frames)}
+
+Bad response:
+{bad_text}
+
+Return JSON only with the same schema:
+{{"frames":[{{"frame_id":"...","needs_commentary":false,"event_type":"no_event","confidence":0.0,"evidence":"..."}}]}}
+""".strip()
+    repair_output = ""
+    for attempt in range(1, attempts + 1):
+        data = client.chat_with_key(
+            f"repair_window_{window_index:06d}_attempt_{attempt}",
+            [{"role": "user", "content": repair_prompt}],
+            temperature=0.0,
+            top_p=1.0,
+            max_tokens=1024,
+        )
+        repair_output = _response_text(data)
+        try:
+            return repair_prompt, repair_output, _parse_scan_response(repair_output, frames, registry, window_index)
+        except Exception:
+            continue
+    return repair_prompt, repair_output, None
+
+
+class FixedKeyClient:
+    def __init__(self, client: ProgressClient, key_prefix: str) -> None:
+        self.client = client
+        self.key_prefix = key_prefix
+        self.count = 0
+        self.lock = Lock()
+
+    def chat(self, messages: list[dict[str, Any]], **kwargs: Any) -> dict[str, Any]:
+        with self.lock:
+            self.count += 1
+            count = self.count
+        return self.client.chat_with_key(f"{self.key_prefix}_{count:02d}", messages, **kwargs)
+
+
+def generate_bilingual_parallel(
+    events: list[EventCandidate],
+    manifest: Any,
+    style: Any,
+    client: ProgressClient,
+    visual_config: VisualCommentaryConfig,
+    translation_config: TranslationConfig,
+    concurrency: int,
+    trace_dir: Path,
+    trace_max_text_chars: int,
+) -> BilingualCommentaryResult:
+    trace_dir.mkdir(parents=True, exist_ok=True)
+
+    def run_event(event: EventCandidate) -> tuple[BilingualCommentarySegment, dict[str, Any]]:
+        tracker = TraceRecorder(record_model_io=True, max_text_chars=trace_max_text_chars)
+        english = generate_visual_commentary(
+            [event],
+            manifest,
+            style,
+            FixedKeyClient(client, f"event_{event.event_id}_english"),
+            tracker,
+            visual_config,
+        )
+        bilingual = translate_commentary_to_chinese(
+            english,
+            style,
+            FixedKeyClient(client, f"event_{event.event_id}_chinese"),
+            tracker,
+            translation_config,
+        )
+        return bilingual.segments[0], tracker.to_dict()
+
+    segments: list[BilingualCommentarySegment] = []
+    traces: dict[str, Any] = {}
+    with ThreadPoolExecutor(max_workers=max(1, min(concurrency, len(events)))) as executor:
+        futures = {executor.submit(run_event, event): event.event_id for event in events}
+        for future in as_completed(futures):
+            event_id = futures[future]
+            segment, trace = future.result()
+            segments.append(segment)
+            traces[event_id] = trace
+            (trace_dir / f"trace_{sanitize_filename(event_id)}.json").write_text(
+                json.dumps(trace, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+    segments.sort(key=lambda item: (item.talk_start_sec, item.event_id))
+    (trace_dir / "trace.json").write_text(json.dumps({"events": traces}, ensure_ascii=False, indent=2), encoding="utf-8")
+    return BilingualCommentaryResult(
+        video_id=manifest.video_id,
+        style_id=style.style_id,
+        source_language="en",
+        target_language=translation_config.target_language,
+        target_language_code=translation_config.target_language_code,
+        segments=tuple(segments),
+    )
 
 
 def build_dense_manifests(
@@ -387,6 +845,19 @@ def write_summary(path: Path, scan_result: Any) -> None:
 
 def sanitize_filename(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", value).strip("_") or "event"
+
+
+def is_retryable_rate_limit(exc: Exception) -> bool:
+    text = str(exc).lower()
+    retryable_markers = [
+        "-20048",
+        "too frequent",
+        "rate limit",
+        "rate_limit",
+        "429",
+        "请求过于频繁",
+    ]
+    return any(marker in text for marker in retryable_markers)
 
 
 def load_event_candidates(path: Path) -> list[EventCandidate]:
