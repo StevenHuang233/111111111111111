@@ -57,7 +57,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 5
+EVENT_CACHE_VERSION = 6
 
 
 class ProgressLogger:

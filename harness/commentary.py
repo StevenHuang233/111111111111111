@@ -6,6 +6,7 @@ from typing import Any, Protocol
 
 from intern_client import InternClient, image_source_to_url
 
+from .event_types import EventTypeDefinition, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FrameInfo, FramesManifest
 from .scanner import EventCandidate
@@ -244,6 +245,9 @@ You are generating football commentary for one detected event.
 Use this style exactly:
 {style_instruction_block(style, "english_generation")}
 
+Event type reference for this candidate:
+{_event_type_reference_block(event.event_type)}
+
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Do not invent player names, teams, scores, or facts that are not present in the event evidence.
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
@@ -286,6 +290,9 @@ You are generating football commentary for one detected event using both structu
 
 Use this style exactly:
 {style_instruction_block(style, "english_generation")}
+
+Event type reference for this candidate:
+{_event_type_reference_block(event.event_type)}
 
 The narration must fit from {format_timestamp(event.start_sec)} to {format_timestamp(event.end_sec)}.
 Use the provided frames to enrich visual details, but do not invent player names, teams, scores, or facts that are not present in the event data or visible frames.
@@ -343,6 +350,33 @@ def _event_to_prompt_dict(event: EventCandidate, manifest: FramesManifest) -> di
             for phase in event.phases
         ],
     }
+
+
+def _event_type_reference_block(event_type: str) -> str:
+    try:
+        registry = load_event_types()
+        definition = next((item for item in registry.definitions if item.event_id == event_type), None)
+    except Exception:
+        definition = None
+    if definition is None:
+        return (
+            f"- event_type: {event_type}\n"
+            "- description: No configured definition was found. Use the visible frames and event evidence conservatively."
+        )
+    return _format_event_type_definition(definition)
+
+
+def _format_event_type_definition(definition: EventTypeDefinition) -> str:
+    lines = [
+        f"- event_type: {definition.event_id} ({definition.name})",
+        f"- description: {definition.description}",
+    ]
+    if definition.positive_cues:
+        lines.append(f"- positive cues: {'; '.join(definition.positive_cues)}")
+    if definition.negative_cues:
+        lines.append(f"- negative cues: {'; '.join(definition.negative_cues)}")
+    lines.append("- usage: Use these cues to interpret the candidate label, but let the event evidence and visible frames decide the final wording.")
+    return "\n".join(lines)
 
 
 def _select_visual_frames(

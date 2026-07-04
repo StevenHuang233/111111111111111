@@ -544,6 +544,29 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(result.segments[0].talk_end_sec, 2.0)
             self.assertIn("decisive", result.segments[0].commentary_text.lower())
 
+    def test_generate_commentary_includes_event_type_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = load_manifest(write_manifest(Path(tmp), count=1))
+            event = EventCandidate(
+                "E010",
+                "card",
+                0.0,
+                2.0,
+                ("f0",),
+                0.9,
+                "referee shows a yellow card",
+                (EventPhase("card", 0.0, 2.0, ("f0",), "yellow card visible"),),
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "The referee reaches for the card.", "subtitle_lines": []})])
+
+            generate_commentary([event], manifest, load_style("broadcast_professional"), fake)
+
+            prompt = fake.calls[0]["messages"][0]["content"][0]["text"]
+            self.assertIn("Event type reference for this candidate", prompt)
+            self.assertIn("event_type: card", prompt)
+            self.assertIn("The referee shows or is clearly about to show a yellow or red card", prompt)
+            self.assertIn("yellow card visible", prompt)
+
     def test_translate_commentary_to_chinese_with_style_prompt(self) -> None:
         commentary = CommentaryResult(
             video_id="demo",
