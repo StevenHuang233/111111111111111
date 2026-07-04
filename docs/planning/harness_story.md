@@ -51,13 +51,13 @@ Output / 输出:
 
 ## Current Built Evidence / 当前已实现证据
 
-EN: The codebase now has a concrete long-running harness entry point: `run_full_bilingual_with_progress.py`. It turns a full frame manifest and a coarse manifest into coarse event detection, dense per-event manifests, per-event bilingual commentary, an aggregated bilingual commentary JSON, progress logs, cached API responses, and checkpoint reuse.
+EN: The codebase now has a concrete long-running harness entry point: `run_full_bilingual_with_progress.py`. It turns a full frame manifest and a coarse manifest into coarse event detection, dense per-event manifests, per-event bilingual commentary, an aggregated bilingual commentary JSON, progress logs, cached API responses, checkpoint reuse, concurrent independent calls, request staggering, and rate-limit retries.
 
-ZH: 当前代码库已经有一个长任务 Harness 入口：`run_full_bilingual_with_progress.py`。它把全量 frame manifest 和 coarse manifest 转换为粗粒度事件检测、事件级 dense manifest、逐事件双语解说、聚合双语解说 JSON、进度日志、API 响应缓存和 checkpoint 复用。
+ZH: 当前代码库已经有一个长任务 Harness 入口：`run_full_bilingual_with_progress.py`。它把全量 frame manifest 和 coarse manifest 转换为粗粒度事件检测、事件级 dense manifest、逐事件双语解说、聚合双语解说 JSON、进度日志、API 响应缓存、checkpoint 复用、独立调用并发、请求错峰和限流重试。
 
-EN: This is useful for the pitch because it makes "harness" visible: the model is only one component; the surrounding system schedules stages, records progress, limits repeated calls, and can resume after interruption.
+EN: This is useful for the pitch because it makes "harness" visible: the model is only one component; the surrounding system schedules stages, records progress, limits repeated calls, controls concurrency, and can resume after interruption.
 
-ZH: 这对路演很有用，因为它让“harness”可见：模型只是其中一个组件，外围系统负责任务阶段调度、进度记录、减少重复调用，并在中断后恢复。
+ZH: 这对路演很有用，因为它让“harness”可见：模型只是其中一个组件，外围系统负责任务阶段调度、进度记录、减少重复调用、控制并发，并在中断后恢复。
 
 ## Why Intern-S2-Preview Matters / Intern-S2-Preview 的角色
 
@@ -77,7 +77,7 @@ EN:
 
 - We separate video time from match clock.
 - We ground commentary in frame evidence and known facts.
-- We provide resumable long-running execution instead of a one-shot prompt.
+- We provide resumable and concurrent long-running execution instead of a one-shot prompt.
 - We record failures and costs as part of the harness.
 - We treat our own coding-agent workflow as a parallel harness, learning from mistakes such as Git object bloat and large-file isolation.
 
@@ -85,7 +85,7 @@ ZH:
 
 - 区分视频时间和比赛计时。
 - 解说内容基于帧证据和已知事实。
-- 提供可续跑的长任务执行，而不是一次性 prompt。
+- 提供可续跑、可并发的长任务执行，而不是一次性 prompt。
 - 把失败、成本和修正过程作为 Harness 的一部分记录。
 - 把协作 coding agent 工作流也视作一个并行 Harness，从 Git 大对象事故、大文件隔离等问题中沉淀方法。
 

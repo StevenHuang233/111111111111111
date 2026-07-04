@@ -1,6 +1,6 @@
 # Overnight Tasks / 夜间任务
 
-Last updated: 2026-07-04 19:00
+Last updated: 2026-07-04
 
 ## Context / 背景
 
@@ -50,4 +50,28 @@ Blocked paths / 禁止修改路径:
 - `source/raw/`
 - `source/frames/`
 - API keys or `.env`
+
+## One-Goal Night Run / 夜间单目标运行
+
+EN: If one long-running goal is left overnight, prefer a local supervised or semi-supervised run on the machine that has frames and API access, not a cloud branch. Cloud agents usually do not have the 7GB video, extracted frames, or secrets.
+
+ZH: 如果夜间留一个长任务运行，优先放在有抽帧和 API 权限的本机做监督或半监督运行，而不是云端分支。云端 agent 通常没有 7GB 视频、抽帧或密钥。
+
+Suggested goal / 建议目标:
+
+```text
+Validate a small resumable concurrent run and produce evidence for the pitch.
+验证一个小规模可续跑并发运行，并产出路演证据。
+```
+
+Suggested scope / 建议范围:
+
+- EN: Use a small smoke manifest first, then one selected event window.
+- ZH: 先用小 smoke manifest，再跑一个选定事件窗口。
+- EN: Start with low concurrency such as `--concurrency 2` or `--concurrency 4`; raise only if logs are clean.
+- ZH: 从低并发如 `--concurrency 2` 或 `--concurrency 4` 开始；日志干净再提高。
+- EN: Save `progress.log`, `progress.jsonl`, generated commentary, and screenshots of the run.
+- ZH: 保存 `progress.log`、`progress.jsonl`、生成解说和运行截图。
+- EN: Do not run unsupervised full-match processing unless disk, API quota, and resume behavior are already verified.
+- ZH: 除非磁盘、API 额度和续跑行为已经验证，否则不要无人值守跑全片。
 

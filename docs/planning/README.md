@@ -8,15 +8,17 @@ Last updated: 2026-07-04
 | --- | --- | --- |
 | [harness_story.md](harness_story.md) | Core story: what harness means and what we built. | 核心叙事：Harness 是什么，我们做了什么。 |
 | [judging_and_execution_plan.md](judging_and_execution_plan.md) | Requirements, priorities, and phased plan. | 题目要求、优先级和分阶段计划。 |
+| [harness_completion_framework.md](harness_completion_framework.md) | Layered design and validation gates for a complete harness. | 完整 Harness 的分层设计和验收关卡。 |
+| [initial_report_notes.md](initial_report_notes.md) | Current presentation claims, evidence, and gaps. | 当前汇报主张、证据和缺口。 |
 | [agent_boundary_and_fact_checking.md](agent_boundary_and_fact_checking.md) | Distinguishes coding agent and target agent; defines fact policy. | 区分协作 coding agent 和目标任务 agent；定义事实策略。 |
 | [task_spec_worldcup.md](task_spec_worldcup.md) | World Cup task input, output, constraints, risks. | 世界杯任务输入、输出、约束和风险。 |
 | [video_preprocessing_guide.md](video_preprocessing_guide.md) | Frame extraction facts and next data steps. | 抽帧事实和下一步数据处理。 |
 
 ## Current Implementation Snapshot / 当前实现快照
 
-EN: The shared repository now contains a full-video bilingual runner, `run_full_bilingual_with_progress.py`. It supports coarse scanning, dense per-event manifests, per-event bilingual commentary, progress logs, cached model calls, and same-run checkpoint resume. Treat this as implementation evidence, but still verify it with smoke tests before claiming full robustness.
+EN: The shared repository now contains a full-video bilingual runner, `run_full_bilingual_with_progress.py`. It supports coarse scanning, dense per-event manifests, per-event bilingual commentary, progress logs, cached model calls, same-run checkpoint resume, concurrent independent model calls, request staggering, and rate-limit retries. Treat this as implementation evidence, but still verify it with smoke tests before claiming full robustness.
 
-ZH: 协作仓库当前已经包含全片双语运行入口 `run_full_bilingual_with_progress.py`。它支持粗扫、按事件生成 dense manifest、逐事件双语解说、进度日志、模型调用缓存，以及同名运行的 checkpoint 续跑。它可以作为实现证据，但在汇报中宣称“完整稳定”前仍需要 smoke test 验证。
+ZH: 协作仓库当前已经包含全片双语运行入口 `run_full_bilingual_with_progress.py`。它支持粗扫、按事件生成 dense manifest、逐事件双语解说、进度日志、模型调用缓存、同名运行 checkpoint 续跑、独立模型调用并发、请求错峰和限流重试。它可以作为实现证据，但在汇报中宣称“完整稳定”前仍需要 smoke test 验证。
 
 ## Collaboration / 协作
 

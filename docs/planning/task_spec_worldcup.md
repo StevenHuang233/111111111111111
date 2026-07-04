@@ -77,7 +77,7 @@ video
 | Smoke | Use a tiny manifest, for example 30 frames, to verify imports, config, API connectivity, output schema, and trace writing. | 用很小的 manifest，例如 30 帧，验证导入、配置、API 连通性、输出结构和 trace 写入。 |
 | Coarse scan | Use sparse frames to find candidate events at lower cost. | 用稀疏帧低成本发现候选事件。 |
 | Dense event pass | Revisit only candidate event intervals with denser frames. | 只对候选事件区间使用更密集帧复查。 |
-| Full bilingual run | Use `run_full_bilingual_with_progress.py` to run coarse scan, dense passes, bilingual commentary, aggregation, progress logging, and resume. | 用 `run_full_bilingual_with_progress.py` 串起粗扫、dense 复查、双语解说、聚合、进度记录和续跑。 |
+| Full bilingual run | Use `run_full_bilingual_with_progress.py` to run coarse scan, dense passes, bilingual commentary, aggregation, progress logging, resume, concurrency, request staggering, and retry/backoff. | 用 `run_full_bilingual_with_progress.py` 串起粗扫、dense 复查、双语解说、聚合、进度记录、续跑、并发、请求错峰和 retry/backoff。 |
 
 ## Evaluation
 
@@ -118,6 +118,14 @@ Current extension:
 
 > 当前仓库已经有接近全片运行的可续跑 runner。它应作为 smoke 通过后的集成路径，而不是跳过小规模可验证 demo 的理由。
 
+Latest update:
+
+> The full runner now supports concurrency with request staggering and retry/backoff. It improves throughput, but the pitch should still show at least one small verified run before claiming reliability.
+
+最新更新：
+
+> 全流程 runner 现在支持并发、请求错峰和 retry/backoff。它提升吞吐，但路演前仍应至少展示一个小规模验证通过的运行，再宣称可靠性。
+
 ## Risks
 
 | Risk | Mitigation |
@@ -129,4 +137,6 @@ Current extension:
 | Copyright or privacy | Do not commit original video or extracted frames; use local ignored folders. |
 | Resume appears implemented but unverified locally | Prove it with a small interrupted run before using it as a pitch claim. |
 | 可续跑看起来已实现但本机未验证 | 先用小任务中断重跑验证，再在路演中宣称。 |
+| Concurrent run may hit API limits or produce hard-to-debug ordering issues | Start with low concurrency, keep request staggering, inspect logs, and verify output ordering. |
+| 并发运行可能触发 API 限流或输出顺序问题 | 从低并发开始，保留请求错峰，检查日志并核对输出顺序。 |
 
