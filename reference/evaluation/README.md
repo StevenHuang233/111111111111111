@@ -17,10 +17,12 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `germany_curacao_public_reference.json` | Evaluation-only public facts and expected goal sequence. | 仅用于验证的公开事实和预期进球顺序。 |
 | `goal_scoreboard_manual_review.md` | Manual 4fps scoreboard review for live score changes. | 基于 4fps 抽帧的现场比分变化人工核验。 |
 | `goal_timeline_alignment.md` | Aligns generated goal claims with verified scoreboard changes. | 将生成进球声明与已核验比分变化对齐。 |
+| `identity_style_audit.md` | Audits supported identity wording and natural broadcast style. | 审计身份措辞依据和自然解说风格。 |
 | `commentary_quality_eval.md` | Latest quality metrics, issue samples, and improvement suggestions for `outputs/commentary_bilingual.json`. | 对 `outputs/commentary_bilingual.json` 的最新质量指标、问题样例和改进建议。 |
 | `tools/audit_commentary_output.py` | Script that audits generated commentary against public facts and ASR weak signals. | 将生成解说与公开事实、ASR 弱信号对比的脚本。 |
 | `tools/evaluate_commentary_quality.py` | General quality evaluator for bilingual commentary JSON. | 面向双语解说 JSON 的通用质量评测脚本。 |
 | `tools/compare_goal_timeline.py` | Goal/score assertion alignment gate. | 进球/比分声明时间线对齐门禁。 |
+| `tools/audit_identity_style.py` | Identity support and broadcast-style wording gate. | 身份依据与解说风格措辞门禁。 |
 | `tools/build_goal_frame_checklist.py` | Converts ASR goal candidates into 4fps frame probes and bisection protocol. | 将 ASR 进球候选转成 4fps 帧探针和二分核验流程。 |
 | `tools/build_frame_contact_sheets.py` | Builds local ignored PNG contact sheets from extracted frames. | 从本地抽帧生成被 Git 忽略的 PNG 拼图，方便人工核验。 |
 
@@ -67,6 +69,27 @@ python reference/evaluation/tools/compare_goal_timeline.py `
 EN: Exit code `2` means generated goal/score assertions are missing, duplicated, or not aligned with verified scoreboard changes.
 
 ZH: 退出码 `2` 表示生成的进球/比分声明存在漏报、重复或无法对齐已核验比分变化。
+
+Audit identity wording and broadcast style / 审计身份措辞与解说风格：
+
+```powershell
+python reference/evaluation/tools/audit_identity_style.py `
+  --input outputs/commentary_bilingual.json `
+  --output-json reference/evaluation/identity_style_audit.json `
+  --output-md reference/evaluation/identity_style_audit.md
+```
+
+Use it as an identity/style gate / 作为身份与风格门禁：
+
+```powershell
+python reference/evaluation/tools/audit_identity_style.py `
+  --input outputs/commentary_bilingual.json `
+  --fail-on-style
+```
+
+EN: Exit code `2` means unsupported names or wrong teams remain; warnings mean the output still sounds like raw visual description.
+
+ZH: 退出码 `2` 表示仍有无依据姓名或错误球队；warning 表示文本仍偏向原始画面描述。
 
 Python API / Python 接口：
 
