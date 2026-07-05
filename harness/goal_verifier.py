@@ -8,6 +8,7 @@ from intern_client import InternClient, image_source_to_url
 
 from .json_utils import extract_json_object, to_pretty_json
 from .manifest import FrameInfo, FramesManifest
+from .replay_markers import FIFA_REPLAY_BUMPER_EVIDENCE, detect_fifa_replay_bumper
 from .scanner import EventCandidate, EventPhase
 from .styles import StyleProfile
 from .time_utils import format_timestamp
@@ -19,9 +20,8 @@ class ChatClient(Protocol):
         ...
 
 
-GOAL_VERIFICATION_VERSION = 6
+GOAL_VERIFICATION_VERSION = 7
 
-ALLOWED_VERDICTS = {"confirmed_goal", "not_goal", "uncertain"}
 ALLOWED_CORRECTED_TYPES = {
     "goal",
     "shot",
@@ -75,9 +75,11 @@ STRONG_LIVE_GOAL_MARKERS = (
 
 @dataclass(frozen=True)
 class GoalVerificationConfig:
-    sample_fps: float | None = 0.5
-    max_frames_per_goal: int = 18
-    max_frames_per_phase: int = 4
+    sample_fps: float | None = 2.0
+    window_sec: float = 3.0
+    stride_sec: float = 3.0
+    max_frames_per_goal: int | None = None
+    max_frames_per_phase: int | None = None
     context_frames_each_side: int = 1
     temperature: float = 0.1
     top_p: float = 0.8
@@ -107,6 +109,15 @@ class GoalVerificationResult:
     records: tuple[GoalVerificationRecord, ...]
     config: GoalVerificationConfig
     input_event_ids: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class GoalVerificationWindow:
+    window_index: int
+    start_sec: float
+    end_sec: float
+    frames: tuple[FrameInfo, ...]
+    fifa_replay_frame_ids: tuple[str, ...] = ()
 
 
 def verify_goal_events(
@@ -160,7 +171,7 @@ def verify_goal_event(
 ) -> tuple[EventCandidate, GoalVerificationRecord]:
     trace = tracker or NullTracker()
     verify_config = config or GoalVerificationConfig()
-    selected_frames = _select_verification_frames(event, manifest.frames, verify_config)
+    windows = _build_verification_windows(event, manifest.frames, verify_config)
     trace.record(
         "verify_goal_event",
         "prepare_model_call",
@@ -168,44 +179,78 @@ def verify_goal_event(
             "event_id": event.event_id,
             "time_range": [event.start_sec, event.end_sec],
             "phase_types": [phase.phase_type for phase in event.phases],
-            "selected_frame_ids": [frame.frame_id for frame in selected_frames],
+            "sample_fps": verify_config.sample_fps,
+            "window_sec": verify_config.window_sec,
+            "stride_sec": verify_config.stride_sec,
+            "window_count": len(windows),
+            "fifa_replay_marker_frames": list(
+                dict.fromkeys(frame_id for window in windows for frame_id in window.fifa_replay_frame_ids)
+            ),
         },
     )
-    messages = _build_goal_verification_messages(event, manifest, style, selected_frames)
-    if should_record_model_io(trace):
+    window_payloads: list[dict[str, Any]] = []
+    for window in windows:
+        messages = _build_goal_verification_window_messages(event, manifest, style, window)
         trace.record(
-            "verify_goal_event",
-            "model_call_input",
+            "verify_goal_event.window",
+            "prepare_model_call",
             {
                 "event_id": event.event_id,
-                "prompt": clip_text(str(messages[0]["content"][0].get("text", "")), tracker_text_limit(trace)),
-                "frames": [
-                    {
-                        "frame_id": frame.frame_id,
-                        "timestamp_sec": frame.timestamp_sec,
-                        "timestamp": format_timestamp(frame.timestamp_sec),
-                        "path": str(frame.path),
-                    }
-                    for frame in selected_frames
-                ],
-                "image_payload_policy": "Image inputs are sent as data URIs to the API, but trace records local paths instead of base64 payloads.",
+                "window_index": window.window_index,
+                "time_range": [window.start_sec, window.end_sec],
+                "selected_frame_ids": [frame.frame_id for frame in window.frames],
+                "fifa_replay_marker_frames": list(window.fifa_replay_frame_ids),
             },
         )
-    data = client.chat(
-        messages,
-        temperature=verify_config.temperature,
-        top_p=verify_config.top_p,
-        max_tokens=verify_config.max_tokens,
-        thinking_mode=verify_config.thinking_mode,
-    )
-    text = data["choices"][0]["message"].get("content") or ""
-    if should_record_model_io(trace):
-        trace.record(
-            "verify_goal_event",
-            "model_call_output",
-            {"event_id": event.event_id, "content": clip_text(text, tracker_text_limit(trace))},
+        if should_record_model_io(trace):
+            trace.record(
+                "verify_goal_event.window",
+                "model_call_input",
+                {
+                    "event_id": event.event_id,
+                    "window_index": window.window_index,
+                    "prompt": clip_text(str(messages[0]["content"][0].get("text", "")), tracker_text_limit(trace)),
+                    "frames": [
+                        {
+                            "frame_id": frame.frame_id,
+                            "timestamp_sec": frame.timestamp_sec,
+                            "timestamp": format_timestamp(frame.timestamp_sec),
+                            "path": str(frame.path),
+                        }
+                        for frame in window.frames
+                    ],
+                    "image_payload_policy": "Image inputs are sent as data URIs to the API, but trace records local paths instead of base64 payloads.",
+                },
+            )
+        data = client.chat(
+            messages,
+            temperature=verify_config.temperature,
+            top_p=verify_config.top_p,
+            max_tokens=verify_config.max_tokens,
+            thinking_mode=verify_config.thinking_mode,
         )
-    payload = _parse_goal_verification_response(text)
+        text = data["choices"][0]["message"].get("content") or ""
+        if should_record_model_io(trace):
+            trace.record(
+                "verify_goal_event.window",
+                "model_call_output",
+                {
+                    "event_id": event.event_id,
+                    "window_index": window.window_index,
+                    "content": clip_text(text, tracker_text_limit(trace)),
+                },
+            )
+        parsed = _parse_goal_window_response(text)
+        parsed["window_index"] = window.window_index
+        parsed["start_sec"] = window.start_sec
+        parsed["end_sec"] = window.end_sec
+        parsed["frame_ids"] = [frame.frame_id for frame in window.frames]
+        parsed["fifa_replay_frame_ids"] = list(window.fifa_replay_frame_ids)
+        if window.fifa_replay_frame_ids:
+            parsed["contains_fifa_replay_bumper"] = True
+        window_payloads.append(parsed)
+
+    payload = _aggregate_goal_window_payload(event, windows, window_payloads)
     payload = _apply_single_goal_followup_policy(event, payload, verify_config)
     refined = _apply_goal_verification(event, payload, verify_config)
     record = GoalVerificationRecord(
@@ -226,6 +271,10 @@ def verify_goal_event(
             "verdict": record.verdict,
             "refined_event_type": record.refined_event_type,
             "confidence": record.confidence,
+            "window_count": len(windows),
+            "fifa_replay_marker_frames": list(
+                dict.fromkeys(frame_id for window in windows for frame_id in window.fifa_replay_frame_ids)
+            ),
         },
     )
     return refined, record
@@ -268,11 +317,11 @@ def dump_goal_verification_result(
     Path(path).write_text(to_pretty_json(goal_verification_result_to_dict(result, manifest)), encoding="utf-8")
 
 
-def _build_goal_verification_messages(
+def _build_goal_verification_window_messages(
     event: EventCandidate,
     manifest: FramesManifest,
     style: StyleProfile,
-    frames: tuple[FrameInfo, ...],
+    window: GoalVerificationWindow,
 ) -> list[dict[str, Any]]:
     event_json = {
         "video_id": manifest.video_id,
@@ -300,30 +349,49 @@ def _build_goal_verification_messages(
             for index, phase in enumerate(event.phases)
         ],
     }
+    frames = window.frames
     frame_listing = "\n".join(
         f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]" for frame in frames
     )
+    fifa_marker_text = (
+        "Local FIFA replay bumper detector matched these frames: "
+        + ", ".join(window.fifa_replay_frame_ids)
+        + f". Treat matched frames as replay packaging, not live scoring action. {FIFA_REPLAY_BUMPER_EVIDENCE}"
+        if window.fifa_replay_frame_ids
+        else "Local FIFA replay bumper detector did not match any frame in this window."
+    )
     prompt = f"""
-You are verifying a football goal sequence package before commentary generation.
+You are verifying one sliding visual window inside a football goal candidate before commentary generation.
 
-The coarse scanner already grouped this as event_type=goal, but it can confuse live goals, saves, replays, celebrations, and scoreboard shots.
-Your task is to correct the event label and phase labels using the structured evidence and selected visual frames.
+The coarse scanner already grouped the full package as event_type=goal, but it can confuse live goals, saves, replays, celebrations, scoreboard shots, and FIFA replay bumpers.
+Your task is to classify only this 3-second window using the structured evidence and selected visual frames.
 
 Decision rules:
-- Use confirmed_goal only when the sequence contains clear live or immediate scoring evidence: ball crossing the line, ball in net immediately after the finish, net rippling from the shot, or the live scoring action plus unmistakable immediate reaction.
-- Do not use confirmed_goal for scoreboard graphics alone, celebration-only shots, ball-already-in-net shots, or replays of an earlier goal unless the same candidate also contains the live scoring action.
-- Use not_goal when the best evidence says it is a save, blocked shot, ordinary shot, near miss, restart, duplicate replay, scoreboard-only moment, or celebration-only moment without proof of the live scoring action.
+- Use window_verdict=live_goal only when this window contains clear live or immediate scoring evidence: ball crossing the line, ball in net immediately after the finish, net rippling from the shot, or live scoring action plus unmistakable immediate reaction.
+- Do not use live_goal for scoreboard graphics alone, celebration-only shots, ball-already-in-net shots, or replays of an earlier goal.
+- Use window_verdict=replay_or_celebration for replay bumpers, slow-motion replays, post-goal reaction, scoreboard-only confirmation, or celebration-only shots.
+- Use window_verdict=not_goal when the best evidence says it is a save, blocked shot, ordinary shot, near miss, restart, or unrelated attack without proof of live scoring.
 - Use uncertain only when visual evidence is genuinely ambiguous.
-- If the event is not a goal, choose corrected_event_type from: shot, save, dangerous_attack, free_kick, penalty, var_show, var_review, celebration_or_replay, other_relevant.
-- If confirmed_goal, keep corrected_event_type as goal.
-- Relabel each existing phase by phase_index. Use only: buildup, live_goal, replay, celebration, var_review.
-- Mark at most one compact segment as live_goal: the first moment where the actual scoring action is visible. Later ball-in-net or scoreboard shots should be replay unless they are the first live scoring moment.
+- If this window is not a live goal, choose corrected_event_type from: shot, save, dangerous_attack, corner, free_kick, penalty, var_show, var_review, celebration_or_replay, other_relevant.
+- If this window is a live goal, set corrected_event_type to goal and contains_live_scoring_action to true.
+- If a local FIFA replay bumper marker is present, classify those matched frames as replay_or_celebration unless unmistakable live scoring action is visible elsewhere in the same window.
 - Do not invent names, teams, scores, or facts.
 
 Style context, only for salience, not for wording:
 {style.prompt_injection}
 
-Selected frame prefixes:
+Window:
+- window_index: {window.window_index}
+- start_sec: {window.start_sec}
+- end_sec: {window.end_sec}
+- start_label: {format_timestamp(window.start_sec)}
+- end_label: {format_timestamp(window.end_sec)}
+- sample_fps: approximately 2 fps
+
+FIFA replay marker precheck:
+{fifa_marker_text}
+
+Selected frame prefixes for this window:
 {frame_listing}
 
 Goal package data:
@@ -331,13 +399,12 @@ Goal package data:
 
 Return JSON only:
 {{
-  "verdict": "confirmed_goal",
+  "window_verdict": "live_goal",
   "confidence": 0.0,
   "corrected_event_type": "goal",
+  "contains_live_scoring_action": false,
+  "contains_fifa_replay_bumper": false,
   "rationale": "short reason grounded in visual evidence",
-  "phase_labels": [
-    {{"phase_index": 0, "phase_type": "buildup", "reason": "short reason"}}
-  ],
   "warnings": []
 }}
 """.strip()
@@ -346,6 +413,189 @@ Return JSON only:
         content.append({"type": "text", "text": f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]"})
         content.append({"type": "image_url", "image_url": {"url": image_source_to_url(str(frame.path))}})
     return [{"role": "user", "content": content}]
+
+
+def _parse_goal_window_response(text: str) -> dict[str, Any]:
+    payload = extract_json_object(text)
+    verdict = str(payload.get("window_verdict", payload.get("verdict", "uncertain"))).strip()
+    verdict_aliases = {
+        "confirmed_goal": "live_goal",
+        "goal": "live_goal",
+        "replay": "replay_or_celebration",
+        "celebration": "replay_or_celebration",
+        "celebration_or_replay": "replay_or_celebration",
+    }
+    verdict = verdict_aliases.get(verdict, verdict)
+    if verdict not in {"live_goal", "not_goal", "replay_or_celebration", "uncertain"}:
+        verdict = "uncertain"
+
+    corrected_event_type = str(payload.get("corrected_event_type", "goal" if verdict == "live_goal" else "other_relevant")).strip()
+    if corrected_event_type not in ALLOWED_CORRECTED_TYPES:
+        corrected_event_type = "goal" if verdict == "live_goal" else "other_relevant"
+    if verdict == "live_goal":
+        corrected_event_type = "goal"
+    elif verdict == "replay_or_celebration" and corrected_event_type == "goal":
+        corrected_event_type = "celebration_or_replay"
+
+    warnings = payload.get("warnings", [])
+    if not isinstance(warnings, list):
+        warnings = []
+    return {
+        "window_verdict": verdict,
+        "confidence": _clamp_float(payload.get("confidence", 0.0)),
+        "corrected_event_type": corrected_event_type,
+        "contains_live_scoring_action": bool(payload.get("contains_live_scoring_action", verdict == "live_goal")),
+        "contains_fifa_replay_bumper": bool(payload.get("contains_fifa_replay_bumper", False)),
+        "rationale": str(payload.get("rationale", "")).strip(),
+        "warnings": [str(item) for item in warnings if str(item)],
+    }
+
+
+def _aggregate_goal_window_payload(
+    event: EventCandidate,
+    windows: tuple[GoalVerificationWindow, ...],
+    window_payloads: list[dict[str, Any]],
+) -> dict[str, Any]:
+    fifa_frame_ids = tuple(
+        dict.fromkeys(frame_id for window in windows for frame_id in window.fifa_replay_frame_ids)
+    )
+    live_rows = [
+        row
+        for row in window_payloads
+        if (
+            row.get("window_verdict") == "live_goal"
+            or bool(row.get("contains_live_scoring_action"))
+            or row.get("corrected_event_type") == "goal"
+        )
+        and not (row.get("contains_fifa_replay_bumper") and not row.get("contains_live_scoring_action"))
+    ]
+
+    if live_rows:
+        best = max(live_rows, key=lambda row: float(row.get("confidence", 0.0)))
+        verdict = "confirmed_goal"
+        corrected_type = "goal"
+        confidence = _clamp_float(best.get("confidence", 0.0))
+        rationale = _join_window_rationales(
+            "At least one 3-second verification window contains live scoring evidence.",
+            window_payloads,
+        )
+    else:
+        all_uncertain = bool(window_payloads) and all(row.get("window_verdict") == "uncertain" for row in window_payloads)
+        verdict = "uncertain" if all_uncertain and not fifa_frame_ids else "not_goal"
+        corrected_type = _choose_downgrade_type(window_payloads, bool(fifa_frame_ids))
+        confidence = max((_clamp_float(row.get("confidence", 0.0)) for row in window_payloads), default=0.0)
+        rationale = _join_window_rationales(
+            "No 3-second verification window contains clear live scoring evidence.",
+            window_payloads,
+        )
+
+    warnings = _aggregate_window_warnings(window_payloads)
+    if fifa_frame_ids:
+        warnings.append("fifa_replay_bumper_detected:" + ",".join(fifa_frame_ids))
+
+    return {
+        "verdict": verdict,
+        "confidence": confidence,
+        "corrected_event_type": corrected_type,
+        "rationale": rationale,
+        "phase_labels": _phase_labels_from_windows(event, windows, live_rows[:1], fifa_frame_ids),
+        "warnings": list(dict.fromkeys(warnings)),
+    }
+
+
+def _choose_downgrade_type(window_payloads: list[dict[str, Any]], has_fifa_replay_marker: bool) -> str:
+    if has_fifa_replay_marker:
+        return "celebration_or_replay"
+    candidates = [
+        row
+        for row in window_payloads
+        if row.get("corrected_event_type") in ALLOWED_CORRECTED_TYPES and row.get("corrected_event_type") != "goal"
+    ]
+    if not candidates:
+        return "other_relevant"
+    best = max(candidates, key=lambda row: float(row.get("confidence", 0.0)))
+    return str(best.get("corrected_event_type") or "other_relevant")
+
+
+def _join_window_rationales(prefix: str, window_payloads: list[dict[str, Any]]) -> str:
+    snippets: list[str] = []
+    for row in window_payloads:
+        rationale = str(row.get("rationale", "")).strip()
+        if not rationale:
+            continue
+        snippets.append(
+            f"window {row.get('window_index')} {row.get('window_verdict')} "
+            f"{row.get('corrected_event_type')}: {rationale}"
+        )
+    if not snippets:
+        return prefix
+    return prefix + " " + " | ".join(snippets[:8])
+
+
+def _aggregate_window_warnings(window_payloads: list[dict[str, Any]]) -> list[str]:
+    warnings: list[str] = []
+    for row in window_payloads:
+        for warning in row.get("warnings", []):
+            text = str(warning).strip()
+            if text:
+                warnings.append(f"window {row.get('window_index')}: {text}")
+    return warnings
+
+
+def _phase_labels_from_windows(
+    event: EventCandidate,
+    windows: tuple[GoalVerificationWindow, ...],
+    live_rows: list[dict[str, Any]],
+    fifa_frame_ids: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    live_row = live_rows[0] if live_rows else None
+    live_start = float(live_row.get("start_sec", 0.0)) if live_row else None
+    live_end = float(live_row.get("end_sec", live_start or 0.0)) if live_row else None
+    fifa_windows = [window for window in windows if window.fifa_replay_frame_ids]
+
+    labels: list[dict[str, Any]] = []
+    used_live = False
+    for index, phase in enumerate(event.phases):
+        phase_type = phase.phase_type if phase.phase_type in GOAL_PHASE_TYPES else "buildup"
+        reason = "Preserved original phase label."
+        if _phase_has_fifa_marker(phase, fifa_frame_ids, fifa_windows):
+            phase_type = "replay"
+            reason = "Local FIFA replay bumper detector matched this phase/window."
+        elif live_start is not None and live_end is not None and _ranges_overlap(
+            phase.start_sec,
+            phase.end_sec,
+            live_start,
+            live_end,
+        ):
+            if used_live:
+                phase_type = "replay"
+                reason = "Additional live-looking phase after first live goal window is treated as replay."
+            else:
+                phase_type = "live_goal"
+                reason = "This phase overlaps the first window with live scoring evidence."
+                used_live = True
+        elif live_start is not None and phase.end_sec < live_start:
+            phase_type = "buildup"
+            reason = "This phase occurs before the verified live goal window."
+        elif live_start is not None and phase.start_sec > (live_end or live_start):
+            phase_type = "celebration" if phase.phase_type == "celebration" else "replay"
+            reason = "This phase occurs after the verified live goal window."
+        labels.append({"phase_index": index, "phase_type": phase_type, "reason": reason})
+    return labels
+
+
+def _phase_has_fifa_marker(
+    phase: EventPhase,
+    fifa_frame_ids: tuple[str, ...],
+    fifa_windows: list[GoalVerificationWindow],
+) -> bool:
+    if any(frame_id in fifa_frame_ids for frame_id in phase.evidence_frames):
+        return True
+    return any(_ranges_overlap(phase.start_sec, phase.end_sec, window.start_sec, window.end_sec) for window in fifa_windows)
+
+
+def _ranges_overlap(left_start: float, left_end: float, right_start: float, right_end: float) -> bool:
+    return left_start <= right_end and right_start <= left_end
 
 
 def _goal_support_signals(event: EventCandidate) -> dict[str, Any]:
@@ -378,31 +628,6 @@ def _row_has_strong_goal_evidence(row: dict[str, Any]) -> bool:
 def _contains_marker(text: str, markers: tuple[str, ...]) -> bool:
     lowered = text.lower()
     return any(marker in lowered for marker in markers)
-
-
-def _parse_goal_verification_response(text: str) -> dict[str, Any]:
-    payload = extract_json_object(text)
-    verdict = str(payload.get("verdict", "uncertain")).strip()
-    if verdict not in ALLOWED_VERDICTS:
-        verdict = "uncertain"
-    corrected_event_type = str(payload.get("corrected_event_type", "goal")).strip()
-    if corrected_event_type not in ALLOWED_CORRECTED_TYPES:
-        corrected_event_type = "goal" if verdict == "confirmed_goal" else "other_relevant"
-    confidence = _clamp_float(payload.get("confidence", 0.0))
-    phase_labels = payload.get("phase_labels", [])
-    if not isinstance(phase_labels, list):
-        phase_labels = []
-    warnings = payload.get("warnings", [])
-    if not isinstance(warnings, list):
-        warnings = []
-    return {
-        "verdict": verdict,
-        "confidence": confidence,
-        "corrected_event_type": corrected_event_type,
-        "rationale": str(payload.get("rationale", "")).strip(),
-        "phase_labels": phase_labels,
-        "warnings": warnings,
-    }
 
 
 def _apply_single_goal_followup_policy(
@@ -523,55 +748,65 @@ def _keep_single_live_goal(phases: list[EventPhase]) -> list[EventPhase]:
     return normalized
 
 
-def _select_verification_frames(
+def estimate_goal_verification_calls(
+    events: list[EventCandidate] | tuple[EventCandidate, ...],
+    manifest_frames: tuple[FrameInfo, ...],
+    config: GoalVerificationConfig | None = None,
+) -> int:
+    verify_config = config or GoalVerificationConfig()
+    return sum(
+        len(_build_verification_windows(event, manifest_frames, verify_config))
+        for event in events
+        if event.event_type == "goal"
+    )
+
+
+def _build_verification_windows(
     event: EventCandidate,
     manifest_frames: tuple[FrameInfo, ...],
     config: GoalVerificationConfig,
-) -> tuple[FrameInfo, ...]:
-    frame_by_id = {frame.frame_id: frame for frame in manifest_frames}
-    selected: list[FrameInfo] = []
-    for phase in event.phases:
-        phase_frames = _frames_in_time_range_with_context(
-            manifest_frames,
-            phase.start_sec,
-            phase.end_sec,
-            config.context_frames_each_side,
-        )
-        phase_frames = _sample_frames_by_fps(phase_frames, config.sample_fps)
-        evidence_frames = tuple(frame_by_id[frame_id] for frame_id in phase.evidence_frames if frame_id in frame_by_id)
-        phase_selected = _sample_frames(_unique_frames(list(evidence_frames)), min(config.max_frames_per_phase, len(evidence_frames)))
-        remaining = config.max_frames_per_phase - len(phase_selected)
-        if remaining > 0:
-            phase_selected.extend(_sample_frames(phase_frames, remaining))
-        selected.extend(phase_selected)
+) -> tuple[GoalVerificationWindow, ...]:
+    window_sec = max(0.25, float(config.window_sec))
+    stride_sec = max(0.25, float(config.stride_sec))
+    start_sec = min(event.start_sec, event.end_sec)
+    end_sec = max(event.start_sec, event.end_sec)
+    windows: list[GoalVerificationWindow] = []
+    current = start_sec
+    index = 1
+    while current <= end_sec + 1e-6:
+        window_end = min(end_sec, current + window_sec)
+        include_end = window_end >= end_sec - 1e-6
+        interval_frames = _frames_in_time_window(manifest_frames, current, window_end, include_end)
+        sampled_frames = _sample_frames_by_fps(interval_frames, config.sample_fps)
+        if sampled_frames:
+            fifa_frame_ids = tuple(
+                frame.frame_id for frame in sampled_frames if detect_fifa_replay_bumper(frame.path)
+            )
+            windows.append(
+                GoalVerificationWindow(
+                    window_index=index,
+                    start_sec=current,
+                    end_sec=window_end,
+                    frames=sampled_frames,
+                    fifa_replay_frame_ids=fifa_frame_ids,
+                )
+            )
+            index += 1
+        if include_end:
+            break
+        current += stride_sec
+    return tuple(windows)
 
-    selected = _unique_frames(selected)
-    if len(selected) < config.max_frames_per_goal:
-        event_frames = _frames_in_time_range_with_context(
-            manifest_frames,
-            event.start_sec,
-            event.end_sec,
-            config.context_frames_each_side,
-        )
-        event_frames = _sample_frames_by_fps(event_frames, config.sample_fps)
-        selected.extend(_sample_frames(event_frames, config.max_frames_per_goal - len(selected)))
 
-    return tuple(_unique_frames(selected)[: config.max_frames_per_goal])
-
-
-def _frames_in_time_range_with_context(
+def _frames_in_time_window(
     frames: tuple[FrameInfo, ...],
     start_sec: float,
     end_sec: float,
-    context_each_side: int,
+    include_end: bool,
 ) -> tuple[FrameInfo, ...]:
-    in_range_indexes = [index for index, frame in enumerate(frames) if start_sec <= frame.timestamp_sec <= end_sec]
-    if not in_range_indexes:
-        return ()
-    context = max(0, context_each_side)
-    start_index = max(0, in_range_indexes[0] - context)
-    end_index = min(len(frames) - 1, in_range_indexes[-1] + context)
-    return frames[start_index : end_index + 1]
+    if include_end:
+        return tuple(frame for frame in frames if start_sec <= frame.timestamp_sec <= end_sec)
+    return tuple(frame for frame in frames if start_sec <= frame.timestamp_sec < end_sec)
 
 
 def _sample_frames_by_fps(frames: tuple[FrameInfo, ...], sample_fps: float | None) -> tuple[FrameInfo, ...]:
@@ -585,20 +820,6 @@ def _sample_frames_by_fps(frames: tuple[FrameInfo, ...], sample_fps: float | Non
             selected.append(frame)
             last_timestamp = frame.timestamp_sec
     return tuple(selected)
-
-
-def _sample_frames(frames: tuple[FrameInfo, ...] | list[FrameInfo], limit: int) -> list[FrameInfo]:
-    frame_tuple = tuple(frames)
-    if limit <= 0 or not frame_tuple:
-        return []
-    if len(frame_tuple) <= limit:
-        return list(frame_tuple)
-    if limit == 1:
-        return [frame_tuple[len(frame_tuple) // 2]]
-    positions = [round(index * (len(frame_tuple) - 1) / (limit - 1)) for index in range(limit)]
-    return [frame_tuple[position] for position in dict.fromkeys(positions)]
-
-
 def _unique_frames(frames: list[FrameInfo]) -> list[FrameInfo]:
     by_id: dict[str, FrameInfo] = {}
     for frame in frames:
@@ -631,6 +852,8 @@ def _event_to_dict(event: EventCandidate) -> dict[str, Any]:
 def _config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]:
     return {
         "sample_fps": config.sample_fps,
+        "window_sec": config.window_sec,
+        "stride_sec": config.stride_sec,
         "max_frames_per_goal": config.max_frames_per_goal,
         "max_frames_per_phase": config.max_frames_per_phase,
         "context_frames_each_side": config.context_frames_each_side,

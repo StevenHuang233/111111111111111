@@ -27,13 +27,14 @@ from .goal_verifier import (
     GoalVerificationRecord,
     GoalVerificationResult,
     dump_goal_verification_result,
+    estimate_goal_verification_calls,
     goal_verification_result_to_dict,
     verify_goal_event,
     verify_goal_events,
 )
 from .match_context import MatchContext, TeamContext, load_match_context, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
-from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
+from .pipeline import BilingualPipelineResult, PipelineResult, prepare_generation_events, run_bilingual_pipeline, run_pipeline
 from .scanner import (
     EventCandidate,
     EventPhase,
@@ -87,6 +88,7 @@ __all__ = [
     "dump_commentary_units",
     "dump_goal_verification_result",
     "dump_scan_result",
+    "estimate_goal_verification_calls",
     "generate_bilingual_commentary",
     "build_commentary_units",
     "generate_commentary",
@@ -98,6 +100,7 @@ __all__ = [
     "load_match_context",
     "load_style",
     "match_context_block",
+    "prepare_generation_events",
     "run_bilingual_pipeline",
     "run_pipeline",
     "scan_events",

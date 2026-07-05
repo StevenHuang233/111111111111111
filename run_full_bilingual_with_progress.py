@@ -38,6 +38,7 @@ from harness import (
     load_manifest,
     load_style,
     translate_commentary_to_chinese,
+    estimate_goal_verification_calls,
     verify_goal_event,
 )
 from harness.match_context import MatchContext
@@ -48,7 +49,6 @@ from harness.scanner import (
     SCAN_ALGORITHM_VERSION,
     _apply_first_var_review_as_var_show,
     _aggregate_observations,
-    _apply_replay_marker_overrides,
     _build_event_candidates,
     _build_scan_messages,
     _merge_event_candidates,
@@ -293,7 +293,7 @@ class WindowResult:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the full coarse+dense bilingual commentary pipeline with progress logs.")
+    parser = argparse.ArgumentParser(description="Run the coarse-first bilingual commentary pipeline with progress logs.")
     parser.add_argument("--full-manifest", default=r"C:\Users\hjj\Desktop\frames_4fps_q3\frames_manifest.json")
     parser.add_argument("--coarse-manifest", default=r"C:\Users\hjj\Desktop\frames_4fps_q3\frames_manifest_coarse_4s.json")
     parser.add_argument("--output-root", default="outputs")
@@ -305,7 +305,7 @@ def main() -> None:
     parser.add_argument("--dense-window", type=int, default=8)
     parser.add_argument("--dense-stride", type=int, default=8)
     parser.add_argument("--dense-sample-fps", type=float, default=1.0)
-    parser.add_argument("--commentary-sample-fps", type=float, default=0.5)
+    parser.add_argument("--commentary-sample-fps", type=float, default=2.0)
     parser.add_argument("--coarse-merge-gap-sec", type=float, default=8.0)
     parser.add_argument("--dense-merge-gap-sec", type=float, default=2.0)
     parser.add_argument("--goal-replay-merge-gap-sec", type=float, default=40.0)
@@ -317,18 +317,31 @@ def main() -> None:
     parser.add_argument("--min-generation-confidence", type=float, default=0.0)
     parser.add_argument("--max-generation-events", type=int, default=0, help="Limit generation to the first N commentary units for smoke tests. 0 means no limit.")
     parser.add_argument("--verify-goals-with-model", action="store_true", help="Use a visual model pass to confirm or downgrade goal commentary units before generation.")
-    parser.add_argument("--goal-verify-sample-fps", type=float, default=0.5)
-    parser.add_argument("--goal-verify-max-frames", type=int, default=18)
-    parser.add_argument("--goal-verify-max-frames-per-phase", type=int, default=4)
-    parser.add_argument("--goal-verify-context-frames", type=int, default=1)
+    parser.add_argument("--goal-verify-sample-fps", type=float, default=2.0)
+    parser.add_argument("--goal-verify-window-sec", type=float, default=3.0)
+    parser.add_argument("--goal-verify-stride-sec", type=float, default=3.0)
+    parser.add_argument("--goal-verify-max-frames", type=int, default=0, help="Deprecated; goal verification now scans all sampled frames in sliding windows.")
+    parser.add_argument("--goal-verify-max-frames-per-phase", type=int, default=0, help="Deprecated; goal verification now scans all sampled frames in sliding windows.")
+    parser.add_argument("--goal-verify-context-frames", type=int, default=0, help="Deprecated for sliding-window goal verification.")
     parser.add_argument("--goal-verify-downgrade-uncertain", action="store_true")
     parser.add_argument("--disable-weak-goal-followup-downgrade", action="store_true", help="Do not downgrade weak confirmed_goal candidates when they lack replay/celebration/scoreboard follow-up support.")
     parser.add_argument("--weak-goal-followup-min-confidence", type=float, default=0.82, help="Minimum model confidence to keep a confirmed_goal candidate without follow-up support when live scoring evidence is otherwise strong.")
     parser.add_argument("--dense-padding-sec", type=float, default=2.0)
-    parser.add_argument("--max-frames-per-event", type=int, default=12)
-    parser.add_argument("--max-frames-per-phase", type=int, default=4)
+    parser.add_argument("--max-frames-per-event", type=int, default=0, help="Generation frame cap per event. 0 means no cap.")
+    parser.add_argument("--max-frames-per-phase", type=int, default=0, help="Generation frame cap per phase. 0 means no cap.")
     parser.add_argument("--context-frames-each-side", type=int, default=1)
-    parser.add_argument("--coarse-only-generation", action="store_true", help="Skip dense scan and generate bilingual commentary directly from coarse events.")
+    parser.add_argument(
+        "--coarse-only-generation",
+        action="store_true",
+        dest="coarse_only_generation",
+        help="Generate bilingual commentary directly from coarse-derived events. This is the default.",
+    )
+    parser.add_argument(
+        "--dense-generation",
+        action="store_false",
+        dest="coarse_only_generation",
+        help="Run the legacy dense per-event scan layer before bilingual generation.",
+    )
     parser.add_argument("--stop-after-coarse", action="store_true", help="Stop after writing coarse/events.json, useful for auditing scan quality before generation.")
     parser.add_argument("--trace-max-text-chars", type=int, default=30000)
     parser.add_argument("--concurrency", type=int, default=16, help="Maximum concurrent model calls for independent work.")
@@ -337,7 +350,7 @@ def main() -> None:
     parser.add_argument("--retry-base-sec", type=float, default=10.0, help="Initial retry delay for rate-limit backoff.")
     parser.add_argument("--retry-max-sec", type=float, default=120.0, help="Maximum retry delay for rate-limit backoff.")
     parser.add_argument("--no-resume", action="store_false", dest="resume", help="Disable checkpoint reuse for this run.")
-    parser.set_defaults(resume=True)
+    parser.set_defaults(resume=True, coarse_only_generation=True)
     args = parser.parse_args()
 
     output_root = Path(args.output_root).expanduser().resolve()
@@ -454,8 +467,10 @@ def main() -> None:
     if args.verify_goals_with_model:
         goal_verify_config = GoalVerificationConfig(
             sample_fps=args.goal_verify_sample_fps,
-            max_frames_per_goal=args.goal_verify_max_frames,
-            max_frames_per_phase=args.goal_verify_max_frames_per_phase,
+            window_sec=args.goal_verify_window_sec,
+            stride_sec=args.goal_verify_stride_sec,
+            max_frames_per_goal=None,
+            max_frames_per_phase=None,
             context_frames_each_side=args.goal_verify_context_frames,
             downgrade_uncertain=args.goal_verify_downgrade_uncertain,
             downgrade_weak_goal_without_followup=not args.disable_weak_goal_followup_downgrade,
@@ -475,11 +490,16 @@ def main() -> None:
         else:
             goal_count = sum(1 for event in generation_events if event.event_type == "goal")
             if goal_count:
+                goal_window_count = estimate_goal_verification_calls(generation_events, full_manifest.frames, goal_verify_config)
                 active_client = get_client()
                 active_client.set_stage(
                     "goal_verification",
-                    goal_count,
-                    extra=f"goal_candidates={goal_count} events={len(generation_events)} mode=per_goal_visual",
+                    goal_window_count,
+                    extra=(
+                        f"goal_candidates={goal_count} events={len(generation_events)} "
+                        f"mode=sliding_window sample_fps={args.goal_verify_sample_fps} "
+                        f"window_sec={args.goal_verify_window_sec} stride_sec={args.goal_verify_stride_sec}"
+                    ),
                     workers=min(args.concurrency, goal_count),
                 )
                 verification = verify_goals_parallel(
@@ -518,8 +538,8 @@ def main() -> None:
                 logger.record("goal_verification_skipped", extra="goals=0")
 
     visual_config = VisualCommentaryConfig(
-        max_frames_per_event=args.max_frames_per_event,
-        max_frames_per_phase=args.max_frames_per_phase,
+        max_frames_per_event=args.max_frames_per_event if args.max_frames_per_event > 0 else None,
+        max_frames_per_phase=args.max_frames_per_phase if args.max_frames_per_phase > 0 else None,
         context_frames_each_side=args.context_frames_each_side,
         sample_fps=args.commentary_sample_fps,
     )
@@ -886,7 +906,6 @@ def scan_events_parallel(
         raw_observations.extend(result.observations)
 
     observations = _aggregate_observations(manifest, raw_observations, registry)
-    observations, replay_marker_frames = _apply_replay_marker_overrides(manifest, observations, registry)
     trace.record(
         "scan_events_parallel",
         "aggregate_frame_observations",
@@ -894,8 +913,6 @@ def scan_events_parallel(
             "raw_observation_count": len(raw_observations),
             "frame_observation_count": len(observations),
             "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
-            "fifa_replay_marker_relabels": len(replay_marker_frames),
-            "fifa_replay_marker_frames": list(replay_marker_frames),
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
@@ -1383,6 +1400,8 @@ def events_fingerprint(events: list[EventCandidate]) -> str:
 def goal_verify_config_to_dict(config: GoalVerificationConfig) -> dict[str, Any]:
     return {
         "sample_fps": config.sample_fps,
+        "window_sec": config.window_sec,
+        "stride_sec": config.stride_sec,
         "max_frames_per_goal": config.max_frames_per_goal,
         "max_frames_per_phase": config.max_frames_per_phase,
         "context_frames_each_side": config.context_frames_each_side,

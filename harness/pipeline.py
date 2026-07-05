@@ -8,9 +8,11 @@ from intern_client import InternClient
 
 from .bilingual import BilingualCommentaryResult, TranslationConfig, generate_bilingual_commentary
 from .commentary import CommentaryResult, VisualCommentaryConfig, generate_visual_commentary
+from .event_units import CommentaryUnitConfig, build_commentary_units
+from .goal_verifier import GoalVerificationConfig, GoalVerificationResult, verify_goal_events
 from .match_context import MatchContext, load_match_context
 from .manifest import FramesManifest, load_manifest
-from .scanner import ScanConfig, ScanResult, scan_events
+from .scanner import EventCandidate, ScanConfig, ScanResult, scan_events
 from .styles import StyleProfile, load_style
 from .tracing import NullTracker, StepTracker
 
@@ -23,6 +25,8 @@ class PipelineResult:
     scan: ScanResult
     commentary: CommentaryResult
     trace: StepTracker | None = None
+    generation_events: tuple[EventCandidate, ...] = ()
+    goal_verification: GoalVerificationResult | None = None
 
 
 @dataclass(frozen=True)
@@ -33,6 +37,69 @@ class BilingualPipelineResult:
     scan: ScanResult
     bilingual_commentary: BilingualCommentaryResult
     trace: StepTracker | None = None
+    generation_events: tuple[EventCandidate, ...] = ()
+    goal_verification: GoalVerificationResult | None = None
+
+
+def prepare_generation_events(
+    scan: ScanResult,
+    manifest: FramesManifest,
+    style: StyleProfile,
+    client: Any | None = None,
+    tracker: StepTracker | None = None,
+    commentary_unit_config: CommentaryUnitConfig | None = None,
+    verify_goals_with_model: bool = False,
+    goal_verification_config: GoalVerificationConfig | None = None,
+) -> tuple[tuple[EventCandidate, ...], GoalVerificationResult | None]:
+    trace = tracker or NullTracker()
+    unit_config = commentary_unit_config or CommentaryUnitConfig()
+    trace.record(
+        "prepare_generation_events",
+        "start",
+        {
+            "raw_event_count": len(scan.events),
+            "commentary_units_enabled": unit_config.enabled,
+            "verify_goals_with_model": verify_goals_with_model,
+        },
+    )
+
+    generation_events = tuple(build_commentary_units(scan.events, unit_config))
+    trace.record(
+        "prepare_generation_events",
+        "coarse_events_merged",
+        {
+            "raw_event_count": len(scan.events),
+            "generation_event_count": len(generation_events),
+            "goal_count": sum(1 for event in generation_events if event.event_type == "goal"),
+        },
+    )
+
+    verification: GoalVerificationResult | None = None
+    if verify_goals_with_model:
+        active_client = client or InternClient()
+        verification = verify_goal_events(
+            generation_events,
+            manifest,
+            style,
+            active_client,
+            trace,
+            goal_verification_config,
+        )
+        generation_events = tuple(verification.events)
+        trace.record(
+            "prepare_generation_events",
+            "goal_scan_complete",
+            {
+                "verified_goals": len(verification.records),
+                "generation_event_count": len(generation_events),
+                "remaining_goal_count": sum(1 for event in generation_events if event.event_type == "goal"),
+            },
+        )
+    else:
+        trace.record("prepare_generation_events", "goal_scan_skipped", {"generation_event_count": len(generation_events)})
+
+    trace.record("prepare_generation_events", "finish", {"generation_event_count": len(generation_events)})
+    return generation_events, verification
 
 
 def run_pipeline(
@@ -43,6 +110,9 @@ def run_pipeline(
     tracker: StepTracker | None = None,
     visual_commentary_config: VisualCommentaryConfig | None = None,
     match_context_id_or_path: str | None = None,
+    commentary_unit_config: CommentaryUnitConfig | None = None,
+    verify_goals_with_model: bool = False,
+    goal_verification_config: GoalVerificationConfig | None = None,
 ) -> PipelineResult:
     trace = tracker or NullTracker()
     trace.record("run_pipeline", "start", {"manifest_path": str(manifest_path), "style_id_or_path": style_id_or_path})
@@ -60,8 +130,27 @@ def run_pipeline(
     trace.record("run_pipeline", "load_manifest", {"video_id": manifest.video_id, "frame_count": len(manifest.frames)})
     scan = scan_events(manifest_path, style, scan_config, active_client, trace, match_context)
     trace.record("run_pipeline", "scan_complete", {"event_count": len(scan.events)})
+    generation_events, goal_verification = prepare_generation_events(
+        scan,
+        manifest,
+        style,
+        active_client,
+        trace,
+        commentary_unit_config,
+        verify_goals_with_model,
+        goal_verification_config,
+    )
+    trace.record(
+        "run_pipeline",
+        "generation_events_ready",
+        {
+            "raw_event_count": len(scan.events),
+            "generation_event_count": len(generation_events),
+            "goal_verified": goal_verification is not None,
+        },
+    )
     commentary = generate_visual_commentary(
-        scan.events,
+        generation_events,
         manifest,
         style,
         active_client,
@@ -70,7 +159,16 @@ def run_pipeline(
         match_context,
     )
     trace.record("run_pipeline", "finish", {"segment_count": len(commentary.segments)})
-    return PipelineResult(manifest=manifest, style=style, match_context=match_context, scan=scan, commentary=commentary, trace=tracker)
+    return PipelineResult(
+        manifest=manifest,
+        style=style,
+        match_context=match_context,
+        scan=scan,
+        commentary=commentary,
+        trace=tracker,
+        generation_events=tuple(generation_events),
+        goal_verification=goal_verification,
+    )
 
 
 def run_bilingual_pipeline(
@@ -82,6 +180,9 @@ def run_bilingual_pipeline(
     visual_commentary_config: VisualCommentaryConfig | None = None,
     translation_config: TranslationConfig | None = None,
     match_context_id_or_path: str | None = None,
+    commentary_unit_config: CommentaryUnitConfig | None = None,
+    verify_goals_with_model: bool = False,
+    goal_verification_config: GoalVerificationConfig | None = None,
 ) -> BilingualPipelineResult:
     trace = tracker or NullTracker()
     trace.record(
@@ -107,8 +208,27 @@ def run_bilingual_pipeline(
     )
     scan = scan_events(manifest_path, style, scan_config, active_client, trace, match_context)
     trace.record("run_bilingual_pipeline", "scan_complete", {"event_count": len(scan.events)})
+    generation_events, goal_verification = prepare_generation_events(
+        scan,
+        manifest,
+        style,
+        active_client,
+        trace,
+        commentary_unit_config,
+        verify_goals_with_model,
+        goal_verification_config,
+    )
+    trace.record(
+        "run_bilingual_pipeline",
+        "generation_events_ready",
+        {
+            "raw_event_count": len(scan.events),
+            "generation_event_count": len(generation_events),
+            "goal_verified": goal_verification is not None,
+        },
+    )
     bilingual = generate_bilingual_commentary(
-        scan.events,
+        generation_events,
         manifest,
         style,
         active_client,
@@ -125,4 +245,6 @@ def run_bilingual_pipeline(
         scan=scan,
         bilingual_commentary=bilingual,
         trace=tracker,
+        generation_events=tuple(generation_events),
+        goal_verification=goal_verification,
     )

@@ -47,10 +47,10 @@ class CommentaryResult:
 
 @dataclass(frozen=True)
 class VisualCommentaryConfig:
-    max_frames_per_event: int = 12
-    max_frames_per_phase: int = 4
+    max_frames_per_event: int | None = None
+    max_frames_per_phase: int | None = None
     context_frames_each_side: int = 1
-    sample_fps: float | None = 0.5
+    sample_fps: float | None = 2.0
 
 
 def generate_commentary(
@@ -405,6 +405,8 @@ def _select_visual_frames(
     config: VisualCommentaryConfig,
 ) -> tuple[FrameInfo, ...]:
     frame_by_id = {frame.frame_id: frame for frame in manifest_frames}
+    event_limit = _normalize_frame_limit(config.max_frames_per_event)
+    phase_limit = _normalize_frame_limit(config.max_frames_per_phase)
     selected_frames: list[FrameInfo] = []
     for phase in event.phases:
         phase_frames = _frames_in_time_range_with_context(
@@ -418,33 +420,39 @@ def _select_visual_frames(
             _select_related_frame_sample(
                 phase_frames,
                 phase.evidence_frames,
-                config.max_frames_per_phase,
+                phase_limit,
                 frame_by_id,
                 config.sample_fps,
             )
         )
 
     selected_frames = _unique_frames(selected_frames)
-    remaining_budget = max(0, config.max_frames_per_event - len(selected_frames))
-    if remaining_budget:
-        event_frames = _frames_in_time_range_with_context(
-            manifest_frames,
-            event.start_sec,
-            event.end_sec,
-            config.context_frames_each_side,
-        )
-        event_frames = _sample_frames_by_fps(event_frames, config.sample_fps)
+    event_frames = _frames_in_time_range_with_context(
+        manifest_frames,
+        event.start_sec,
+        event.end_sec,
+        config.context_frames_each_side,
+    )
+    event_frames = _sample_frames_by_fps(event_frames, config.sample_fps)
+    if event_limit is None:
         selected_frames.extend(
-            _select_related_frame_sample(
-                event_frames,
-                event.evidence_frames,
-                remaining_budget,
-                frame_by_id,
-                config.sample_fps,
-            )
+            _select_related_frame_sample(event_frames, event.evidence_frames, None, frame_by_id, config.sample_fps)
+        )
+        return tuple(_unique_frames(selected_frames))
+
+    remaining_budget = max(0, event_limit - len(selected_frames))
+    if remaining_budget:
+        selected_frames.extend(
+            _select_related_frame_sample(event_frames, event.evidence_frames, remaining_budget, frame_by_id, config.sample_fps)
         )
 
-    return tuple(_unique_frames(selected_frames)[: config.max_frames_per_event])
+    return tuple(_unique_frames(selected_frames)[:event_limit])
+
+
+def _normalize_frame_limit(limit: int | None) -> int | None:
+    if limit is None or limit <= 0:
+        return None
+    return limit
 
 
 def _frames_in_time_range(frames: tuple[FrameInfo, ...], start_sec: float, end_sec: float) -> tuple[FrameInfo, ...]:
@@ -470,15 +478,15 @@ def _frames_in_time_range_with_context(
 def _select_related_frame_sample(
     interval_frames: tuple[FrameInfo, ...],
     evidence_frame_ids: tuple[str, ...],
-    limit: int,
+    limit: int | None,
     frame_by_id: dict[str, FrameInfo],
     sample_fps: float | None,
 ) -> list[FrameInfo]:
-    if limit <= 0:
-        return []
-
     evidence_frames = tuple(frame_by_id[frame_id] for frame_id in evidence_frame_ids if frame_id in frame_by_id)
     evidence_frames = _sample_frames_by_fps(evidence_frames, sample_fps)
+    if limit is None:
+        return _unique_frames([*evidence_frames, *interval_frames])
+
     selected = list(_sample_frames(evidence_frames, min(limit, len(evidence_frames))))
     remaining = limit - len(_unique_frames(selected))
     if remaining > 0:

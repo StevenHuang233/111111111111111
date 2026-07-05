@@ -10,7 +10,6 @@ from .event_types import EventTypeRegistry, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
 from .match_context import MatchContext, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
-from .replay_markers import FIFA_REPLAY_BUMPER_EVIDENCE, detect_fifa_replay_bumper
 from .styles import StyleProfile
 from .time_utils import format_timestamp
 from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
@@ -205,7 +204,6 @@ def scan_events(
                 )
 
     observations = _aggregate_observations(manifest, raw_observations, registry)
-    observations, replay_marker_frames = _apply_replay_marker_overrides(manifest, observations, registry)
     trace.record(
         "scan_events",
         "aggregate_frame_observations",
@@ -213,8 +211,6 @@ def scan_events(
             "raw_observation_count": len(raw_observations),
             "frame_observation_count": len(observations),
             "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
-            "fifa_replay_marker_relabels": len(replay_marker_frames),
-            "fifa_replay_marker_frames": list(replay_marker_frames),
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
@@ -503,52 +499,6 @@ def _aggregate_observations(
             )
         )
     return aggregated
-
-
-def _apply_replay_marker_overrides(
-    manifest: FramesManifest,
-    observations: list[FrameObservation],
-    registry: EventTypeRegistry,
-) -> tuple[list[FrameObservation], tuple[str, ...]]:
-    replay_event_type = "celebration_or_replay"
-    if replay_event_type not in registry.event_types:
-        return observations, ()
-
-    frame_by_id = {frame.frame_id: frame for frame in manifest.frames}
-    adjusted: list[FrameObservation] = []
-    relabeled_frame_ids: list[str] = []
-    for observation in observations:
-        if not (
-            observation.needs_commentary
-            and observation.event_type == "goal"
-            and (frame := frame_by_id.get(observation.frame_id)) is not None
-            and detect_fifa_replay_bumper(frame.path)
-        ):
-            adjusted.append(observation)
-            continue
-
-        relabeled_frame_ids.append(observation.frame_id)
-        adjusted.append(
-            FrameObservation(
-                frame_id=observation.frame_id,
-                timestamp_sec=observation.timestamp_sec,
-                needs_commentary=True,
-                event_type=replay_event_type,
-                confidence=observation.confidence,
-                evidence=_append_evidence(observation.evidence, FIFA_REPLAY_BUMPER_EVIDENCE),
-                source_window=observation.source_window,
-            )
-        )
-
-    return adjusted, tuple(relabeled_frame_ids)
-
-
-def _append_evidence(existing: str, note: str) -> str:
-    if not existing:
-        return note
-    if note in existing:
-        return existing
-    return f"{existing}; {note}"
 
 
 def _build_event_candidates(

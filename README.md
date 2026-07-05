@@ -61,10 +61,11 @@ result = run_pipeline(
     style_id_or_path="broadcast_professional",
     scan_config=ScanConfig(window_size_frames=6, stride_frames=3),
     tracker=tracker,
-    visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=12, max_frames_per_phase=4),
+    visual_commentary_config=VisualCommentaryConfig(),
 )
 
 dump_scan_result(result.scan, "outputs/events.json")
+# Generation reads result.generation_events, which are built from the coarse scan.
 dump_commentary_result(result.commentary, "outputs/commentary.json")
 tracker.dump("outputs/trace.json")
 ```
@@ -78,7 +79,7 @@ result = run_bilingual_pipeline(
     style_id_or_path="broadcast_professional",
     scan_config=ScanConfig(window_size_frames=6, stride_frames=3),
     tracker=tracker,
-    visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=12, max_frames_per_phase=4),
+    visual_commentary_config=VisualCommentaryConfig(),
     translation_config=TranslationConfig(),
 )
 
@@ -121,6 +122,8 @@ The trace records high-level and module-level steps such as:
 - `scan_events.window -> parsed_model_response`
 - `scan_events -> aggregate_frame_observations`
 - `scan_events -> merge_event_candidates`
+- `prepare_generation_events -> coarse_events_merged`
+- `prepare_generation_events -> goal_scan_skipped` or `goal_scan_complete`
 - `generate_visual_commentary.event -> prepare_model_call`
 
 Each step includes an index, elapsed seconds, action name, and structured details such as frame IDs, window ranges, event counts, phase types, and merge counts.
@@ -229,7 +232,6 @@ python run_full_bilingual_with_progress.py `
   --run-name "nightwork_context_full" `
   --match-context germany_curacao_world_cup_2026 `
   --style elite_broadcast_replay `
-  --coarse-only-generation `
   --verify-goals-with-model
 ```
 
@@ -269,7 +271,7 @@ ScanConfig(
 
 ## Commentary unit packing
 
-The scan result is kept as raw evidence in `coarse/events.json`. Before dense scanning or coarse-only generation, the full runner now builds a separate commentary-facing event list in `commentary_units/events.json`.
+The scan result is kept as raw evidence in `coarse/events.json`. Before generation, the full runner builds a separate commentary-facing event list in `commentary_units/events.json`.
 
 This layer is intentionally separate from scanning:
 
@@ -333,14 +335,14 @@ It returns segments with:
 
 By default, the speaking interval equals the detected event interval.
 
-`generate_visual_commentary()` sends structured event data plus selected visual frames to the model. It does not send every frame in a long event; it samples representative frames from each phase interval and the overall event interval, while prioritizing evidence frames. Tune this with:
+`generate_visual_commentary()` sends structured event data plus selected visual frames to the model. It samples frames from each phase interval and the overall event interval at the configured FPS, while prioritizing evidence frames. By default there is no per-event or per-phase frame-count cap; set the max fields only for smoke tests or cost-control runs:
 
 ```python
 VisualCommentaryConfig(
-    max_frames_per_event=12,
-    max_frames_per_phase=4,
+    max_frames_per_event=None,
+    max_frames_per_phase=None,
     context_frames_each_side=1,
-    sample_fps=0.5,
+    sample_fps=2.0,
 )
 ```
 
@@ -397,23 +399,24 @@ The runner writes:
 - `coarse/events.json`: full-video coarse scan result.
 - `commentary_units/events.json`: filtered and packed generation units built from coarse events.
 - `commentary_units/events_selected.json`: optional smoke-test subset when `--max-generation-events` is set.
-- `dense/<event>/events.json`: dense scan result for each coarse event interval.
+- `dense/<event>/events.json`: dense scan result for each coarse event interval when `--dense-generation` is enabled.
 - `commentary/<event>/commentary_bilingual.json`: per-event bilingual commentary.
 - `commentary_bilingual.json`: aggregated bilingual commentary.
 
 Resume is enabled by default. If the process is interrupted, run the same command with the same `--run-name`; completed stages and cached model calls are reused. Use `--no-resume` only when you want to ignore checkpoints.
 
-Use `--coarse-only-generation` when dense scan is too slow or does not add enough value for a demo. In that mode the runner stops after coarse scanning and generates bilingual commentary directly from coarse events, using the full manifest for sampled visual frames:
+The full runner now uses coarse-derived event generation by default. It stops after coarse scanning, builds commentary units, optionally verifies goals, and generates bilingual commentary directly from those events using the full manifest for sampled visual frames:
 
 ```powershell
 python run_full_bilingual_with_progress.py `
   --run-name "coarse_demo" `
-  --coarse-only-generation `
-  --commentary-sample-fps 0.5 `
+  --commentary-sample-fps 2.0 `
   --exclude-generation-event-types period_transition,other_relevant
 ```
 
-`--concurrency` controls independent model calls. Coarse scan windows and dense scan windows run concurrently. For bilingual generation, English must be generated before the matching Chinese translation for the same event, but different events can run concurrently.
+Use `--dense-generation` only when you want the legacy dense per-event scan layer before generation.
+
+`--concurrency` controls independent model calls. Coarse scan windows run concurrently; dense scan windows also run concurrently when `--dense-generation` is enabled. For bilingual generation, English must be generated before the matching Chinese translation for the same event, but different events can run concurrently.
 
 The runner also staggers request starts and retries rate-limit errors by default. Tune this with `--request-stagger-sec`, `--max-retries`, `--retry-base-sec`, and `--retry-max-sec` if the API reports requests are too frequent.
 
@@ -481,11 +484,11 @@ outputs/<run-name>/goal_validation/refined_events.json
 outputs/<run-name>/goal_validation/flagged_goals.md
 ```
 
-The verifier treats `event_type=goal` as a candidate label, not proof. It can keep the event as `goal` or downgrade it to `shot`, `save`, `dangerous_attack`, `celebration_or_replay`, or another allowed type when the visual evidence does not support a real scored goal. It does not enforce a fixed number of goals for the match.
+The verifier treats `event_type=goal` as a candidate label, not proof. It scans each goal package at 2fps in 3-second sliding windows, then keeps the event as `goal` or downgrades it to `shot`, `save`, `dangerous_attack`, `celebration_or_replay`, or another allowed type when the visual evidence does not support a real scored goal. FIFA replay bumper detection runs only inside this verifier stage; a replay-bumper-only goal candidate is downgraded to `celebration_or_replay`. It does not enforce a fixed number of goals for the match.
 
 ### Step 5: Generate all coarse-derived commentary
 
-For the current "generate everything after coarse scan" mode, use `--coarse-only-generation` and do not set `--generation-event-types`, `--exclude-generation-event-types`, or `--max-generation-events`. This means every commentary unit produced from the coarse scan is sent to bilingual generation.
+For the current "generate everything after coarse scan" mode, do not set `--generation-event-types`, `--exclude-generation-event-types`, or `--max-generation-events`. This means every commentary unit produced from the coarse scan is sent to bilingual generation.
 
 Recommended command:
 
@@ -494,16 +497,13 @@ $env:INTERN_API_KEY="your_key"
 
 python run_full_bilingual_with_progress.py `
   --run-name "coarse_new_boundary_20260704_223738" `
-  --coarse-only-generation `
   --verify-goals-with-model `
   --concurrency 16 `
   --request-stagger-sec 2 `
-  --commentary-sample-fps 0.5 `
-  --max-frames-per-event 12 `
-  --max-frames-per-phase 4
+  --commentary-sample-fps 2.0
 ```
 
-With `--coarse-only-generation`, dense scanning is skipped. The generation module reads the coarse-derived event unit, its phases, evidence summary, event definitions, style profile, and sampled visual frames from the full 4fps manifest. `--commentary-sample-fps 0.5` means final generation samples about one frame every 2 seconds inside each event or phase, up to the configured frame caps.
+By default, dense scanning is skipped. The generation module reads the coarse-derived event unit, its phases, evidence summary, event definitions, style profile, and sampled visual frames from the full 4fps manifest. `--commentary-sample-fps 2.0` means final generation samples about two frames per second inside each event or phase without a frame-count cap. Use `--max-frames-per-event` or `--max-frames-per-phase` only when you intentionally want to cap generation payload size.
 
 The final output is:
 
@@ -542,13 +542,10 @@ Start-Process -FilePath ".\.venv\Scripts\python.exe" `
   -ArgumentList @(
     "run_full_bilingual_with_progress.py",
     "--run-name", "coarse_new_boundary_20260704_223738",
-    "--coarse-only-generation",
     "--verify-goals-with-model",
     "--concurrency", "16",
     "--request-stagger-sec", "2",
-    "--commentary-sample-fps", "0.5",
-    "--max-frames-per-event", "12",
-    "--max-frames-per-phase", "4"
+    "--commentary-sample-fps", "2.0"
   ) `
   -WorkingDirectory (Get-Location) `
   -RedirectStandardOutput $stdout `

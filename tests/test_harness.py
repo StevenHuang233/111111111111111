@@ -407,7 +407,7 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual([phase.phase_type for phase in event.phases], ["live_goal", "replay"])
             self.assertIn("wide replay", event.evidence_summary)
 
-    def test_fifa_replay_bumper_relabels_goal_observation_as_replay(self) -> None:
+    def test_fifa_replay_bumper_downgrades_goal_during_verification(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             frames = []
@@ -441,11 +441,32 @@ class HarnessTests(unittest.TestCase):
                 FakeClient([response]),
             )
 
-            self.assertEqual(result.observations[1].event_type, "celebration_or_replay")
-            self.assertIn("FIFA replay bumper detected", result.observations[1].evidence)
+            self.assertEqual(result.observations[1].event_type, "goal")
             self.assertEqual(len(result.events), 1)
             self.assertEqual(result.events[0].event_type, "goal")
-            self.assertEqual([phase.phase_type for phase in result.events[0].phases], ["live_goal", "replay"])
+
+            verification_response = json.dumps(
+                {
+                    "window_verdict": "replay_or_celebration",
+                    "confidence": 0.94,
+                    "corrected_event_type": "celebration_or_replay",
+                    "contains_live_scoring_action": False,
+                    "contains_fifa_replay_bumper": True,
+                    "rationale": "The selected frames show FIFA replay packaging, not a live scoring action.",
+                    "warnings": [],
+                }
+            )
+            verification = verify_goal_events(
+                [result.events[0]],
+                load_manifest(manifest_path),
+                load_style("broadcast_professional"),
+                FakeClient([verification_response, verification_response]),
+                config=GoalVerificationConfig(sample_fps=2.0, window_sec=3.0, stride_sec=3.0),
+            )
+
+            self.assertEqual(verification.events[0].event_type, "celebration_or_replay")
+            self.assertEqual(verification.records[0].corrected_event_type, "celebration_or_replay")
+            self.assertIn("fifa_replay_bumper_detected", verification.records[0].warnings[0])
 
     def test_commentary_units_merge_goal_with_mixed_replay_sequence(self) -> None:
         events = [
@@ -578,6 +599,53 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(result.events[0].event_type, "shot")
             self.assertEqual(result.records[0].verdict, "not_goal")
             self.assertIn("no follow-up support", result.records[0].warnings[0])
+
+    def test_goal_verifier_ignores_deprecated_frame_caps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            timestamps = [index * 0.25 for index in range(13)]
+            manifest = load_manifest(write_manifest_with_timestamps(Path(tmp), timestamps))
+            event = EventCandidate(
+                "U020",
+                "goal",
+                0.0,
+                3.0,
+                tuple(f"f{index}" for index in range(13)),
+                0.9,
+                "ball crosses the goal line",
+                (EventPhase("live_goal", 0.0, 3.0, tuple(f"f{index}" for index in range(13)), "ball crosses the goal line"),),
+            )
+            response = json.dumps(
+                {
+                    "window_verdict": "live_goal",
+                    "confidence": 0.96,
+                    "corrected_event_type": "goal",
+                    "contains_live_scoring_action": True,
+                    "contains_fifa_replay_bumper": False,
+                    "rationale": "The finish is visible.",
+                    "warnings": [],
+                }
+            )
+            fake = FakeClient([response])
+
+            verify_goal_events(
+                [event],
+                manifest,
+                load_style("broadcast_professional"),
+                fake,
+                config=GoalVerificationConfig(
+                    sample_fps=2.0,
+                    window_sec=3.0,
+                    stride_sec=3.0,
+                    max_frames_per_goal=1,
+                    max_frames_per_phase=1,
+                ),
+            )
+
+            content = fake.calls[0]["messages"][0]["content"]
+            image_count = sum(1 for part in content if isinstance(part, dict) and part.get("type") == "image_url")
+            sent_text = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
+            self.assertEqual(image_count, 7)
+            self.assertIn("frame_id=f12", sent_text)
 
     def test_illegal_event_type_repair(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -741,6 +809,89 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(len(result.scan.events), 1)
             self.assertEqual(len(result.commentary.segments), 1)
 
+    def test_run_pipeline_generates_from_coarse_merged_units(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=5)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "goal", "confidence": 0.93, "evidence": "ball in net"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {
+                            "frame_id": "f3",
+                            "needs_commentary": True,
+                            "event_type": "celebration_or_replay",
+                            "confidence": 0.88,
+                            "evidence": "players celebrating",
+                        },
+                        {"frame_id": "f4", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "Goal, then the celebration rolls on.", "subtitle_lines": []})
+            result = run_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=5, stride_frames=5),
+                FakeClient([scan_response, commentary_response]),
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=4, max_frames_per_phase=2),
+            )
+
+            self.assertEqual(len(result.scan.events), 2)
+            self.assertEqual(len(result.generation_events), 1)
+            self.assertEqual(result.generation_events[0].event_type, "goal")
+            self.assertEqual([phase.phase_type for phase in result.generation_events[0].phases], ["live_goal", "celebration"])
+            self.assertEqual(len(result.commentary.segments), 1)
+
+    def test_run_pipeline_can_goal_scan_before_generation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=3)
+            scan_response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {
+                            "frame_id": "f1",
+                            "needs_commentary": True,
+                            "event_type": "goal",
+                            "confidence": 0.9,
+                            "evidence": "ball crossing the goal line",
+                        },
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            verification_response = json.dumps(
+                {
+                    "verdict": "confirmed_goal",
+                    "corrected_event_type": "goal",
+                    "confidence": 0.96,
+                    "rationale": "The ball crossing the goal line is visible.",
+                    "phase_labels": [{"phase_index": 0, "phase_type": "live_goal", "reason": "clear finish"}],
+                    "warnings": [],
+                }
+            )
+            commentary_response = json.dumps({"commentary_text": "The finish is confirmed.", "subtitle_lines": []})
+            fake = FakeClient([scan_response, verification_response, commentary_response])
+
+            result = run_pipeline(
+                manifest_path,
+                "broadcast_professional",
+                ScanConfig(window_size_frames=3, stride_frames=3),
+                fake,
+                visual_commentary_config=VisualCommentaryConfig(max_frames_per_event=2, max_frames_per_phase=2),
+                verify_goals_with_model=True,
+            )
+
+            self.assertIsNotNone(result.goal_verification)
+            self.assertEqual(len(result.goal_verification.records), 1)
+            self.assertIn("Goal verification verdict=confirmed_goal", result.generation_events[0].evidence_summary)
+            second_prompt = fake.calls[1]["messages"][0]["content"][0]["text"]
+            third_prompt = fake.calls[2]["messages"][0]["content"][0]["text"]
+            self.assertIn("verifying one sliding visual window", second_prompt)
+            self.assertIn("generating football commentary", third_prompt)
+
     def test_run_bilingual_pipeline_with_fake_client(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=3)
@@ -866,6 +1017,35 @@ class HarnessTests(unittest.TestCase):
             self.assertIn("frame_id=f4", sent_text)
             self.assertNotIn("frame_id=f1", sent_text)
             self.assertNotIn("frame_id=f3", sent_text)
+
+    def test_visual_commentary_defaults_to_no_frame_count_cap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            timestamps = [index * 0.25 for index in range(33)]
+            manifest = load_manifest(write_manifest_with_timestamps(Path(tmp), timestamps))
+            event = EventCandidate(
+                event_id="E001",
+                event_type="dangerous_attack",
+                start_sec=0.0,
+                end_sec=8.0,
+                evidence_frames=tuple(f"f{index}" for index in range(33)),
+                confidence=0.8,
+                evidence_summary="sustained attack",
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "A sustained attack.", "subtitle_lines": []})])
+
+            generate_commentary(
+                [event],
+                manifest,
+                load_style("broadcast_professional"),
+                fake,
+                visual_config=VisualCommentaryConfig(context_frames_each_side=0),
+            )
+
+            content = fake.calls[-1]["messages"][0]["content"]
+            image_count = sum(1 for part in content if isinstance(part, dict) and part.get("type") == "image_url")
+            sent_text = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
+            self.assertEqual(image_count, 17)
+            self.assertIn("frame_id=f32", sent_text)
 
     def test_dense_manifests_respect_sample_fps(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
