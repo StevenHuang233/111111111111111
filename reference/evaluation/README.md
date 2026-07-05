@@ -21,9 +21,11 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `commentary_quality_eval.md` | Latest quality metrics, issue samples, and improvement suggestions for `outputs/commentary_bilingual.json`. | 对 `outputs/commentary_bilingual.json` 的最新质量指标、问题样例和改进建议。 |
 | `final_evaluation_gates.md` | Aggregates quality, goal alignment, and identity/style gates. | 汇总质量、进球对齐、身份与风格三类门禁。 |
 | `revision_queue.md` | Prioritized rewrite/suppression queue built from gate failures. | 从门禁失败项生成的重写/抑制优先级队列。 |
+| `commentary_revision_annotations.md` | Final-output segments annotated with blocker/warning/clear status and safe-use policy. | 给终稿片段标注阻塞、警告、可保留状态和安全使用策略。 |
 | `tools/audit_commentary_output.py` | Script that audits generated commentary against public facts and ASR weak signals. | 将生成解说与公开事实、ASR 弱信号对比的脚本。 |
 | `tools/run_evaluation_gates.py` | One-command final evaluation gate runner. | 一条命令运行全部终稿评测门禁。 |
 | `tools/build_revision_queue.py` | Converts gate reports into concrete segment-level fix actions. | 将门禁报告转换成具体片段级修订动作。 |
+| `tools/annotate_commentary_for_revision.py` | Merges the revision queue back into commentary JSON for human/agent correction. | 将修订队列合并回解说 JSON，供人工或修订 Agent 使用。 |
 | `tools/evaluate_commentary_quality.py` | General quality evaluator for bilingual commentary JSON. | 面向双语解说 JSON 的通用质量评测脚本。 |
 | `tools/compare_goal_timeline.py` | Goal/score assertion alignment gate. | 进球/比分声明时间线对齐门禁。 |
 | `tools/audit_identity_style.py` | Identity support and broadcast-style wording gate. | 身份依据与解说风格措辞门禁。 |
@@ -57,6 +59,20 @@ python reference/evaluation/tools/build_revision_queue.py `
 EN: Fix `Must` items first, then rerun `run_evaluation_gates.py --fail-on-any`.
 
 ZH: 先处理 `Must` 项，再重新运行 `run_evaluation_gates.py --fail-on-any`。
+
+Annotate the generated commentary with safe-use policies / 给生成解说标注安全使用策略：
+
+```powershell
+python reference/evaluation/tools/annotate_commentary_for_revision.py `
+  --input outputs/commentary_bilingual.json `
+  --queue reference/evaluation/revision_queue.json `
+  --output-json reference/evaluation/commentary_revision_annotations.json `
+  --output-md reference/evaluation/commentary_revision_annotations.md
+```
+
+EN: `blocker` segments must be suppressed, rewritten, or manually accepted before final demo packaging.
+
+ZH: `blocker` 片段必须被抑制、重写或人工确认接受后，才能进入最终 demo 打包。
 
 Generate a report / 生成报告：
 
