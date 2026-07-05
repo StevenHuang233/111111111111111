@@ -337,6 +337,28 @@ The bilingual output nests both languages under each segment:
 }
 ```
 
+## SRT export
+
+Export generated bilingual commentary to SRT files:
+
+中文：将生成的双语解说导出为 SRT 字幕文件：
+
+```powershell
+python scripts/export_commentary_srt.py `
+  --input outputs/commentary_bilingual.json `
+  --output-dir outputs/srt `
+  --text-source both `
+  --languages all
+```
+
+This writes Chinese, English, and bilingual SRT files for both concise
+`subtitle_lines` and full `commentary_text`. The generated SRT files stay under
+ignored `outputs/`.
+
+中文：该命令会同时生成中文、英文和中英双语 SRT，并覆盖简短
+`subtitle_lines` 与完整 `commentary_text` 两种文本来源。生成的 SRT 文件保留在被
+Git 忽略的 `outputs/` 目录下。
+
 ## Full run with progress and resume
 
 For a full-video run with live progress, ETA, and checkpoint resume:
