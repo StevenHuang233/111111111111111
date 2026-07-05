@@ -1,0 +1,2797 @@
+{
+  "policy": "Evaluation-only revision queue. Do not inject public references or manual-review facts into target-agent hidden context.",
+  "summary": {
+    "revision_items": 108,
+    "counts_by_priority": {
+      "Must": 32,
+      "Should": 75,
+      "Could": 1
+    },
+    "counts_by_issue": {
+      "unsupported_name": 13,
+      "wrong_entity": 9,
+      "raw_visual_wording": 44,
+      "prematch_action_misclassification": 1,
+      "extra_goal_assertion": 21,
+      "color_identity_fallback": 43,
+      "duplicate_goal_near_verified_change": 8,
+      "mixed_language_chinese": 5
+    }
+  },
+  "items": [
+    {
+      "event_id": "U011",
+      "event_type": "other_relevant",
+      "time": "00:05:28-00:05:32",
+      "excerpt": "And here comes the crowd reaction. A sea of blue and yellow, Colombian fans in their signature wide-brimmed hats, hands clasped in quiet tension. Then, a sharp cut to the other sid",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombian"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U014",
+      "event_type": "var_review",
+      "time": "00:06:48-00:06:52",
+      "excerpt": "The VAR team is now reviewing the incident. Referee Hamza El Fario and assistant Nicolas Gallo are closely examining the footage in the Hisense VAR room, with multiple screens disp",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "prematch_action_misclassification",
+          "priority": "Must",
+          "action": "Reclassify as opening/officials/broadcast context; do not narrate as match action.",
+          "rationale": "Before kickoff, ceremony and broadcast graphics must not become fouls, VAR incidents, or restarts.",
+          "source": "commentary_quality_eval",
+          "details": {}
+        }
+      ]
+    },
+    {
+      "event_id": "U036",
+      "event_type": "goal",
+      "time": "00:14:08-00:15:28",
+      "excerpt": "Germany takes the lead! A shot from inside the box finds the back of the net after a scramble in the penalty area. The goalkeeper dives but can't reach it as the ball rolls past hi",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombia"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U042",
+      "event_type": "goal",
+      "time": "00:17:12-00:18:12",
+      "excerpt": "And here it is — Germany doubles their lead! A crisp, clinical finish from inside the box as the ball nestles into the back of the net. The keeper dives but can’t reach it — pure c",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "1-0",
+            "previous_goal_id": "G01",
+            "next_goal_id": "G02",
+            "next_goal_window": "00:29:31-00:30:04"
+          }
+        },
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Müller"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U054",
+      "event_type": "celebration_or_replay",
+      "time": "00:21:00-00:21:00",
+      "excerpt": "And there it is — a moment of pure precision. The German striker connects cleanly on the volley, sending the ball past the keeper and into the net. The crowd erupts as the scoreboa",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "1-0",
+            "previous_goal_id": "G01",
+            "next_goal_id": "G02",
+            "next_goal_window": "00:29:31-00:30:04"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U062",
+      "event_type": "dangerous_attack",
+      "time": "00:23:32-00:23:32",
+      "excerpt": "Germany's #15 raises his arm in appeal as he advances — the team is pushing forward with intent, pressing into the final third. The momentum suggests a dangerous attack unfolding, ",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "1-0",
+            "previous_goal_id": "G01",
+            "next_goal_id": "G02",
+            "next_goal_window": "00:29:31-00:30:04"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U084",
+      "event_type": "foul",
+      "time": "00:33:00-00:33:00",
+      "excerpt": "A sharp challenge from behind catches the German player off guard — he goes down under contact from the Colombian defender. The referee immediately blows for the foul, and play sto",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombian"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U089",
+      "event_type": "foul",
+      "time": "00:34:36-00:34:40",
+      "excerpt": "There's a foul here — the Colombian player catches the German attacker with a late leg, sending him tumbling to the ground. The referee will need to decide whether that was careles",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombian"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U090",
+      "event_type": "goal",
+      "time": "00:34:52-00:36:16",
+      "excerpt": "Germany takes a free kick near the penalty area. The ball is struck with precision, curling past the defensive wall and into the net. The German players celebrate as the goal is co",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "1-1",
+            "previous_goal_id": "G02",
+            "next_goal_id": "G03",
+            "next_goal_window": "00:45:35-00:45:52"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U118",
+      "event_type": "dangerous_attack",
+      "time": "00:43:04-00:43:08",
+      "excerpt": "Colombia’s #12 drives down the right flank, cutting inside as German defenders converge — a tight moment in the box, no shot taken yet, but the pressure is building. / 哥伦比亚12号沿右路高速",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombia"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U119",
+      "event_type": "dangerous_attack",
+      "time": "00:43:16-00:43:16",
+      "excerpt": "Germany builds a dangerous attack in the final third, with multiple players entering the penalty area and a cross delivered into a crowded box. The chance looks promising as the ba",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "1-1",
+            "previous_goal_id": "G02",
+            "next_goal_id": "G03",
+            "next_goal_window": "00:45:35-00:45:52"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U130",
+      "event_type": "celebration_or_replay",
+      "time": "00:48:48-00:49:08",
+      "excerpt": "Germany takes the lead! Späne finds the back of the net with a powerful strike, sending the home crowd into a frenzy. The replay shows his precise placement past the diving keeper,",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Späne"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U131",
+      "event_type": "goal",
+      "time": "00:49:40-00:50:40",
+      "excerpt": "Germany takes a commanding lead! The attacking move builds with precision as the ball is moved into the final third. A player drives forward, evading defenders, and delivers a deci",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "2-1",
+            "previous_goal_id": "G03",
+            "next_goal_id": "G04",
+            "next_goal_window": "00:57:19-00:57:35"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U135",
+      "event_type": "goal",
+      "time": "00:51:40-00:53:00",
+      "excerpt": "Germany takes a free kick near the penalty area. The German player strikes the ball, and it goes into the net! The goalkeeper dives but cannot reach it. The German players celebrat",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "2-1",
+            "previous_goal_id": "G03",
+            "next_goal_id": "G04",
+            "next_goal_window": "00:57:19-00:57:35"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U136",
+      "event_type": "celebration_or_replay",
+      "time": "00:53:12-00:53:20",
+      "excerpt": "Curacao's player in blue and yellow celebrates as the crowd erupts. The scoreboard shows Germany leading 2-1 at 45:02, but the home fans are visibly energized. Close-ups reveal emo",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "2-1",
+            "previous_goal_id": "G03",
+            "next_goal_id": "G04",
+            "next_goal_window": "00:57:19-00:57:35"
+          }
+        },
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in blue\\b"
+            ]
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头",
+              "特写",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U162",
+      "event_type": "goal",
+      "time": "01:06:04-01:06:16",
+      "excerpt": "And there it is! Germany scores! The ball finds the back of the net as the goalkeeper is beaten. Sané and Musiala are seen celebrating in the moments following the goal. / 球进了！德国队破",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U176",
+      "event_type": "celebration_or_replay",
+      "time": "01:12:24-01:12:28",
+      "excerpt": "And there it is, Musiala with his 10th goal for Germany. The scoreboard confirms the 4-1 lead as Musiala catches his breath, bending over in exhaustion after the strike. / 进了！穆西亚拉为",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U180",
+      "event_type": "goal",
+      "time": "01:14:52-01:15:00",
+      "excerpt": "And there it is! A goal for Germany! The ball finds the back of the net as the goalkeeper is beaten on the dive. The German player who scored turns away with a focused look, and hi",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U186",
+      "event_type": "celebration_or_replay",
+      "time": "01:16:40-01:16:52",
+      "excerpt": "The German fans are absolutely losing it in the stands! Look at that sea of white and black-red-gold, everyone on their feet, arms raised, flags waving — pure electric atmosphere a",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U187",
+      "event_type": "free_kick",
+      "time": "01:16:56-01:17:08",
+      "excerpt": "Germany awarded a free kick just outside the penalty area. The referee ensures the defensive wall is set, and the taker steps up to take control of the situation. With the scorelin",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U191",
+      "event_type": "shot",
+      "time": "01:17:40-01:17:40",
+      "excerpt": "Colombia's number 11 takes a powerful shot from outside the box — the ball rockets toward goal as the German keeper braces for impact. A moment of tension, but will it find the net",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombia"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U193",
+      "event_type": "goal",
+      "time": "01:18:08-01:18:52",
+      "excerpt": "Germany scores! A fast break down the right flank sees Gnabry cut inside and strike a low shot that beats the goalkeeper and nestles into the bottom corner. The net ripples as the ",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        },
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Gnabry"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U200",
+      "event_type": "foul",
+      "time": "01:21:12-01:21:16",
+      "excerpt": "Curaçao's Bacuna goes up for a header, but he's caught off balance by Undav's challenge. The German defender makes contact with his back, sending Bacuna crashing to the turf. The r",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U201",
+      "event_type": "other_relevant",
+      "time": "01:21:20-01:21:20",
+      "excerpt": "Leandro Bacuna, wearing the number 10 for Curaçao, is shown on the field with a graphic indicating his 73rd cap for the national team. He stands next to an opponent in a Germany je",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bis shown\\b",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U202",
+      "event_type": "goal",
+      "time": "01:21:32-01:22:04",
+      "excerpt": "Curaçao takes a free kick near the penalty area. The ball is played into the box, and a Curaçao player makes a run towards the goal. He receives the ball and takes a shot from insi",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "4-1",
+            "previous_goal_id": "G05",
+            "next_goal_id": "G06",
+            "next_goal_window": "01:23:34-01:26:40"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U222",
+      "event_type": "goal",
+      "time": "01:29:44-01:30:40",
+      "excerpt": "Germany extends their lead! The attacker in white takes a shot from inside the box, the goalkeeper in green dives but can't reach it, and the ball finds the back of the net. The cr",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "5-1",
+            "previous_goal_id": "G06",
+            "next_goal_id": "G07",
+            "next_goal_window": "01:31:30-01:33:20"
+          }
+        },
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "白衣",
+              "绿衣门将"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U225",
+      "event_type": "goal",
+      "time": "01:31:28-01:32:36",
+      "excerpt": "Germany goes up 6-1! The ball finds the back of the net as the German players erupt in celebration. The crowd is on its feet, and the scoreboard confirms the goal. Nkunku and Kimmi",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Nkunku"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U238",
+      "event_type": "goal",
+      "time": "01:38:04-01:38:32",
+      "excerpt": "Germany's #26, Wirtz, finds space in the box and fires a low shot past the keeper! The net ripples as the ball crosses the line. Confirmed: Germany extend their lead to 6-1. Wirtz ",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "6-1",
+            "previous_goal_id": "G07",
+            "next_goal_id": "G08",
+            "next_goal_window": "01:42:20-01:42:30"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U244",
+      "event_type": "goal",
+      "time": "01:42:08-01:43:24",
+      "excerpt": "And here comes the goal for Germany! Havetz with a sharp finish from inside the box, the ball finds the back of the net as the keeper is beaten. The crowd erupts — 7-1 now! Havertz",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Havetz"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U248",
+      "event_type": "goal",
+      "time": "01:46:32-01:47:44",
+      "excerpt": "In stoppage time, Colombia’s number 10 breaks away with pace, chased by a German defender. He drives forward, enters the penalty area, and fires a shot. The ball finds the back of ",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "7-1",
+            "previous_goal_id": "G08",
+            "next_goal_id": null,
+            "next_goal_window": null
+          }
+        },
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombia"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "画面"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U249",
+      "event_type": "foul",
+      "time": "01:46:36-01:46:36",
+      "excerpt": "And there's the whistle! The German defender #22 makes contact with the Colombian attacker #10 near the sideline, causing a loss of balance. The assistant referee immediately raise",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "unsupported_name",
+          "priority": "Must",
+          "action": "Remove the name unless roster/OCR/broadcast graphic evidence supports it; use team+role/number instead.",
+          "rationale": "Unsupported names are unsafe factual assertions.",
+          "source": "identity_style_audit",
+          "details": {
+            "name": "Colombian"
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U252",
+      "event_type": "goal",
+      "time": "01:48:12-01:49:32",
+      "excerpt": "In stoppage time, Germany takes a free kick from just outside the penalty area. The ball is struck with precision, curling over the defensive wall and into the top corner of the ne",
+      "highest_priority": "Must",
+      "issues": [
+        {
+          "issue": "extra_goal_assertion",
+          "priority": "Must",
+          "action": "Suppress score-changing wording, or rewrite as replay/history/pending verification.",
+          "rationale": "Generated goal/score assertion does not align with a verified scoreboard transition.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "score_should_be": "7-1",
+            "previous_goal_id": "G08",
+            "next_goal_id": null,
+            "next_goal_window": null
+          }
+        },
+        {
+          "issue": "wrong_entity",
+          "priority": "Must",
+          "action": "Remove or replace the wrong team/entity with verified match metadata.",
+          "rationale": "Wrong team/entity is a factual blocker for final narration.",
+          "source": "identity_style_audit",
+          "details": {
+            "entity": "colombia"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U005",
+      "event_type": "other_relevant",
+      "time": "00:03:52-00:03:52",
+      "excerpt": "A close-up on the jacket reveals the crest of the Federashon Futbol Kòrsou, marking the presence of the Curaçao national team in this broadcast segment. / 镜头特写这件夹克，上面印有库拉索足球联合会的队徽，",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头",
+              "特写",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U007",
+      "event_type": "celebration_or_replay",
+      "time": "00:04:24-00:04:24",
+      "excerpt": "The camera finds a group of fans in the stands, their faces alight with emotion as they stand for the national anthem. One woman places her hand over her heart, eyes closed in reve",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U010",
+      "event_type": "period_transition",
+      "time": "00:04:48-00:05:24",
+      "excerpt": "The players are lining up for the pre-match handshake ceremony, a moment of sportsmanship before the kickoff. Mascots and young ball boys accompany the teams as they walk onto the ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "画面"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U013",
+      "event_type": "other_relevant",
+      "time": "00:06:28-00:06:44",
+      "excerpt": "The match officials are introduced on screen with their names and nationalities displayed. Referees are shown in a huddle, likely discussing match protocols before kickoff. Close-u",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头",
+              "画面",
+              "特写",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U016",
+      "event_type": "other_relevant",
+      "time": "00:07:04-00:08:00",
+      "excerpt": "The broadcast is now presenting the pre-match team lineups for both sides. Germany, under head coach Julian Nagelsmann, are set up in a 4-2-3-1 formation, with Jonathan Tah wearing",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bis shown\\b",
+              "镜头",
+              "画面",
+              "特写"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U017",
+      "event_type": "period_transition",
+      "time": "00:08:08-00:08:12",
+      "excerpt": "The German national team gathers in a tight huddle on the pitch, signaling a period transition—either before kickoff or after halftime. Players in white jerseys with visible number",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "身穿白色"
+            ]
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U021",
+      "event_type": "other_relevant",
+      "time": "00:08:48-00:08:52",
+      "excerpt": "A moment of heavy emotion for Germany as Kimmich sinks to his knees, head bowed in clear frustration or exhaustion. The weight of the game is visible on his shoulders. Across the p",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U023",
+      "event_type": "dangerous_attack",
+      "time": "00:09:28-00:09:28",
+      "excerpt": "A white-shirted attacker drives into the penalty area, surrounded by blue-shirted defenders. The ball is played forward as pressure mounts near the goal line. / 白衣进攻球员突入禁区，被蓝衣防守队员包",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwhite-shirted\\b",
+              "\\bblue-shirted\\b",
+              "蓝衣",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U028",
+      "event_type": "foul",
+      "time": "00:11:12-00:11:16",
+      "excerpt": "A German player makes contact with a Curaçao player, causing the Curaçao player to fall to the ground. This is visible as a foul situation. / 一名德国球员与库拉索球员发生接触，导致库拉索球员倒地。这明显是一次犯规情况。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U029",
+      "event_type": "foul",
+      "time": "00:11:28-00:11:28",
+      "excerpt": "And there it is — a clear trip from behind by Germany’s No. 5 as the Curaçao attacker dives forward in pursuit of the ball. The contact is visible, the fall is abrupt, and the refe",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U030",
+      "event_type": "dangerous_attack",
+      "time": "00:11:48-00:11:48",
+      "excerpt": "Germany in the final third, a white-jerseyed attacker drives forward with pace as defenders converge — this is where danger brews. The cross or shot is imminent, and the box is cro",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwhite-jerseyed\\b",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U033",
+      "event_type": "other_relevant",
+      "time": "00:12:04-00:12:08",
+      "excerpt": "Julian Nagelsmann is on the touchline, visibly animated as he directs his team. He points upward with one hand, then brings it to his lips in a focused gesture — likely signaling f",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U034",
+      "event_type": "dangerous_attack",
+      "time": "00:12:28-00:12:32",
+      "excerpt": "Germany builds a dangerous attack in the final third. A German player in white drives forward with the ball, drawing defenders as teammates converge near the penalty area. The ball",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "身穿白色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U045",
+      "event_type": "dangerous_attack",
+      "time": "00:18:52-00:18:52",
+      "excerpt": "A dangerous attack unfolds as the player in blue drives into the penalty area, drawing defenders in tight. The pressure builds as he attempts to create space, but the defense holds",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in blue\\b",
+              "蓝队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U046",
+      "event_type": "foul",
+      "time": "00:19:04-00:19:04",
+      "excerpt": "A German player in white goes down under the challenge from a Curaçao defender in blue. The referee is on the spot to assess whether contact was made. / 一名身穿白色球衣的德国球员在蓝衣库拉索防守球员的铲抢下",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "身穿白色",
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U051",
+      "event_type": "dangerous_attack",
+      "time": "00:20:40-00:20:40",
+      "excerpt": "White builds through the middle, and a runner in white finds space near the edge of the box. The attacker drives forward with the ball, pressing into the final third as a defender ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "白衣球员",
+              "白衣",
+              "白队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U052",
+      "event_type": "shot",
+      "time": "00:20:44-00:20:44",
+      "excerpt": "A player in white takes a shot from inside the penalty area. The ball is struck towards the goal, and the goalkeeper is positioned to react, but the outcome is not yet determined. ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U053",
+      "event_type": "dangerous_attack",
+      "time": "00:20:48-00:20:48",
+      "excerpt": "A white-jerseyed attacker breaks into the penalty area, but the goalkeeper is already down — defenders scramble to close out the chance. The ball’s gone, and the attack fizzles bef",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwhite-jerseyed\\b",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U055",
+      "event_type": "foul",
+      "time": "00:21:12-00:21:24",
+      "excerpt": "A foul is called near the center circle as a player in white goes down after contact with Locadia #9. The referee immediately intervenes, speaking to Locadia and gesturing for a fr",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U058",
+      "event_type": "foul",
+      "time": "00:23:04-00:23:04",
+      "excerpt": "Wintz in white makes a challenge with his arm out, making contact with the opponent as they go for the ball. The referee will likely blow for a foul there. / 身穿白色球衣的温茨在拼抢中伸臂拦截，与对手同",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "身穿白色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U061",
+      "event_type": "celebration_or_replay",
+      "time": "00:23:20-00:23:20",
+      "excerpt": "Germany's Pavlović and his teammate react with visible frustration after a missed opportunity — hands on heads, bowed heads — as the scoreboard shows Germany leading 1-0 against Cu",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U066",
+      "event_type": "other_relevant",
+      "time": "00:25:04-00:25:04",
+      "excerpt": "A close-up on Curaçao's Locden, number 6, standing near the sideline. The camera focuses on him as he looks towards the pitch, possibly awaiting instructions or preparing for a sub",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U068",
+      "event_type": "dangerous_attack",
+      "time": "00:27:04-00:27:04",
+      "excerpt": "Curaçao's attacker in blue drives forward into the penalty area, closely tracked by two German defenders. The pressure is high as he approaches the goal line with the ball, but the",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "身穿蓝色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U073",
+      "event_type": "dangerous_attack",
+      "time": "00:28:48-00:28:48",
+      "excerpt": "Germany in the final third, a dangerous attack developing with pace. The player in white drives forward, supported by runners into the box. Pressure is building as they look to unl",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U075",
+      "event_type": "celebration_or_replay",
+      "time": "00:29:00-00:29:00",
+      "excerpt": "Havertz reacts with visible frustration, hands on his head — a clear sign of a missed opportunity or setback in the match. The camera lingers on his back, capturing the weight of t",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bthe camera (?:shows|cuts|lingers)\\b",
+              "\\bvisible\\b",
+              "镜头",
+              "特写"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U076",
+      "event_type": "other_relevant",
+      "time": "00:29:04-00:29:08",
+      "excerpt": "Manuel Neuer stands alert in goal, the broadcast noting his status as Germany’s oldest ever player at 40 years and 79 days — a quiet moment of legacy amid the match’s rhythm. / 门前的",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U078",
+      "event_type": "shot",
+      "time": "00:29:48-00:29:48",
+      "excerpt": "A blue-shirted attacker takes a shot from inside the penalty area, but the goalkeeper dives to make a save. / 一名身穿蓝色球衣的进攻球员在禁区附近起脚射门，但门将迅速倒地成功将球扑出。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue-shirted\\b",
+              "身穿蓝色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U081",
+      "event_type": "goal",
+      "time": "00:30:48-00:32:44",
+      "excerpt": "And there it is! The ball finds the back of the net from a tight angle inside the box. The German attacker has beaten the diving goalkeeper with a precise strike into the bottom co",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G02 1-0 -> 1-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G02",
+            "score_change": "1-0 -> 1-1",
+            "verified_window": "00:29:31-00:30:04"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U088",
+      "event_type": "foul",
+      "time": "00:34:28-00:34:28",
+      "excerpt": "A blue-shirted defender closes in on the attacker in white, and as the challenge comes in, the German player goes down cleanly under contact. The referee blows for a foul — a clear",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue-shirted\\b",
+              "身穿蓝色",
+              "白衣"
+            ]
+          }
+        },
+        {
+          "issue": "mixed_language_chinese",
+          "priority": "Could",
+          "action": "Run Chinese polish pass to remove stray English tokens unless they are official names/acronyms.",
+          "rationale": "Mixed-language fragments reduce final narration polish.",
+          "source": "commentary_quality_eval",
+          "details": {
+            "tokens": [
+              "cleanly"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U092",
+      "event_type": "foul",
+      "time": "00:36:24-00:36:24",
+      "excerpt": "And there it is — a clean, sharp challenge from the Curacao defender in blue, catching the German attacker off balance just outside the box. The German player goes down cleanly und",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "身穿蓝色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U099",
+      "event_type": "celebration_or_replay",
+      "time": "00:37:00-00:37:00",
+      "excerpt": "A close-up on the German player, number 16, shows a look of clear frustration. The scoreboard indicates the match is level at 1-1 against Curaçao, and this reaction follows a misse",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头",
+              "特写",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U102",
+      "event_type": "celebration_or_replay",
+      "time": "00:37:48-00:37:48",
+      "excerpt": "A close-up on the German player, Pavlovic, as he reacts to the play. The match remains tied at 1-1. / 镜头特写德国球员帕夫洛维奇，他正对刚才的攻防做出反应。目前比赛仍维持在1-1平局。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头",
+              "特写"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U106",
+      "event_type": "corner",
+      "time": "00:38:24-00:38:28",
+      "excerpt": "Corner kick for the team in white. The ball is placed at the corner flag as players from both teams position themselves in the penalty area. The referee oversees the setup, ensurin",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bteam in white\\b",
+              "白队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U107",
+      "event_type": "shot",
+      "time": "00:38:32-00:38:32",
+      "excerpt": "A player in blue takes a shot towards the goal, with the ball traveling towards the goal and the goalkeeper reacting to the shot. / 一名身穿蓝色球衣的球员起脚射门，皮球直飞球门，门将迅速做出反应。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in blue\\b",
+              "身穿蓝色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U109",
+      "event_type": "shot",
+      "time": "00:40:12-00:40:12",
+      "excerpt": "Germany's player in white takes a shot from inside the penalty box, ball heading toward goal as goalkeeper prepares to react. / 德国队白衣球员在禁区起脚射门，皮球直逼球门，门将已做好扑救准备。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U112",
+      "event_type": "shot",
+      "time": "00:41:28-00:41:28",
+      "excerpt": "Inside the penalty area, the player in white takes a shot. The ball is in flight towards the goal, and the goalkeeper is reacting to the strike. / 禁区之内，白衣球员起脚射门。皮球飞向球门，门将正在做出反应。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U126",
+      "event_type": "foul",
+      "time": "00:47:52-00:47:56",
+      "excerpt": "A player in white goes down under challenge from a player in blue near the penalty area. The referee blows the whistle and signals a foul, pointing to the spot. Players from both s",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "\\bplayer in blue\\b",
+              "白衣球员",
+              "蓝衣球员",
+              "蓝衣",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U128",
+      "event_type": "foul",
+      "time": "00:48:32-00:48:32",
+      "excerpt": "A German player is fouled by a Croatian defender in midfield — visible contact and fall, referee approaching to assess. / 中场区域，一名德国球员遭到克罗地亚后卫犯规——动作清晰可见，球员倒地，裁判正在上前查看情况。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U138",
+      "event_type": "other_relevant",
+      "time": "00:53:28-00:53:28",
+      "excerpt": "At the break, a German player raises his hands in appeal or communication — likely reacting to the referee’s decision or signaling during the final moments of the first half. The s",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U140",
+      "event_type": "save",
+      "time": "00:54:28-00:54:28",
+      "excerpt": "A shot from the blue-clad attacker is met by the goalkeeper, who dives to his left and parries the ball away with a strong touch. The save denies the clear chance, keeping Germany'",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U141",
+      "event_type": "foul",
+      "time": "00:54:56-00:54:56",
+      "excerpt": "Blue No. 9 goes down under contact near midfield — referee’s whistle follows immediately, a clear stoppage for the foul. / 蓝队9号在中场附近接触后倒地——裁判立即吹哨，犯规判罚明确，比赛暂停。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "蓝队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U142",
+      "event_type": "other_relevant",
+      "time": "00:55:00-00:55:00",
+      "excerpt": "And there it is, the moment of truth for the striker in blue. No. 9 reacts with visible frustration and pain, a clear sign that something has gone wrong. The crowd falls silent as ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "蓝衣"
+            ]
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bvisible\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U143",
+      "event_type": "shot",
+      "time": "00:55:16-00:55:16",
+      "excerpt": "Inside the penalty area, the white-shirted attacker takes a shot from close range. The goalkeeper dives to his right and parries the ball away, denying the scoring opportunity. / 禁",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwhite-shirted\\b",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U144",
+      "event_type": "foul",
+      "time": "00:55:20-00:55:20",
+      "excerpt": "And there it is — a clear foul inside the box. The German attacker goes down under contact from the blue-shirted defender, and the referee immediately blows the whistle. No hesitat",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue-shirted\\b",
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U147",
+      "event_type": "goal",
+      "time": "00:55:48-00:56:48",
+      "excerpt": "Germany takes a free kick just outside the penalty area. The ball is struck with precision, curling past the defensive wall and into the top corner of the net. The goalkeeper dives",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U148",
+      "event_type": "foul",
+      "time": "00:56:08-00:56:12",
+      "excerpt": "A foul is called near the penalty area as a German player goes down under contact from a Curaçao defender. The referee immediately blows the whistle and gathers the players to mana",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头",
+              "特写",
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U149",
+      "event_type": "goal",
+      "time": "00:57:00-00:58:20",
+      "excerpt": "Germany awarded a penalty kick. The player steps up, takes the shot, and the ball goes into the net! The goalkeeper dives but cannot reach it. The German players celebrate as the s",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G04 2-1 -> 3-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G04",
+            "score_change": "2-1 -> 3-1",
+            "verified_window": "00:57:19-00:57:35"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U150",
+      "event_type": "period_transition",
+      "time": "00:58:40-00:59:08",
+      "excerpt": "Half-time in this World Cup qualifier, and Germany lead 3-1 against Curaçao. Havertz, Schlotterbeck, and Nmecha have all found the net for the Germans, while Comenencia pulled one ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G04 2-1 -> 3-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G04",
+            "score_change": "2-1 -> 3-1",
+            "verified_window": "00:57:19-00:57:35"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U154",
+      "event_type": "substitution",
+      "time": "01:00:04-01:00:08",
+      "excerpt": "Half-time substitution for the team in blue. Number 12, Hansen, is coming on, and number 11, Antonisse, is making his way onto the pitch. / 半场休息，蓝队进行换人。12号汉森上场，11号安东尼塞也准备登场。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bteam in blue\\b",
+              "蓝队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U157",
+      "event_type": "foul",
+      "time": "01:01:28-01:01:28",
+      "excerpt": "A player in white goes down near the center circle after contact with a blue-shirted opponent. The referee immediately raises his arm to signal a foul, stopping play as the player ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "\\bblue-shirted\\b",
+              "白衣球员",
+              "蓝衣",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U158",
+      "event_type": "goal",
+      "time": "01:01:40-01:02:44",
+      "excerpt": "Germany breaks through! Musiala, the number 10, receives the ball inside the penalty area, takes a touch to set himself, and fires a low shot that beats the diving goalkeeper. The ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G05 3-1 -> 4-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G05",
+            "score_change": "3-1 -> 4-1",
+            "verified_window": "01:01:41-01:01:58"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        },
+        {
+          "issue": "mixed_language_chinese",
+          "priority": "Could",
+          "action": "Run Chinese polish pass to remove stray English tokens unless they are official names/acronyms.",
+          "rationale": "Mixed-language fragments reduce final narration polish.",
+          "source": "commentary_quality_eval",
+          "details": {
+            "tokens": [
+              "cleanly"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U159",
+      "event_type": "celebration_or_replay",
+      "time": "01:02:56-01:03:00",
+      "excerpt": "Musiala finds the net, and Germany extend their lead to four goals. The scoreboard updates to reflect his 47th-minute strike as the players reset for the restart. / 穆西亚拉破门！德国队将领先优势",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G05 3-1 -> 4-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G05",
+            "score_change": "3-1 -> 4-1",
+            "verified_window": "01:01:41-01:01:58"
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U160",
+      "event_type": "foul",
+      "time": "01:04:24-01:04:24",
+      "excerpt": "A blue-shirted attacker goes down inside the penalty area after contact with a defender. The referee blows for a foul and points to the spot, awarding Germany a penalty kick. / 一名身",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue-shirted\\b",
+              "身穿蓝色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U161",
+      "event_type": "dangerous_attack",
+      "time": "01:05:20-01:05:32",
+      "excerpt": "Germany builds a dangerous attack in the final third, with players moving quickly into the penalty area. The ball is circulated with intent, creating space and pressure on the defe",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U163",
+      "event_type": "dangerous_attack",
+      "time": "01:07:40-01:07:44",
+      "excerpt": "Blue team pushes forward with a quick transition, multiple attackers entering the penalty area. The ball is circulated inside the box under pressure from the defense, creating a cr",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue team\\b",
+              "蓝队"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U167",
+      "event_type": "celebration_or_replay",
+      "time": "01:08:40-01:08:40",
+      "excerpt": "A close-up on a German player, his expression intense and focused, capturing the emotional weight of the moment after a significant play. / 镜头给到了一名德国球员，他神情专注而凝重，这一刻的情绪张力在关键攻防后尽显无遗。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U168",
+      "event_type": "shot",
+      "time": "01:09:12-01:09:12",
+      "excerpt": "A player in white takes a shot on goal; the ball is in motion toward the net with the goalkeeper reacting. / 白衣球员起脚射门，皮球直奔球门而去，门将迅速做出反应。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U173",
+      "event_type": "foul",
+      "time": "01:11:52-01:11:52",
+      "excerpt": "A German player in white goes down under contact from a blue-shirted opponent near the penalty area. The referee will need to assess whether that challenge warranted a stoppage. / ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "\\bblue-shirted\\b",
+              "身穿白色",
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U175",
+      "event_type": "foul",
+      "time": "01:12:08-01:12:20",
+      "excerpt": "A German player in white and black is fouled by a Ukrainian player in blue and yellow near the sideline. The German player falls to the ground after contact, and the referee is nea",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "\\bplayer in blue\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U181",
+      "event_type": "foul",
+      "time": "01:15:36-01:15:36",
+      "excerpt": "A blue-shirted player goes down under challenge from an opponent in white near midfield — the referee’s whistle follows, and play stops for a foul. The contact appears to be a trip",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bblue-shirted\\b",
+              "蓝衣球员",
+              "蓝衣",
+              "白衣"
+            ]
+          }
+        },
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "画面"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U183",
+      "event_type": "foul",
+      "time": "01:16:20-01:16:20",
+      "excerpt": "Nmecha makes contact, the blue player goes down — a moment of physical challenge that halts play. The referee will need to assess whether it was fair or foul. / Nmecha 与对方球员发生身体接触，",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "蓝队"
+            ]
+          }
+        },
+        {
+          "issue": "mixed_language_chinese",
+          "priority": "Could",
+          "action": "Run Chinese polish pass to remove stray English tokens unless they are official names/acronyms.",
+          "rationale": "Mixed-language fragments reduce final narration polish.",
+          "source": "commentary_quality_eval",
+          "details": {
+            "tokens": [
+              "nmecha"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U184",
+      "event_type": "other_relevant",
+      "time": "01:16:28-01:16:28",
+      "excerpt": "A close-up on a Curaçao fan with striking blue hair and leopard-print glasses, smiling brightly — a vivid moment of fan spirit captured as Germany leads 4-1 at the 60th minute. / 镜",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bclose-up\\b",
+              "镜头"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U196",
+      "event_type": "dangerous_attack",
+      "time": "01:20:08-01:20:08",
+      "excerpt": "Germany's attack breaks through into the final third. A player in white drives towards the penalty area, drawing defenders before delivering a cross into the crowded box. The ball ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in white\\b",
+              "白衣球员",
+              "白衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U203",
+      "event_type": "goal",
+      "time": "01:23:16-01:24:24",
+      "excerpt": "And there it is! Germany makes it five! The ball finds the back of the net as the German player fires a shot from inside the box that the goalkeeper cannot reach. The crowd erupts ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U205",
+      "event_type": "other_relevant",
+      "time": "01:24:36-01:24:40",
+      "excerpt": "A wide shot of the field with players positioned, but no specific event like a goal or foul is occurring. The scene is part of the ongoing match but lacks a clear event type.; The ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "镜头",
+              "画面"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U207",
+      "event_type": "substitution",
+      "time": "01:24:48-01:24:48",
+      "excerpt": "And there's the substitution at the touchline. The player in the white jersey with number 18 is being replaced by a teammate wearing the brown bib, as they exchange a quick hug nea",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwhite jersey\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U211",
+      "event_type": "celebration_or_replay",
+      "time": "01:26:24-01:26:36",
+      "excerpt": "Germany extend their lead to 5-1, and the players are celebrating on the pitch. Tah and Raum are seen embracing, while Rüdiger runs back towards midfield. The crowd is in full swin",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G06 4-1 -> 5-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G06",
+            "score_change": "4-1 -> 5-1",
+            "verified_window": "01:23:34-01:26:40"
+          }
+        },
+        {
+          "issue": "mixed_language_chinese",
+          "priority": "Could",
+          "action": "Run Chinese polish pass to remove stray English tokens unless they are official names/acronyms.",
+          "rationale": "Mixed-language fragments reduce final narration polish.",
+          "source": "commentary_quality_eval",
+          "details": {
+            "tokens": [
+              "deutschland"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U215",
+      "event_type": "dangerous_attack",
+      "time": "01:27:40-01:27:44",
+      "excerpt": "Germany are on the move, pushing forward with intent. A quick transition sees a German player carrying the ball past midfield, drawing defenders as he approaches the final third. T",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G06 4-1 -> 5-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G06",
+            "score_change": "4-1 -> 5-1",
+            "verified_window": "01:23:34-01:26:40"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U218",
+      "event_type": "shot",
+      "time": "01:28:00-01:28:00",
+      "excerpt": "The number 10 in blue takes a shot from the edge of the box. The German defender number 17 reacts as the ball travels towards goal. / 蓝衣10号在禁区边缘起脚射门，德国17号后卫迅速反应，皮球正朝着球门飞去。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U223",
+      "event_type": "foul",
+      "time": "01:29:56-01:29:56",
+      "excerpt": "A close challenge on the ball as the German player attempts a shot, with contact from the opposing player in blue. / 德国球员射门时遭遇对方蓝衣球员的贴身逼抢，身体接触发生。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in blue\\b",
+              "蓝衣球员",
+              "蓝衣"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U226",
+      "event_type": "celebration_or_replay",
+      "time": "01:33:40-01:33:48",
+      "excerpt": "Deniz Undav finds the back of the net once more, extending his remarkable scoring streak. The German striker, wearing number 26, is seen celebrating with a smile and a teammate emb",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "duplicate_goal_near_verified_change",
+          "priority": "Should",
+          "action": "Merge with the primary verified goal segment, or demote to replay/celebration context.",
+          "rationale": "Multiple generated segments map to verified goal G07 5-1 -> 6-1.",
+          "source": "goal_timeline_alignment",
+          "details": {
+            "goal_id": "G07",
+            "score_change": "5-1 -> 6-1",
+            "verified_window": "01:31:30-01:33:20"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U230",
+      "event_type": "shot",
+      "time": "01:36:04-01:36:04",
+      "excerpt": "Germany takes a shot from inside the penalty area. The ball travels toward the goal, and the goalkeeper in orange reacts to make a save. / 德国队禁区前沿起脚射门，皮球直挂球门，身穿橙色球衣的门将迅速反应做出扑救。",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "身穿橙色"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U235",
+      "event_type": "celebration_or_replay",
+      "time": "01:36:56-01:36:56",
+      "excerpt": "Kimmich and Anton embrace in celebration as the stadium roars around them. The scoreboard shows Germany leading 6-1 against Curaçao at 82:30, with the crowd filling every tier of t",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "显示"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U251",
+      "event_type": "foul",
+      "time": "01:47:56-01:48:08",
+      "excerpt": "In the dying moments of the match, a Curacao player in blue and yellow goes down under a challenge near the center circle. The referee blows for a foul as the player clutches his l",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "color_identity_fallback",
+          "priority": "Should",
+          "action": "Rewrite through identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+          "rationale": "Repeated color-subject wording sounds like raw frame description rather than broadcast commentary.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bplayer in blue\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U256",
+      "event_type": "other_relevant",
+      "time": "01:50:28-01:50:44",
+      "excerpt": "The final whistle has blown, and the players are coming together on the pitch. We see a player in the blue and yellow kit, number 8, acknowledging the crowd before engaging in the ",
+      "highest_priority": "Should",
+      "issues": [
+        {
+          "issue": "raw_visual_wording",
+          "priority": "Should",
+          "action": "Convert camera/frame description into playable commentary, or keep it only for shots where the broadcast camera itself is meaningful.",
+          "rationale": "Final narration should not read like direct image-caption output.",
+          "source": "identity_style_audit",
+          "details": {
+            "patterns": [
+              "\\bwe see\\b"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "U039",
+      "event_type": "shot",
+      "time": "00:15:52-00:15:52",
+      "excerpt": "Inside the penalty area, the attacker rises and directs a header toward goal — the keeper is already in motion to react. That’s a genuine attempt from close range, forcing the defe",
+      "highest_priority": "Could",
+      "issues": [
+        {
+          "issue": "mixed_language_chinese",
+          "priority": "Could",
+          "action": "Run Chinese polish pass to remove stray English tokens unless they are official names/acronyms.",
+          "rationale": "Mixed-language fragments reduce final narration polish.",
+          "source": "commentary_quality_eval",
+          "details": {
+            "tokens": [
+              "genuine"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "workflow": [
+    {
+      "step": "1",
+      "en": "Fix Must items first: wrong entities, unsupported names, extra goal assertions, and prematch action mistakes.",
+      "zh": "先处理 Must：错误实体、无依据姓名、额外进球声明、赛前动作误判。"
+    },
+    {
+      "step": "2",
+      "en": "Run final evaluation gates again; do not polish style before factual blockers are gone.",
+      "zh": "重新运行终稿门禁；事实阻塞项清零前，不优先做风格润色。"
+    },
+    {
+      "step": "3",
+      "en": "Then handle Should items: duplicate goals, color fallback, and raw visual wording.",
+      "zh": "再处理 Should：重复进球、颜色 fallback、原始画面式措辞。"
+    }
+  ]
+}

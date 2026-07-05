@@ -20,8 +20,10 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `identity_style_audit.md` | Audits supported identity wording and natural broadcast style. | 审计身份措辞依据和自然解说风格。 |
 | `commentary_quality_eval.md` | Latest quality metrics, issue samples, and improvement suggestions for `outputs/commentary_bilingual.json`. | 对 `outputs/commentary_bilingual.json` 的最新质量指标、问题样例和改进建议。 |
 | `final_evaluation_gates.md` | Aggregates quality, goal alignment, and identity/style gates. | 汇总质量、进球对齐、身份与风格三类门禁。 |
+| `revision_queue.md` | Prioritized rewrite/suppression queue built from gate failures. | 从门禁失败项生成的重写/抑制优先级队列。 |
 | `tools/audit_commentary_output.py` | Script that audits generated commentary against public facts and ASR weak signals. | 将生成解说与公开事实、ASR 弱信号对比的脚本。 |
 | `tools/run_evaluation_gates.py` | One-command final evaluation gate runner. | 一条命令运行全部终稿评测门禁。 |
+| `tools/build_revision_queue.py` | Converts gate reports into concrete segment-level fix actions. | 将门禁报告转换成具体片段级修订动作。 |
 | `tools/evaluate_commentary_quality.py` | General quality evaluator for bilingual commentary JSON. | 面向双语解说 JSON 的通用质量评测脚本。 |
 | `tools/compare_goal_timeline.py` | Goal/score assertion alignment gate. | 进球/比分声明时间线对齐门禁。 |
 | `tools/audit_identity_style.py` | Identity support and broadcast-style wording gate. | 身份依据与解说风格措辞门禁。 |
@@ -43,6 +45,18 @@ python reference/evaluation/tools/run_evaluation_gates.py `
 EN: Exit code `2` means at least one final-output gate failed.
 
 ZH: 退出码 `2` 表示至少一个终稿门禁未通过。
+
+Build the actionable revision queue / 生成可执行修订队列：
+
+```powershell
+python reference/evaluation/tools/build_revision_queue.py `
+  --output-json reference/evaluation/revision_queue.json `
+  --output-md reference/evaluation/revision_queue.md
+```
+
+EN: Fix `Must` items first, then rerun `run_evaluation_gates.py --fail-on-any`.
+
+ZH: 先处理 `Must` 项，再重新运行 `run_evaluation_gates.py --fail-on-any`。
 
 Generate a report / 生成报告：
 
