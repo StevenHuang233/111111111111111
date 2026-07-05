@@ -1,0 +1,101 @@
+{
+  "generated_at": "2026-07-05T13:47:13",
+  "input": "outputs/commentary_bilingual-final-unreflected.json",
+  "events": "outputs/events-night.json",
+  "reflected_output": "outputs/commentary_bilingual-final-reflected.json",
+  "report_dir": "reference/evaluation/final_reflection",
+  "srt_dir": "outputs/srt/final_reflected",
+  "reflection_summary": {
+    "segments": 235,
+    "verified_score_changes": 8,
+    "goal_assertion_segments_before": 57,
+    "primary_verified_goal_segments": 8,
+    "rewritten_false_positive_segments": 49,
+    "sanitized_non_goal_score_claim_segments": 11,
+    "sanitized_forbidden_entity_segments": 0,
+    "sanitized_prematch_action_segments": 0,
+    "api_review_segments": 0,
+    "remaining_goal_type_segments": 8
+  },
+  "final_gate": {
+    "overall_status": "pass_with_warnings",
+    "gates": {
+      "quality": {
+        "status": "pass_with_warnings",
+        "blockers": [],
+        "warnings": [
+          "mixed_language_segments"
+        ],
+        "key_metrics": {
+          "generated_goal_count": 8,
+          "verified_goal_count": 8,
+          "goal_overcount": 0,
+          "score_claim_segments": 5,
+          "wrong_entity_segments": 0,
+          "style_color_identity_segments": 6
+        }
+      },
+      "goal_alignment": {
+        "status": "pass",
+        "blockers": [],
+        "warnings": [],
+        "key_metrics": {
+          "verified_score_changes": 8,
+          "generated_goal_type_segments": 8,
+          "generated_goal_assertion_segments": 8,
+          "covered_verified_goals": 8,
+          "missing_verified_goals": 0,
+          "duplicate_verified_goal_groups": 0,
+          "extra_goal_assertions": 0
+        }
+      },
+      "identity_style": {
+        "status": "pass_with_warnings",
+        "blockers": [],
+        "warnings": [
+          "raw_visual_segments"
+        ],
+        "key_metrics": {
+          "color_identity_segments": 4,
+          "raw_visual_segments": 42,
+          "wrong_entity_segments": 0,
+          "unsupported_name_segments": 0,
+          "color_identity_ratio": 0.017,
+          "raw_visual_ratio": 0.1787
+        }
+      }
+    }
+  },
+  "srt_files": [
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.commentary.bilingual.srt",
+      "bytes": 108499,
+      "entries": 235
+    },
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.commentary.en.srt",
+      "bytes": 63086,
+      "entries": 235
+    },
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.commentary.zh.srt",
+      "bytes": 54236,
+      "entries": 235
+    },
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.subtitle.bilingual.srt",
+      "bytes": 38195,
+      "entries": 257
+    },
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.subtitle.en.srt",
+      "bytes": 24736,
+      "entries": 257
+    },
+    {
+      "path": "outputs/srt/final_reflected/commentary_bilingual-final-reflected.subtitle.zh.srt",
+      "bytes": 23118,
+      "entries": 257
+    }
+  ]
+}
