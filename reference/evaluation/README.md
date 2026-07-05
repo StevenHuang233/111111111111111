@@ -19,7 +19,9 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `goal_timeline_alignment.md` | Aligns generated goal claims with verified scoreboard changes. | 将生成进球声明与已核验比分变化对齐。 |
 | `identity_style_audit.md` | Audits supported identity wording and natural broadcast style. | 审计身份措辞依据和自然解说风格。 |
 | `commentary_quality_eval.md` | Latest quality metrics, issue samples, and improvement suggestions for `outputs/commentary_bilingual.json`. | 对 `outputs/commentary_bilingual.json` 的最新质量指标、问题样例和改进建议。 |
+| `final_evaluation_gates.md` | Aggregates quality, goal alignment, and identity/style gates. | 汇总质量、进球对齐、身份与风格三类门禁。 |
 | `tools/audit_commentary_output.py` | Script that audits generated commentary against public facts and ASR weak signals. | 将生成解说与公开事实、ASR 弱信号对比的脚本。 |
+| `tools/run_evaluation_gates.py` | One-command final evaluation gate runner. | 一条命令运行全部终稿评测门禁。 |
 | `tools/evaluate_commentary_quality.py` | General quality evaluator for bilingual commentary JSON. | 面向双语解说 JSON 的通用质量评测脚本。 |
 | `tools/compare_goal_timeline.py` | Goal/score assertion alignment gate. | 进球/比分声明时间线对齐门禁。 |
 | `tools/audit_identity_style.py` | Identity support and broadcast-style wording gate. | 身份依据与解说风格措辞门禁。 |
@@ -27,6 +29,20 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `tools/build_frame_contact_sheets.py` | Builds local ignored PNG contact sheets from extracted frames. | 从本地抽帧生成被 Git 忽略的 PNG 拼图，方便人工核验。 |
 
 ## Teacher-Testable Entry / 老师可测试入口
+
+Run all final-output gates / 运行全部终稿门禁：
+
+```powershell
+python reference/evaluation/tools/run_evaluation_gates.py `
+  --input outputs/commentary_bilingual.json `
+  --output-json reference/evaluation/final_evaluation_gates.json `
+  --output-md reference/evaluation/final_evaluation_gates.md `
+  --fail-on-any
+```
+
+EN: Exit code `2` means at least one final-output gate failed.
+
+ZH: 退出码 `2` 表示至少一个终稿门禁未通过。
 
 Generate a report / 生成报告：
 

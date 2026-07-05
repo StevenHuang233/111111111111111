@@ -17,6 +17,7 @@ ZH: 本文总结对生成解说结果的审计，重点是当前 `outputs/commen
 | ASR weak signal / ASR 弱信号 | `reference/audio_asr/germany_curacao/` | Original commentary transcript and candidate event windows. / 原解说字幕和候选事件窗口。 |
 | Public fact reference / 公开事实参考 | `reference/evaluation/germany_curacao_public_reference.json` | Evaluation-only final score and goal order. / 仅用于验证的比分和进球顺序。 |
 | Audit report / 审计报告 | `reference/evaluation/commentary_full_review_audit.md` | Detected conflicts and style issues. / 检出的冲突和风格问题。 |
+| Final gate summary / 终稿门禁汇总 | `reference/evaluation/final_evaluation_gates.md` | One-page aggregate of all final-output gates. / 所有终稿门禁的一页式汇总。 |
 | Quality gate / 质量门禁 | `reference/evaluation/commentary_quality_eval.md` | Latest metrics, issue samples, and final-output gate status. / 最新指标、问题样例和终稿门禁状态。 |
 | Goal timeline alignment / 进球时间线对齐 | `reference/evaluation/goal_timeline_alignment.md` | Aligns generated goal assertions with manually verified score changes. / 将生成进球声明与人工核验比分变化对齐。 |
 | Identity/style audit / 身份与风格审计 | `reference/evaluation/identity_style_audit.md` | Checks supported identity facts, color fallback, raw visual wording, and wording repetition. / 检查身份事实依据、颜色 fallback、原始画面式措辞和表达重复。 |
@@ -61,6 +62,7 @@ ZH: 本地可见的 `origin/main@94d5933` 已经加入基于模型的 `goal_veri
 | Priority | Task | Acceptance |
 | --- | --- | --- |
 | Must | Run `reference/evaluation/tools/audit_commentary_output.py` after every full review output. | Audit report exists and critical issues are listed. |
+| Must | Run `reference/evaluation/tools/run_evaluation_gates.py --fail-on-any` before final packaging. | Overall status is 0/pass, or blockers are explicitly reviewed and accepted. |
 | Must | Run `reference/evaluation/tools/evaluate_commentary_quality.py --fail-on-gate` before final packaging. | Exit code is 0, or all blockers are explicitly reviewed and accepted. |
 | Must | Run `reference/evaluation/tools/compare_goal_timeline.py --fail-on-alignment` before final packaging. | Generated goals align with the 8 verified score changes, or unaligned claims are rewritten as replay/history/pending. |
 | Must | Run `reference/evaluation/tools/audit_identity_style.py --fail-on-style` before final packaging. | Wrong teams and unsupported names are zero; color fallback and raw visual wording are below warning threshold or reviewed. |
