@@ -1,0 +1,57 @@
+{
+  "policy": "Evaluation-only. Do not inject public references, manual review, or gate outputs into target-agent prompt/runtime context.",
+  "overall_status": "pass_with_warnings",
+  "input": "outputs\\commentary_bilingual-final-V11-reflected.json",
+  "gates": {
+    "quality": {
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "key_metrics": {
+        "generated_goal_count": 8,
+        "verified_goal_count": 8,
+        "goal_overcount": 0,
+        "score_claim_segments": 5,
+        "wrong_entity_segments": 0,
+        "style_color_identity_segments": 3
+      }
+    },
+    "goal_alignment": {
+      "status": "pass",
+      "blockers": [],
+      "warnings": [],
+      "key_metrics": {
+        "verified_score_changes": 8,
+        "generated_goal_type_segments": 8,
+        "generated_goal_assertion_segments": 8,
+        "covered_verified_goals": 8,
+        "missing_verified_goals": 0,
+        "duplicate_verified_goal_groups": 0,
+        "extra_goal_assertions": 0
+      }
+    },
+    "identity_style": {
+      "status": "pass_with_warnings",
+      "blockers": [],
+      "warnings": [
+        "raw_visual_segments"
+      ],
+      "key_metrics": {
+        "color_identity_segments": 2,
+        "raw_visual_segments": 43,
+        "wrong_entity_segments": 0,
+        "unsupported_name_segments": 0,
+        "color_identity_ratio": 0.0085,
+        "raw_visual_ratio": 0.183
+      }
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "Should",
+      "area": "Manual review",
+      "en": "Perform a short manual review of high-stakes events before packaging.",
+      "zh": "打包前仍应对高风险事件做短人工复核。"
+    }
+  ]
+}
