@@ -1,0 +1,29 @@
+{
+  "presets": {
+    "full_coarse_only_context": {
+      "description": "Full coarse-derived bilingual generation with match-context injection.",
+      "args": {
+        "style": "broadcast_professional",
+        "match_context": "germany_curacao_world_cup_2026",
+        "coarse_only_generation": true,
+        "verify_goals_with_model": true,
+        "concurrency": 16,
+        "request_stagger_sec": 2,
+        "commentary_sample_fps": 0.5,
+        "max_frames_per_event": 12,
+        "max_frames_per_phase": 4
+      }
+    },
+    "style_review_fast": {
+      "description": "Small API experiment for comparing commentary styles without rerunning scan.",
+      "args": {
+        "styles": ["storytelling_witty", "elite_broadcast_replay"],
+        "match_context": "germany_curacao_world_cup_2026",
+        "event_ids": ["U036", "U149", "U225"],
+        "commentary_sample_fps": 0.5,
+        "max_frames_per_event": 10,
+        "max_frames_per_phase": 3
+      }
+    }
+  }
+}

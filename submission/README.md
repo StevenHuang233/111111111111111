@@ -24,4 +24,5 @@ Do not commit large generated videos, raw frames, API keys, passwords, or privat
 ## Current Templates / 当前模板
 
 - [intern_s2_feedback_table.md](intern_s2_feedback_table.md)
+- [source_code_submission_readme.md](source_code_submission_readme.md)
 

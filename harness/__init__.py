@@ -20,8 +20,21 @@ from .commentary import (
     generate_visual_commentary,
 )
 from .event_types import DEFAULT_EVENT_TYPES, EventTypeDefinition, EventTypeRegistry, load_event_types
+from .event_units import CommentaryUnitConfig, build_commentary_units, dump_commentary_units
+from .goal_verifier import (
+    GOAL_VERIFICATION_VERSION,
+    GoalVerificationConfig,
+    GoalVerificationRecord,
+    GoalVerificationResult,
+    dump_goal_verification_result,
+    estimate_goal_verification_calls,
+    goal_verification_result_to_dict,
+    verify_goal_event,
+    verify_goal_events,
+)
+from .match_context import MatchContext, TeamContext, load_match_context, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
-from .pipeline import BilingualPipelineResult, PipelineResult, run_bilingual_pipeline, run_pipeline
+from .pipeline import BilingualPipelineResult, PipelineResult, prepare_generation_events, run_bilingual_pipeline, run_pipeline
 from .scanner import (
     EventCandidate,
     EventPhase,
@@ -38,6 +51,8 @@ from .tracing import NullTracker, StepTracker, TraceRecorder, TraceStep
 __all__ = [
     "CommentaryResult",
     "CommentarySegment",
+    "CommentaryUnitConfig",
+    "GOAL_VERIFICATION_VERSION",
     "SubtitleLine",
     "BilingualCommentaryResult",
     "BilingualCommentarySegment",
@@ -50,11 +65,16 @@ __all__ = [
     "FrameInfo",
     "FrameObservation",
     "FramesManifest",
+    "GoalVerificationConfig",
+    "GoalVerificationRecord",
+    "GoalVerificationResult",
     "LocalizedCommentary",
+    "MatchContext",
     "PipelineResult",
     "ScanConfig",
     "ScanResult",
     "StyleProfile",
+    "TeamContext",
     "StepTracker",
     "TraceRecorder",
     "TraceStep",
@@ -65,17 +85,27 @@ __all__ = [
     "commentary_result_to_dict",
     "dump_bilingual_commentary_result",
     "dump_commentary_result",
+    "dump_commentary_units",
+    "dump_goal_verification_result",
     "dump_scan_result",
+    "estimate_goal_verification_calls",
     "generate_bilingual_commentary",
+    "build_commentary_units",
     "generate_commentary",
     "generate_commentary_from_summary",
     "generate_visual_commentary",
+    "goal_verification_result_to_dict",
     "load_event_types",
     "load_manifest",
+    "load_match_context",
     "load_style",
+    "match_context_block",
+    "prepare_generation_events",
     "run_bilingual_pipeline",
     "run_pipeline",
     "scan_events",
     "scan_result_to_dict",
     "translate_commentary_to_chinese",
+    "verify_goal_event",
+    "verify_goal_events",
 ]

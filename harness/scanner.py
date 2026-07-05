@@ -8,6 +8,7 @@ from intern_client import InternClient, image_source_to_url
 
 from .event_types import EventTypeRegistry, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
+from .match_context import MatchContext, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
 from .styles import StyleProfile
 from .time_utils import format_timestamp
@@ -19,6 +20,10 @@ class ChatClient(Protocol):
         ...
 
 
+SCAN_ALGORITHM_VERSION = 3
+DERIVED_SCAN_EVENT_TYPES = {"var_show"}
+
+
 @dataclass(frozen=True)
 class ScanConfig:
     window_size_frames: int = 6
@@ -27,6 +32,7 @@ class ScanConfig:
     event_types_path: str | None = None
     merge_gap_sec: float = 4.0
     goal_replay_merge_gap_sec: float = 30.0
+    first_var_review_as_var_show: bool = True
 
 
 @dataclass(frozen=True)
@@ -94,6 +100,7 @@ def scan_events(
     config: ScanConfig | None = None,
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
+    match_context: MatchContext | None = None,
 ) -> ScanResult:
     trace = tracker or NullTracker()
     scan_config = config or ScanConfig()
@@ -107,6 +114,9 @@ def scan_events(
             "stride_frames": scan_config.stride_frames,
             "merge_gap_sec": scan_config.merge_gap_sec,
             "goal_replay_merge_gap_sec": scan_config.goal_replay_merge_gap_sec,
+            "first_var_review_as_var_show": scan_config.first_var_review_as_var_show,
+            "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
     registry = load_event_types(scan_config.event_types_path)
@@ -137,7 +147,7 @@ def scan_events(
                 "time_range": [frames[0].timestamp_sec, frames[-1].timestamp_sec] if frames else [],
             },
         )
-        messages = _build_scan_messages(frames, style, registry)
+        messages = _build_scan_messages(frames, style, registry, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "scan_events.window",
@@ -204,11 +214,19 @@ def scan_events(
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
-    events = _merge_event_candidates(initial_events, scan_config, registry)
+    events = _merge_event_candidates(initial_events, scan_config, registry, observations)
+    var_show_event_id = None
+    if scan_config.first_var_review_as_var_show:
+        events, var_show_event_id = _apply_first_var_review_as_var_show(events, registry)
     trace.record(
         "scan_events",
         "merge_event_candidates",
-        {"initial_event_count": len(initial_events), "merged_event_count": len(events)},
+        {
+            "initial_event_count": len(initial_events),
+            "merged_event_count": len(events),
+            "first_var_review_as_var_show": scan_config.first_var_review_as_var_show,
+            "var_show_event_id": var_show_event_id,
+        },
     )
     trace.record("scan_events", "finish", {"window_errors": len(window_errors), "event_count": len(events)})
     return ScanResult(
@@ -219,16 +237,24 @@ def scan_events(
     )
 
 
-def _build_scan_messages(frames: Iterable[FrameInfo], style: StyleProfile, registry: EventTypeRegistry) -> list[dict[str, Any]]:
+def _build_scan_messages(
+    frames: Iterable[FrameInfo],
+    style: StyleProfile,
+    registry: EventTypeRegistry,
+    match_context: MatchContext | None = None,
+) -> list[dict[str, Any]]:
     frame_list = list(frames)
-    allowed_types = ", ".join(registry.event_types)
-    event_reference = registry.prompt_reference()
+    allowed_types = ", ".join(_scan_event_types(registry))
+    event_reference = _scan_prompt_reference(registry)
     prefixes = "\n".join(_frame_prefix(frame) for frame in frame_list)
     prompt = f"""
 You are a football video event scanner.
 
 Style context for salience only:
 {style.prompt_injection}
+
+Match context for team and kit disambiguation:
+{match_context_block(match_context)}
 
 Allowed event_type values:
 {allowed_types}
@@ -296,6 +322,30 @@ def _response_text(data: dict[str, Any]) -> str:
     return data["choices"][0]["message"].get("content") or ""
 
 
+def _scan_event_types(registry: EventTypeRegistry) -> tuple[str, ...]:
+    return tuple(event_type for event_type in registry.event_types if event_type not in DERIVED_SCAN_EVENT_TYPES)
+
+
+def _scan_prompt_reference(registry: EventTypeRegistry) -> str:
+    lines: list[str] = []
+    for definition in registry.definitions:
+        if definition.event_id in DERIVED_SCAN_EVENT_TYPES:
+            continue
+        lines.append(f"- {definition.event_id} ({definition.name}): {definition.description}")
+        if definition.positive_cues:
+            lines.append(f"  Positive cues: {'; '.join(definition.positive_cues)}")
+        if definition.negative_cues:
+            lines.append(f"  Negative cues: {'; '.join(definition.negative_cues)}")
+    return "\n".join(lines)
+
+
+def _normalize_scan_event_type(raw_event_type: str, registry: EventTypeRegistry) -> str:
+    event_type = raw_event_type.strip()
+    if event_type in DERIVED_SCAN_EVENT_TYPES:
+        return "var_review" if "var_review" in registry.allowed else registry.no_event_type
+    return event_type
+
+
 def _parse_scan_response(
     text: str,
     frames: tuple[FrameInfo, ...],
@@ -312,11 +362,12 @@ def _parse_scan_response(
     for row in rows:
         if not isinstance(row, dict):
             raise ValueError("Each frame result must be an object.")
-        frame_id = str(row.get("frame_id", ""))
-        if frame_id not in frame_by_id:
-            raise ValueError(f"Unknown frame_id '{frame_id}'.")
+        raw_frame_id = str(row.get("frame_id", ""))
+        frame_id = _normalize_frame_id(raw_frame_id, frame_by_id)
+        if frame_id is None:
+            raise ValueError(f"Unknown frame_id '{raw_frame_id}'.")
 
-        event_type = registry.validate(str(row.get("event_type", registry.no_event_type)))
+        event_type = registry.validate(_normalize_scan_event_type(str(row.get("event_type", registry.no_event_type)), registry))
         needs_commentary = bool(row.get("needs_commentary", False)) and event_type != registry.no_event_type
         confidence = max(0.0, min(1.0, float(row.get("confidence", 0.0))))
         evidence = str(row.get("evidence", "")).strip()
@@ -336,6 +387,25 @@ def _parse_scan_response(
     return observations
 
 
+def _normalize_frame_id(raw_frame_id: str, frame_by_id: dict[str, FrameInfo]) -> str | None:
+    cleaned = raw_frame_id.strip()
+    if cleaned in frame_by_id:
+        return cleaned
+
+    for separator in (",", " ", "\n", "\t"):
+        prefix = cleaned.split(separator, 1)[0].strip()
+        if prefix in frame_by_id:
+            return prefix
+
+    for frame_id in sorted(frame_by_id, key=len, reverse=True):
+        if not cleaned.startswith(frame_id):
+            continue
+        suffix = cleaned[len(frame_id) :].strip()
+        if not suffix or suffix.startswith((",", "[", "(", "-", "|")) or "timestamp" in suffix.lower():
+            return frame_id
+    return None
+
+
 def _try_repair_scan_response(
     client: ChatClient,
     bad_text: str,
@@ -352,9 +422,9 @@ def _try_repair_scan_response(
     repair_prompt = f"""
 Fix this football event scan response into valid JSON.
 Error: {error}
-Allowed event_type values: {", ".join(registry.event_types)}
+Allowed event_type values: {", ".join(_scan_event_types(registry))}
 Event definitions and decision cues:
-{registry.prompt_reference()}
+{_scan_prompt_reference(registry)}
 Required frame_ids: {", ".join(frame.frame_id for frame in frames)}
 
 Bad response:
@@ -454,8 +524,8 @@ def _build_event_candidates(
         ):
             end += 1
 
-        start_sec = _previous_non_demand_time(observations, start, manifest.frames[start].timestamp_sec)
-        end_sec = _next_non_demand_time(observations, end, manifest.frames[end].timestamp_sec)
+        start_sec = manifest.frames[start].timestamp_sec
+        end_sec = manifest.frames[end].timestamp_sec
         run = observations[start : end + 1]
         confidence = max(item.confidence for item in run)
         evidence_summary = "; ".join(dict.fromkeys(item.evidence for item in run if item.evidence))
@@ -505,6 +575,7 @@ def _merge_event_candidates(
     candidates: list[EventCandidate],
     config: ScanConfig,
     registry: EventTypeRegistry,
+    observations: list[FrameObservation] | None = None,
 ) -> list[EventCandidate]:
     if not candidates:
         return []
@@ -518,7 +589,7 @@ def _merge_event_candidates(
             continue
 
         previous = merged[-1]
-        if _should_merge_events(previous, candidate, config):
+        if _should_merge_events(previous, candidate, config, observations):
             merged[-1] = _merge_two_events(previous, candidate, registry)
         else:
             merged.append(candidate)
@@ -526,16 +597,69 @@ def _merge_event_candidates(
     return [_renumber_event(event, index + 1) for index, event in enumerate(merged)]
 
 
-def _should_merge_events(left: EventCandidate, right: EventCandidate, config: ScanConfig) -> bool:
+def _apply_first_var_review_as_var_show(
+    events: list[EventCandidate],
+    registry: EventTypeRegistry,
+) -> tuple[list[EventCandidate], str | None]:
+    if "var_show" not in registry.allowed or "var_review" not in registry.allowed:
+        return list(events), None
+
+    adjusted: list[EventCandidate] = []
+    relabeled_event_id: str | None = None
+    for event in events:
+        if relabeled_event_id is None and event.event_type == "var_review":
+            adjusted.append(_relabel_event_and_matching_phases(event, "var_show", "var_review"))
+            relabeled_event_id = event.event_id
+            continue
+        adjusted.append(event)
+    return adjusted, relabeled_event_id
+
+
+def _relabel_event_and_matching_phases(
+    event: EventCandidate,
+    event_type: str,
+    phase_type_to_replace: str,
+) -> EventCandidate:
+    return EventCandidate(
+        event_id=event.event_id,
+        event_type=event_type,
+        start_sec=event.start_sec,
+        end_sec=event.end_sec,
+        evidence_frames=event.evidence_frames,
+        confidence=event.confidence,
+        evidence_summary=event.evidence_summary,
+        phases=tuple(
+            EventPhase(
+                phase_type=event_type if phase.phase_type == phase_type_to_replace else phase.phase_type,
+                start_sec=phase.start_sec,
+                end_sec=phase.end_sec,
+                evidence_frames=phase.evidence_frames,
+                evidence_summary=phase.evidence_summary,
+            )
+            for phase in event.phases
+        ),
+    )
+
+
+def _should_merge_events(
+    left: EventCandidate,
+    right: EventCandidate,
+    config: ScanConfig,
+    observations: list[FrameObservation] | None = None,
+) -> bool:
     gap = right.start_sec - left.end_sec
     overlaps_or_close = gap <= config.merge_gap_sec
-    if left.event_type == right.event_type and overlaps_or_close:
+    has_no_event_barrier = _has_between_observation_barrier(left, right, observations, block_event_type_change=False)
+    has_type_barrier = _has_between_observation_barrier(left, right, observations, block_event_type_change=True)
+
+    if left.event_type == right.event_type and overlaps_or_close and not has_type_barrier:
         return True
 
     if (
         left.event_type == "goal"
         and right.event_type == "celebration_or_replay"
         and gap <= config.goal_replay_merge_gap_sec
+        and not has_no_event_barrier
     ):
         return True
 
@@ -543,9 +667,35 @@ def _should_merge_events(left: EventCandidate, right: EventCandidate, config: Sc
         left.event_type == "celebration_or_replay"
         and right.event_type == "goal"
         and gap <= config.goal_replay_merge_gap_sec
+        and not has_no_event_barrier
     ):
         return True
 
+    return False
+
+
+def _has_between_observation_barrier(
+    left: EventCandidate,
+    right: EventCandidate,
+    observations: list[FrameObservation] | None,
+    *,
+    block_event_type_change: bool,
+) -> bool:
+    if not observations:
+        return False
+
+    lower = min(left.end_sec, right.start_sec)
+    upper = max(left.end_sec, right.start_sec)
+    if lower == upper:
+        return False
+
+    for observation in observations:
+        if not (lower < observation.timestamp_sec < upper):
+            continue
+        if not observation.needs_commentary:
+            return True
+        if block_event_type_change and observation.event_type not in {left.event_type, right.event_type}:
+            return True
     return False
 
 
@@ -607,20 +757,6 @@ def _renumber_event(event: EventCandidate, number: int) -> EventCandidate:
 
 def _unique_tuple(values: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(dict.fromkeys(values))
-
-
-def _previous_non_demand_time(observations: list[FrameObservation], start_index: int, default: float) -> float:
-    for index in range(start_index - 1, -1, -1):
-        if not observations[index].needs_commentary:
-            return observations[index].timestamp_sec
-    return default
-
-
-def _next_non_demand_time(observations: list[FrameObservation], end_index: int, default: float) -> float:
-    for index in range(end_index + 1, len(observations)):
-        if not observations[index].needs_commentary:
-            return observations[index].timestamp_sec
-    return default
 
 
 def scan_result_to_dict(result: ScanResult) -> dict[str, Any]:

@@ -3,9 +3,9 @@
     {
       "id": "goal",
       "name": "Goal",
-      "description": "A live goal is strongly supported by the ball crossing the goal line, a scoreboard increment, or immediate unambiguous celebration after a finish.",
-      "positive_cues": ["ball inside or behind the net", "ball clearly over the goal line", "scoreboard increment", "players running away celebrating immediately after a finish", "replay clearly tied to a confirmed live goal"],
-      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration", "goalkeeper holding or parrying the ball", "historical discussion of a past goal", "halftime summary", "replay with no score confirmation"]
+      "description": "A live scoring action where the ball clearly enters the goal or the immediate live sequence proves that a goal has just been scored.",
+      "positive_cues": ["ball crossing the goal line during live play", "ball inside or behind the net immediately after the finish", "net rippling from the shot", "goalkeeper beaten in the live scoring action", "unmistakable immediate scored-goal reaction tied to the live finish"],
+      "negative_cues": ["ordinary shot before the result is known", "near miss", "save followed by no clear celebration", "scoreboard graphic alone", "replay of an earlier finish without the live scoring action", "celebration-only frame"]
     },
     {
       "id": "shot",
@@ -69,6 +69,13 @@
       "description": "A player substitution is happening or clearly displayed.",
       "positive_cues": ["substitution board", "player entering or leaving touchline", "broadcast substitution graphic", "coaches greeting player"],
       "negative_cues": ["injury treatment without player replacement", "player warming up only"]
+    },
+    {
+      "id": "var_show",
+      "name": "VAR System Show",
+      "description": "A broadcast presentation of the video assistant referee team, VAR room, referee communication system, or VAR technology setup, without a specific active review decision being shown.",
+      "positive_cues": ["video assistant referee room", "VAR officials shown at monitors", "VAR technology or system graphic", "broadcast explains the VAR team or setup", "referee communication equipment shown without a decision"],
+      "negative_cues": ["specific foul or handball check", "on-field referee reviewing an incident", "VAR decision graphic", "players waiting for a review outcome", "replay of the incident under review"]
     },
     {
       "id": "var_review",

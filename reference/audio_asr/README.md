@@ -27,8 +27,8 @@ Use it mainly to check:
 
 | Path | EN | ZH |
 | --- | --- | --- |
-| `germany_curacao/chunks/` | 10-minute MP3 chunks used for ASR. | 用于 ASR 的 10 分钟 MP3 分块。 |
-| `germany_curacao/raw_asr/` | Raw Bcut/Bijian ASR JSON responses. | Bcut/Bijian ASR 原始 JSON 响应。 |
+| `germany_curacao/chunks/` | Local ignored 10-minute MP3 chunks used for ASR, not tracked in final source. | 本地忽略的 10 分钟 MP3 分块，不进入最终源码。 |
+| `germany_curacao/raw_asr/` | Local ignored raw Bcut/Bijian ASR JSON responses, not tracked in final source. | 本地忽略的 Bcut/Bijian ASR 原始 JSON 响应，不进入最终源码。 |
 | `germany_curacao/audio_reference.srt` | Timestamped subtitle reference. | 带时间戳字幕参考。 |
 | `germany_curacao/audio_reference.segments.json` | Structured subtitle segments. | 结构化字幕段。 |
 | `germany_curacao/audio_reference.timeline.md` | Human-readable timeline. | 可读时间线。 |
@@ -44,6 +44,6 @@ EN: The included script follows the VideoCaptioner Bcut/Bijian ASR route and upl
 
 ZH: 这里的脚本沿用 VideoCaptioner 的 Bcut/Bijian ASR 路线，只有显式传入 `--allow-upload` 时才会把音频分块上传到第三方云端 ASR。未经允许不要用于私密媒体。
 
-The full extracted audio file is intentionally not committed. Only small chunks and reference outputs are tracked.
+The full extracted audio file, audio chunks, and raw ASR upload responses are intentionally not committed. Only compact reference outputs and reproduction scripts are tracked.
 
-完整抽取音频文件有意不入库。仓库只跟踪小分块和参考输出。
+完整抽取音频、音频分块和 raw ASR 上传响应有意不入库。仓库只跟踪精简参考输出和复现脚本。

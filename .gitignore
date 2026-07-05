@@ -45,6 +45,11 @@ logs/
 !reference/audio_asr/**
 reference/audio_asr/**/__pycache__/
 reference/audio_asr/**/*.pyc
+reference/audio_asr/**/chunks/
+reference/audio_asr/**/raw_asr/
+reference/audio_asr/**/*.mp3
+reference/audio_asr/**/*.wav
+reference/audio_asr/**/*.aac
 
 # Secrets / 密钥
 .env.*

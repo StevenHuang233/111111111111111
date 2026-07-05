@@ -302,6 +302,7 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 | `event_types_path` | `None` | 自定义事件类型配置路径 | 有自定义分类时填写 |
 | `merge_gap_sec` | 4.0 | 同类型事件候选的最大合并间隔 | 解决滑块切分导致的同一事件断裂 |
 | `goal_replay_merge_gap_sec` | 30.0 | 进球与后续庆祝/回放的最大合并间隔 | 用于生成“进球 + 回放”的复合事件 |
+| `dense_sample_fps` | 1.0 | 全量 runner 构建细扫 manifest 时使用的采样率 | 将 4fps 源帧降采样到 1fps 后再细扫 |
 
 ### Manifest 字段
 
@@ -337,6 +338,8 @@ event_type 必须严格等于允许值之一。没有重要内容时使用 no_ev
 |---|---:|---|
 | `max_frames_per_event` | 12 | 单个事件最多传给解说模型的图片数量 |
 | `max_frames_per_phase` | 4 | 每个 phase 最多抽取多少张代表帧 |
+| `context_frames_each_side` | 1 | 每个事件区间前后各额外抽取多少张上下文帧，不改变事件自身时间区间 |
+| `sample_fps` | 0.5 | 解说生成阶段传入视觉帧的采样率 |
 
 原来的纯 summary 生成逻辑仍保留为 `generate_commentary_from_summary()`。
 

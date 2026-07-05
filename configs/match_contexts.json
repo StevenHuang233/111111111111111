@@ -1,0 +1,33 @@
+{
+  "contexts": [
+    {
+      "context_id": "germany_curacao_world_cup_2026",
+      "match_title": "Germany vs Curacao",
+      "competition": "FIFA World Cup 2026",
+      "description": "Full-match frame set used for the current football commentary harness demo.",
+      "home_team": {
+        "name": "Germany",
+        "short_name": "GER",
+        "aliases": ["German team", "德国", "德国队"],
+        "kit": "white shirts with black shorts and black-red-gold trim"
+      },
+      "away_team": {
+        "name": "Curacao",
+        "short_name": "CUW",
+        "aliases": ["Curaçao", "Curacao national team", "库拉索", "库拉索队"],
+        "kit": "blue and yellow shirts"
+      },
+      "final_score": "Germany 7-1 Curacao",
+      "prompt_injection": "The team in blue/yellow is Curacao, not Colombia. Never rename Curacao as Colombia or Paraguay. Use Germany and Curacao as the match teams unless the visual evidence is explicitly about neutral graphics.",
+      "notes": [
+        "Use final score metadata only as background consistency; do not claim a specific scoring change unless the event evidence or visible scoreboard supports it.",
+        "If a segment only shows replay, celebration, or a scoreboard after the score has already changed, describe it as replay/celebration instead of inventing another goal.",
+        "Chinese output should use 德国队 and 库拉索队."
+      ],
+      "metadata": {
+        "video_id": "frames_4fps_q3",
+        "source_fps": 4
+      }
+    }
+  ]
+}

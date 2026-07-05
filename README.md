@@ -4,6 +4,18 @@ Minimal Python setup for testing Intern-S2-Preview text/image calls and building
 
 中文：这是基于 Intern-S2-Preview 的世界杯视频解说 Harness。核心产出是带时间戳的解说稿，并尽量保留可核验的视频证据、事件时间线和运行 trace。
 
+## Final Handoff / 最终交付入口
+
+- Source package guide / 源码包指南：`docs/final_source_package_guide.md`
+- Submission README / 提交说明：`submission/source_code_submission_readme.md`
+- V11 acceptance record / V11 验收记录：`reference/evaluation/final_reflection_v11/README.md`
+- Final reflection package / 最终反思打包：`reference/evaluation/final_reflection/README.md`
+- Nightwork usage / nightwork 使用说明：`docs/nightwork_usage_zh.md`
+
+EN: Keep `.env`, videos, frames, `outputs/`, audio chunks, and generated media out of the source-code zip. Use `git archive --format=zip --output submission/source_code.zip HEAD` for a tracked-file-only package.
+
+中文：源码 zip 不包含 `.env`、视频、抽帧、`outputs/`、音频切块和生成媒体。建议使用 `git archive --format=zip --output submission/source_code.zip HEAD` 只打包 Git 跟踪文件。
+
 ## Planning docs / 规划文档
 
 For bilingual planning, judging analysis, and presentation story, see:

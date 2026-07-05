@@ -14,9 +14,10 @@ from .commentary import (
     generate_visual_commentary,
 )
 from .json_utils import extract_json_object, to_pretty_json
+from .match_context import MatchContext, match_context_block
 from .manifest import FramesManifest
 from .scanner import EventCandidate
-from .styles import StyleProfile
+from .styles import StyleProfile, style_instruction_block
 from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
 
 
@@ -69,21 +70,27 @@ def generate_bilingual_commentary(
     tracker: StepTracker | None = None,
     visual_config: VisualCommentaryConfig | None = None,
     translation_config: TranslationConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> BilingualCommentaryResult:
     active_client = client or InternClient()
     trace = tracker or NullTracker()
     trace.record(
         "generate_bilingual_commentary",
         "start",
-        {"video_id": manifest.video_id, "style_id": style.style_id, "event_count": len(events)},
+        {
+            "video_id": manifest.video_id,
+            "style_id": style.style_id,
+            "event_count": len(events),
+            "match_context_id": match_context.context_id if match_context else None,
+        },
     )
-    english = generate_visual_commentary(events, manifest, style, active_client, trace, visual_config)
+    english = generate_visual_commentary(events, manifest, style, active_client, trace, visual_config, match_context)
     trace.record(
         "generate_bilingual_commentary",
         "english_generated",
         {"segment_count": len(english.segments)},
     )
-    bilingual = translate_commentary_to_chinese(english, style, active_client, trace, translation_config)
+    bilingual = translate_commentary_to_chinese(english, style, active_client, trace, translation_config, match_context)
     trace.record(
         "generate_bilingual_commentary",
         "finish",
@@ -98,6 +105,7 @@ def translate_commentary_to_chinese(
     client: ChatClient | None = None,
     tracker: StepTracker | None = None,
     config: TranslationConfig | None = None,
+    match_context: MatchContext | None = None,
 ) -> BilingualCommentaryResult:
     translation_config = config or TranslationConfig()
     active_client = client or InternClient()
@@ -110,6 +118,7 @@ def translate_commentary_to_chinese(
             "style_id": style.style_id,
             "segment_count": len(commentary.segments),
             "target_language_code": translation_config.target_language_code,
+            "match_context_id": match_context.context_id if match_context else None,
         },
     )
 
@@ -125,7 +134,7 @@ def translate_commentary_to_chinese(
                 "subtitle_count": len(segment.subtitle_lines),
             },
         )
-        messages = _build_translation_messages(segment, style, translation_config)
+        messages = _build_translation_messages(segment, style, translation_config, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "translate_commentary_to_chinese.segment",
@@ -180,6 +189,7 @@ def _build_translation_messages(
     segment: CommentarySegment,
     style: StyleProfile,
     config: TranslationConfig,
+    match_context: MatchContext | None = None,
 ) -> list[dict[str, str]]:
     source = {
         "event_id": segment.event_id,
@@ -200,14 +210,23 @@ def _build_translation_messages(
 You are translating football commentary from English into {config.target_language}.
 
 Meaning fidelity is the first priority. Preserve the exact factual meaning, timing, numbers, names, teams, score references, and uncertainty.
-Apply this commentary style only after preserving meaning:
-{style.prompt_injection}
+Apply this commentary style strongly after preserving meaning:
+{style_instruction_block(style, "chinese_translation")}
+
+Match context for factual disambiguation:
+{match_context_block(match_context)}
 
 Translation rules:
 - Do not add facts, player names, team names, scores, or tactical details that are not in the English source.
+- Use the match context to preserve team identity and avoid wrong team substitutions; for this video, do not translate Curacao/Curaçao as Colombia or Paraguay.
+- The returned commentary_text and subtitle_lines must be written in {config.target_language}; do not copy the English source into the translated fields.
+- Translate an in-match "penalty kick" as "点球" or "主罚点球"; do not call it "点球大战" unless the source explicitly says penalty shootout.
 - Keep the same event_id, event_type, talk_start_sec, talk_end_sec, and subtitle timing.
-- Translate naturally for spoken football commentary in {config.target_language}.
-- If style and meaning conflict, choose meaning.
+- Translate as a polished Chinese football commentator would speak, not as a literal subtitle translator.
+- Preserve factual meaning, but you may reshape sentence order, rhythm, connectives, and exclamatory cadence to fit the selected style.
+- Avoid flat phrases like "a player takes a shot" when the source allows a more vivid but still faithful Chinese rendering.
+- Do not leave stray English words in Chinese text except standard football/broadcast terms such as VAR.
+- If style and meaning conflict, choose meaning, then recover style through rhythm and wording.
 - Return JSON only.
 
 English source:
@@ -227,7 +246,7 @@ Return JSON only:
 def _parse_translation_response(text: str, source: CommentarySegment) -> LocalizedCommentary:
     try:
         payload = extract_json_object(text)
-        commentary_text = str(payload.get("commentary_text", "")).strip() or text.strip()
+        commentary_text = _first_text_value(payload, ("commentary_text", "commentation_text", "commentary", "text")) or text.strip()
         subtitle_rows = payload.get("subtitle_lines", [])
         subtitles: list[SubtitleLine] = []
         if isinstance(subtitle_rows, list):
@@ -245,6 +264,17 @@ def _parse_translation_response(text: str, source: CommentarySegment) -> Localiz
         commentary_text = text.strip()
         subtitles = ()
     return LocalizedCommentary(commentary_text=commentary_text, subtitle_lines=tuple(subtitles))
+
+
+def _first_text_value(payload: dict[str, Any], keys: tuple[str, ...]) -> str:
+    for key in keys:
+        value = payload.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    for value in payload.values():
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
 
 
 def bilingual_commentary_result_to_dict(result: BilingualCommentaryResult) -> dict[str, Any]:

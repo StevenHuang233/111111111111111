@@ -31,9 +31,9 @@ EN: Use this as a weak reference for evaluation, not as a gold answer. A good vi
 
 ZH: 它只能作为弱参考，不是 gold answer。好的视觉解说 Harness 应该在关键事件时间和事实背景上与参考一致，但措辞可以不同，也可以描述音轨没有说出的画面事实。
 
-Do not commit the full extracted audio file here. Keep only chunks and reference outputs.
+Do not commit the full extracted audio file, audio chunks, or raw ASR responses here. Keep only compact reference outputs and reproduction tools in source control.
 
-不要把完整抽取音频提交到这里。只保留分块和参考输出。
+不要把完整抽取音频、音频分块或 raw ASR 响应提交到这里。源码控制中只保留精简参考输出和复现工具。
 
 Verification priority / 核验优先级：
 

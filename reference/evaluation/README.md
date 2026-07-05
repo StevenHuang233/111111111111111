@@ -21,6 +21,8 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `identity_style_audit.md` | Audits supported identity wording and natural broadcast style. | 审计身份措辞依据和自然解说风格。 |
 | `commentary_quality_eval.md` | Latest quality metrics, issue samples, and improvement suggestions for `outputs/commentary_bilingual.json`. | 对 `outputs/commentary_bilingual.json` 的最新质量指标、问题样例和改进建议。 |
 | `final_evaluation_gates.md` | Aggregates quality, goal alignment, and identity/style gates. | 汇总质量、进球对齐、身份与风格三类门禁。 |
+| `final_reflection_v11/README.md` | Final V11 evaluate-reflect-evaluate-SRT acceptance loop. | V11 终稿“检测-反思-复检-SRT”验收闭环。 |
+| `final_reflection/README.md` | One-shot final reflection and SRT package guide. | 一键最终反思与 SRT 打包说明。 |
 | `revision_queue.md` | Prioritized rewrite/suppression queue built from gate failures. | 从门禁失败项生成的重写/抑制优先级队列。 |
 | `commentary_revision_annotations.md` | Final-output segments annotated with blocker/warning/clear status and safe-use policy. | 给终稿片段标注阻塞、警告、可保留状态和安全使用策略。 |
 | `demo_safe_commentary_candidate.md` | Non-generative demo candidate that excludes blocker segments by default. | 默认剔除阻塞片段的非生成式 demo 候选稿。 |
