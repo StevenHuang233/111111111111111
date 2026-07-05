@@ -263,6 +263,7 @@ def _build_commentary_messages(
             "celebration phases for emotional reaction, and var_review phases only if the evidence clearly supports review context."
         )
     verification_guard = _verification_guard_instruction(event)
+    event_guard = _event_specific_guard_instruction(event)
     prompt = f"""
 You are generating football commentary for one detected event.
 
@@ -281,6 +282,7 @@ Do not invent player names, teams, scores, or facts that are not present in the 
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
 Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 {verification_guard}
+{event_guard}
 {phase_instruction}
 
 Event data:
@@ -314,6 +316,7 @@ def _build_visual_commentary_messages(
             "celebration frames for emotional reaction, and var_review frames only if the evidence clearly supports review context."
         )
     verification_guard = _verification_guard_instruction(event)
+    event_guard = _event_specific_guard_instruction(event)
     frame_listing = "\n".join(
         f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]" for frame in frames
     )
@@ -337,6 +340,7 @@ Use the provided frames to enrich visual details, but do not invent player names
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
 Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 {verification_guard}
+{event_guard}
 Treat selected frames as representative samples from the event and phase intervals, not as a complete video clip.
 {image_input_note}
 {phase_instruction}
@@ -410,6 +414,16 @@ def _verification_guard_instruction(event: EventCandidate) -> str:
         return (
             "This is not a goal event. Do not upgrade it into a goal call or say the ball finds the net unless the structured "
             "event data explicitly says a separate goal verification confirmed a scored goal."
+        )
+    return ""
+
+
+def _event_specific_guard_instruction(event: EventCandidate) -> str:
+    if event.event_type == "var_show":
+        return (
+            "This is a VAR system/team presentation segment. Describe the VAR room, officials, monitors, "
+            "or broadcast technology shown, but do not infer a specific incident, check type, decision, "
+            "penalty, offside, or outcome unless that exact review or decision is explicitly visible in this event."
         )
     return ""
 

@@ -752,6 +752,28 @@ class HarnessTests(unittest.TestCase):
             self.assertIn("do not announce a new goal", prompt)
             self.assertIn("not live scoring in this segment", prompt)
 
+    def test_var_show_prompt_blocks_specific_review_inference(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = load_manifest(write_manifest(Path(tmp), count=1))
+            event = EventCandidate(
+                "U017",
+                "var_show",
+                0.0,
+                2.0,
+                ("f0",),
+                0.95,
+                "FIFA VAR ROOM graphic with officials at monitors.",
+                (EventPhase("var_show", 0.0, 2.0, ("f0",), "VAR room officials shown."),),
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "VAR room shown.", "subtitle_lines": []})])
+
+            generate_commentary([event], manifest, load_style("broadcast_professional"), fake)
+
+            prompt = fake.calls[0]["messages"][0]["content"][0]["text"]
+            self.assertIn("VAR system/team presentation segment", prompt)
+            self.assertIn("do not infer a specific incident", prompt)
+            self.assertIn("unless that exact review or decision is explicitly visible", prompt)
+
     def test_translate_commentary_to_chinese_with_style_prompt(self) -> None:
         commentary = CommentaryResult(
             video_id="demo",
