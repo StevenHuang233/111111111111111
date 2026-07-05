@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
+
+from PIL import Image, ImageDraw
 
 from intern_client import InternClient, image_source_to_url
 
@@ -51,6 +55,8 @@ class VisualCommentaryConfig:
     max_frames_per_phase: int | None = None
     context_frames_each_side: int = 1
     sample_fps: float | None = 2.0
+    contact_sheet_threshold: int = 12
+    contact_sheet_frames_per_image: int = 16
 
 
 def generate_commentary(
@@ -151,6 +157,8 @@ def generate_visual_commentary(
             "max_frames_per_phase": visual_config.max_frames_per_phase,
             "context_frames_each_side": visual_config.context_frames_each_side,
             "sample_fps": visual_config.sample_fps,
+            "contact_sheet_threshold": visual_config.contact_sheet_threshold,
+            "contact_sheet_frames_per_image": visual_config.contact_sheet_frames_per_image,
             "match_context_id": match_context.context_id if match_context else None,
         },
     )
@@ -169,7 +177,7 @@ def generate_visual_commentary(
                 "selected_frame_ids": [frame.frame_id for frame in selected_frames],
             },
         )
-        messages = _build_visual_commentary_messages(event, manifest, style, selected_frames, match_context)
+        messages = _build_visual_commentary_messages(event, manifest, style, selected_frames, visual_config, match_context)
         if should_record_model_io(trace):
             trace.record(
                 "generate_visual_commentary.event",
@@ -187,6 +195,10 @@ def generate_visual_commentary(
                         for frame in selected_frames
                     ],
                     "image_payload_policy": "Image inputs are sent as data URIs to the API, but trace records local paths instead of base64 payloads.",
+                    "contact_sheet_policy": (
+                        "When selected frame count exceeds the threshold, frames are packed into labeled contact sheets "
+                        "to preserve the full 2fps sequence without exceeding image-input count limits."
+                    ),
                 },
             )
         data = active_client.chat(
@@ -288,6 +300,7 @@ def _build_visual_commentary_messages(
     manifest: FramesManifest,
     style: StyleProfile,
     frames: tuple[FrameInfo, ...],
+    config: VisualCommentaryConfig,
     match_context: MatchContext | None = None,
 ) -> list[dict[str, Any]]:
     event_json = _event_to_prompt_dict(event, manifest)
@@ -301,6 +314,8 @@ def _build_visual_commentary_messages(
     frame_listing = "\n".join(
         f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]" for frame in frames
     )
+    image_inputs = _build_visual_image_inputs(event, frames, config)
+    image_input_note = _visual_image_input_note(image_inputs, len(frames))
     prompt = f"""
 You are generating football commentary for one detected event using both structured event data and selected visual frames.
 
@@ -319,6 +334,7 @@ Use the provided frames to enrich visual details, but do not invent player names
 If an exact name, team, or score is uncertain, describe it visually instead of guessing.
 Treat event_type as a pipeline candidate label, not as proof. For event_type=goal, call it as a goal only when the event evidence, selected frames, or a goal verification note clearly supports an actual scored goal. If the evidence contradicts the label, describe the visible action conservatively instead of forcing a goal call.
 Treat selected frames as representative samples from the event and phase intervals, not as a complete video clip.
+{image_input_note}
 {phase_instruction}
 
 Selected frame prefixes:
@@ -336,9 +352,9 @@ Return JSON only:
 }}
 """.strip()
     content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
-    for frame in frames:
-        content.append({"type": "text", "text": f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]"})
-        content.append({"type": "image_url", "image_url": {"url": image_source_to_url(str(frame.path))}})
+    for image_input in image_inputs:
+        content.append({"type": "text", "text": image_input["label"]})
+        content.append({"type": "image_url", "image_url": {"url": image_source_to_url(str(image_input["path"]))}})
     return [{"role": "user", "content": content}]
 
 
@@ -370,6 +386,102 @@ def _event_to_prompt_dict(event: EventCandidate, manifest: FramesManifest) -> di
             for phase in event.phases
         ],
     }
+
+
+def _build_visual_image_inputs(
+    event: EventCandidate,
+    frames: tuple[FrameInfo, ...],
+    config: VisualCommentaryConfig,
+) -> list[dict[str, str]]:
+    if not frames:
+        return []
+    threshold = max(1, int(config.contact_sheet_threshold))
+    if len(frames) <= threshold:
+        return [
+            {
+                "label": f"[frame_id={frame.frame_id}, timestamp={format_timestamp(frame.timestamp_sec)}]",
+                "path": str(frame.path),
+            }
+            for frame in frames
+        ]
+
+    frames_per_sheet = max(1, int(config.contact_sheet_frames_per_image))
+    sheet_paths = _build_contact_sheets(event, frames, frames_per_sheet)
+    inputs: list[dict[str, str]] = []
+    for sheet_index, (sheet_path, sheet_frames) in enumerate(sheet_paths, start=1):
+        start = sheet_frames[0]
+        end = sheet_frames[-1]
+        inputs.append(
+            {
+                "label": (
+                    f"[contact_sheet={sheet_index}, frames={len(sheet_frames)}, "
+                    f"range={format_timestamp(start.timestamp_sec)}-{format_timestamp(end.timestamp_sec)}]"
+                ),
+                "path": str(sheet_path),
+            }
+        )
+    return inputs
+
+
+def _visual_image_input_note(image_inputs: list[dict[str, str]], selected_frame_count: int) -> str:
+    if not image_inputs or len(image_inputs) == selected_frame_count:
+        return ""
+    return (
+        f"The {selected_frame_count} selected frames are packed into {len(image_inputs)} labeled contact sheet images. "
+        "Read each contact sheet left-to-right, top-to-bottom; each tile is labeled with its frame_id and timestamp."
+    )
+
+
+def _build_contact_sheets(
+    event: EventCandidate,
+    frames: tuple[FrameInfo, ...],
+    frames_per_sheet: int,
+) -> list[tuple[Path, tuple[FrameInfo, ...]]]:
+    root = Path(tempfile.gettempdir()) / "ailab_commentary_contact_sheets"
+    root.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha1(
+        "|".join([event.event_id, *(f"{frame.frame_id}:{frame.timestamp_sec:.3f}" for frame in frames)]).encode("utf-8")
+    ).hexdigest()[:16]
+    safe_event_id = "".join(char if char.isalnum() or char in {"-", "_"} else "_" for char in event.event_id)
+
+    sheets: list[tuple[Path, tuple[FrameInfo, ...]]] = []
+    for offset in range(0, len(frames), frames_per_sheet):
+        sheet_frames = frames[offset : offset + frames_per_sheet]
+        sheet_path = root / f"{safe_event_id}_{digest}_{len(sheets) + 1:02d}.jpg"
+        if not sheet_path.exists():
+            _write_contact_sheet(sheet_path, sheet_frames)
+        sheets.append((sheet_path, sheet_frames))
+    return sheets
+
+
+def _write_contact_sheet(path: Path, frames: tuple[FrameInfo, ...]) -> None:
+    columns = 4
+    tile_width = 320
+    tile_height = 180
+    label_height = 28
+    rows = (len(frames) + columns - 1) // columns
+    sheet = Image.new("RGB", (columns * tile_width, rows * (tile_height + label_height)), "white")
+    draw = ImageDraw.Draw(sheet)
+
+    for index, frame in enumerate(frames):
+        column = index % columns
+        row = index // columns
+        left = column * tile_width
+        top = row * (tile_height + label_height)
+        try:
+            image = Image.open(frame.path).convert("RGB")
+            image.thumbnail((tile_width, tile_height))
+        except Exception:
+            image = Image.new("RGB", (tile_width, tile_height), "#202020")
+        image_left = left + (tile_width - image.width) // 2
+        image_top = top + (tile_height - image.height) // 2
+        sheet.paste(image, (image_left, image_top))
+        draw.rectangle((left, top + tile_height, left + tile_width, top + tile_height + label_height), fill="#111111")
+        label = f"{frame.frame_id}  {format_timestamp(frame.timestamp_sec)}"
+        draw.text((left + 6, top + tile_height + 7), label, fill="white")
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(path, quality=88)
 
 
 def _event_type_reference_block(event_type: str) -> str:

@@ -63,7 +63,7 @@ from harness.tracing import clip_text, should_record_model_io, tracker_text_limi
 from intern_client import InternClient
 
 
-EVENT_CACHE_VERSION = 9
+EVENT_CACHE_VERSION = 10
 
 
 class ProgressLogger:
@@ -1254,6 +1254,10 @@ def bilingual_checkpoint_valid(
         if detail.get("context_frames_each_side") != visual_config.context_frames_each_side:
             return False
         if detail.get("sample_fps") != visual_config.sample_fps:
+            return False
+        if detail.get("contact_sheet_threshold") != visual_config.contact_sheet_threshold:
+            return False
+        if detail.get("contact_sheet_frames_per_image") != visual_config.contact_sheet_frames_per_image:
             return False
     return True
 

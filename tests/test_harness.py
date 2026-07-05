@@ -1052,7 +1052,8 @@ class HarnessTests(unittest.TestCase):
             content = fake.calls[-1]["messages"][0]["content"]
             image_count = sum(1 for part in content if isinstance(part, dict) and part.get("type") == "image_url")
             sent_text = "\n".join(part.get("text", "") for part in content if isinstance(part, dict))
-            self.assertEqual(image_count, 17)
+            self.assertEqual(image_count, 2)
+            self.assertIn("17 selected frames are packed into 2 labeled contact sheet images", sent_text)
             self.assertIn("frame_id=f32", sent_text)
 
     def test_dense_manifests_respect_sample_fps(self) -> None:

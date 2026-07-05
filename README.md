@@ -335,7 +335,7 @@ It returns segments with:
 
 By default, the speaking interval equals the detected event interval.
 
-`generate_visual_commentary()` sends structured event data plus selected visual frames to the model. It samples frames from each phase interval and the overall event interval at the configured FPS, while prioritizing evidence frames. By default there is no per-event or per-phase frame-count cap; set the max fields only for smoke tests or cost-control runs:
+`generate_visual_commentary()` sends structured event data plus selected visual frames to the model. It samples frames from each phase interval and the overall event interval at the configured FPS, while prioritizing evidence frames. By default there is no per-event or per-phase frame-count cap. When a long event would exceed the API image-input count, the selected frames are packed into labeled contact sheets instead of being dropped. Set the max fields only for smoke tests or cost-control runs:
 
 ```python
 VisualCommentaryConfig(
@@ -503,12 +503,12 @@ python run_full_bilingual_with_progress.py `
   --commentary-sample-fps 2.0
 ```
 
-By default, dense scanning is skipped. The generation module reads the coarse-derived event unit, its phases, evidence summary, event definitions, style profile, and sampled visual frames from the full 4fps manifest. `--commentary-sample-fps 2.0` means final generation samples about two frames per second inside each event or phase without a frame-count cap. Use `--max-frames-per-event` or `--max-frames-per-phase` only when you intentionally want to cap generation payload size.
+By default, dense scanning is skipped. The generation module reads the coarse-derived event unit, its phases, evidence summary, event definitions, style profile, and sampled visual frames from the full 4fps manifest. `--commentary-sample-fps 2.0` means final generation samples about two frames per second inside each event or phase without a frame-count cap. Long events use labeled contact sheets to stay under API image-input limits without dropping selected frames. Use `--max-frames-per-event` or `--max-frames-per-phase` only when you intentionally want to cap generation payload size.
 
 The final output is:
 
 ```text
-outputs/<run-name>/commentary/coarse_events_verified_v9/commentary_bilingual.json
+outputs/<run-name>/commentary/coarse_events_verified_v10/commentary_bilingual.json
 outputs/<run-name>/commentary_bilingual.json
 ```
 
