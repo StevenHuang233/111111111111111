@@ -508,7 +508,7 @@ By default, dense scanning is skipped. The generation module reads the coarse-de
 The final output is:
 
 ```text
-outputs/<run-name>/commentary/coarse_events_verified_v10/commentary_bilingual.json
+outputs/<run-name>/commentary/coarse_events_verified_v11/commentary_bilingual.json
 outputs/<run-name>/commentary_bilingual.json
 ```
 

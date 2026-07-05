@@ -20,7 +20,7 @@ class ChatClient(Protocol):
         ...
 
 
-GOAL_VERIFICATION_VERSION = 8
+GOAL_VERIFICATION_VERSION = 10
 
 ALLOWED_CORRECTED_TYPES = {
     "goal",
@@ -598,7 +598,28 @@ def _phase_labels_from_windows(
             phase_type = "celebration" if phase.phase_type == "celebration" else "replay"
             reason = "This phase occurs after the verified live goal window."
         labels.append({"phase_index": index, "phase_type": phase_type, "reason": reason})
+    if live_row and labels and not any(label.get("phase_type") == "live_goal" for label in labels):
+        fallback_index = _nearest_phase_index(event.phases, live_start or event.start_sec, live_end or live_start or event.end_sec)
+        labels[fallback_index] = {
+            "phase_index": fallback_index,
+            "phase_type": "live_goal",
+            "reason": "Fallback live_goal label assigned to the phase nearest the verified live scoring window.",
+        }
     return labels
+
+
+def _nearest_phase_index(phases: tuple[EventPhase, ...], start_sec: float, end_sec: float) -> int:
+    target_midpoint = (start_sec + end_sec) / 2.0
+    best_index = 0
+    best_score = float("inf")
+    for index, phase in enumerate(phases):
+        overlap = max(0.0, min(phase.end_sec, end_sec) - max(phase.start_sec, start_sec))
+        midpoint = (phase.start_sec + phase.end_sec) / 2.0
+        score = abs(midpoint - target_midpoint) - overlap
+        if score < best_score:
+            best_score = score
+            best_index = index
+    return best_index
 
 
 def _phase_has_fifa_marker(

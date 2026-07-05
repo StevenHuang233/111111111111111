@@ -730,6 +730,28 @@ class HarnessTests(unittest.TestCase):
             self.assertIn("The referee shows or is clearly about to show a yellow or red card", prompt)
             self.assertIn("yellow card visible", prompt)
 
+    def test_downgraded_goal_prompt_blocks_new_goal_call(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = load_manifest(write_manifest(Path(tmp), count=1))
+            event = EventCandidate(
+                "U030",
+                "celebration_or_replay",
+                0.0,
+                2.0,
+                ("f0",),
+                0.95,
+                "Goal verification verdict=not_goal, corrected_event_type=celebration_or_replay, confidence=0.95",
+                (EventPhase("replay", 0.0, 2.0, ("f0",), "broadcast replay package"),),
+            )
+            fake = FakeClient([json.dumps({"commentary_text": "Replay aftermath.", "subtitle_lines": []})])
+
+            generate_commentary([event], manifest, load_style("broadcast_professional"), fake)
+
+            prompt = fake.calls[0]["messages"][0]["content"][0]["text"]
+            self.assertIn("Goal verification downgraded this candidate", prompt)
+            self.assertIn("do not announce a new goal", prompt)
+            self.assertIn("not live scoring in this segment", prompt)
+
     def test_translate_commentary_to_chinese_with_style_prompt(self) -> None:
         commentary = CommentaryResult(
             video_id="demo",
