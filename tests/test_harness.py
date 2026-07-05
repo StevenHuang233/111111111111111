@@ -560,7 +560,15 @@ class HarnessTests(unittest.TestCase):
             )
             result = verify_goal_events([event], manifest, load_style("broadcast_professional"), FakeClient([response]))
 
+            self.assertEqual(len(result.events), 2)
             self.assertEqual(result.events[0].event_type, "save")
+            self.assertEqual(result.events[0].start_sec, 0.0)
+            self.assertEqual(result.events[0].end_sec, 0.0)
+            self.assertEqual(result.events[1].event_id, "E001_replay_01")
+            self.assertEqual(result.events[1].event_type, "celebration_or_replay")
+            self.assertEqual(result.events[1].start_sec, 2.0)
+            self.assertEqual(result.events[1].end_sec, 2.0)
+            self.assertEqual(result.records[0].refined_event_type, "split:save,celebration_or_replay")
             self.assertEqual(result.records[0].verdict, "not_goal")
             self.assertIn("Goal verification verdict=not_goal", result.events[0].evidence_summary)
 

@@ -1068,12 +1068,12 @@ def verify_goals_parallel(
     trace_max_text_chars: int,
 ) -> GoalVerificationResult:
     trace_dir.mkdir(parents=True, exist_ok=True)
-    refined_by_id: dict[str, EventCandidate] = {event.event_id: event for event in events}
+    refined_by_id: dict[str, tuple[EventCandidate, ...]] = {event.event_id: (event,) for event in events}
     records = []
     traces: dict[str, Any] = {}
     goal_events = [event for event in events if event.event_type == "goal"]
 
-    def run_event(event: EventCandidate) -> tuple[EventCandidate, Any, dict[str, Any]]:
+    def run_event(event: EventCandidate) -> tuple[tuple[EventCandidate, ...], Any, dict[str, Any]]:
         tracker = TraceRecorder(record_model_io=True, max_text_chars=trace_max_text_chars)
         refined, record = verify_goal_event(
             event,
@@ -1098,7 +1098,7 @@ def verify_goals_parallel(
                 encoding="utf-8",
             )
 
-    ordered = [refined_by_id[event.event_id] for event in events]
+    ordered = [item for event in events for item in refined_by_id[event.event_id]]
     records.sort(key=lambda item: item.event_id)
     (trace_dir / "trace.json").write_text(json.dumps({"events": traces}, ensure_ascii=False, indent=2), encoding="utf-8")
     return GoalVerificationResult(

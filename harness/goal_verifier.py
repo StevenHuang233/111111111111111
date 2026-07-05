@@ -20,7 +20,7 @@ class ChatClient(Protocol):
         ...
 
 
-GOAL_VERIFICATION_VERSION = 7
+GOAL_VERIFICATION_VERSION = 8
 
 ALLOWED_CORRECTED_TYPES = {
     "goal",
@@ -41,6 +41,20 @@ ALLOWED_CORRECTED_TYPES = {
 }
 GOAL_PHASE_TYPES = {"buildup", "live_goal", "replay", "celebration", "var_review"}
 GOAL_FOLLOWUP_PHASE_TYPES = {"replay", "celebration", "var_review"}
+NON_GOAL_PRIMARY_TYPES = {
+    "shot",
+    "save",
+    "dangerous_attack",
+    "corner",
+    "free_kick",
+    "penalty",
+    "foul",
+    "card",
+    "substitution",
+    "var_show",
+    "var_review",
+    "other_relevant",
+}
 GOAL_FOLLOWUP_MARKERS = (
     "replay",
     "slow motion",
@@ -148,8 +162,8 @@ def verify_goal_events(
         if event.event_type != "goal":
             refined.append(event)
             continue
-        result_event, record = verify_goal_event(event, manifest, style, active_client, trace, verify_config)
-        refined.append(result_event)
+        result_events, record = verify_goal_event(event, manifest, style, active_client, trace, verify_config)
+        refined.extend(result_events)
         records.append(record)
 
     trace.record("verify_goal_events", "finish", {"verified_goals": len(records)})
@@ -168,7 +182,7 @@ def verify_goal_event(
     client: ChatClient,
     tracker: StepTracker | None = None,
     config: GoalVerificationConfig | None = None,
-) -> tuple[EventCandidate, GoalVerificationRecord]:
+) -> tuple[tuple[EventCandidate, ...], GoalVerificationRecord]:
     trace = tracker or NullTracker()
     verify_config = config or GoalVerificationConfig()
     windows = _build_verification_windows(event, manifest.frames, verify_config)
@@ -252,15 +266,16 @@ def verify_goal_event(
 
     payload = _aggregate_goal_window_payload(event, windows, window_payloads)
     payload = _apply_single_goal_followup_policy(event, payload, verify_config)
-    refined = _apply_goal_verification(event, payload, verify_config)
+    refined_events = _apply_goal_verification(event, payload, verify_config)
+    refined_type_summary = _refined_type_summary(refined_events)
     record = GoalVerificationRecord(
         event_id=event.event_id,
         original_event_type=event.event_type,
-        refined_event_type=refined.event_type,
+        refined_event_type=refined_type_summary,
         verdict=str(payload["verdict"]),
         confidence=float(payload["confidence"]),
         rationale=str(payload.get("rationale", "")),
-        corrected_event_type=str(payload.get("corrected_event_type", refined.event_type)),
+        corrected_event_type=str(payload.get("corrected_event_type", refined_events[0].event_type if refined_events else event.event_type)),
         warnings=tuple(str(item) for item in payload.get("warnings", []) if isinstance(item, str)),
     )
     trace.record(
@@ -270,6 +285,8 @@ def verify_goal_event(
             "event_id": event.event_id,
             "verdict": record.verdict,
             "refined_event_type": record.refined_event_type,
+            "refined_event_count": len(refined_events),
+            "refined_event_ids": [item.event_id for item in refined_events],
             "confidence": record.confidence,
             "window_count": len(windows),
             "fifa_replay_marker_frames": list(
@@ -277,7 +294,7 @@ def verify_goal_event(
             ),
         },
     )
-    return refined, record
+    return refined_events, record
 
 
 def goal_verification_result_to_dict(
@@ -668,7 +685,7 @@ def _apply_goal_verification(
     event: EventCandidate,
     payload: dict[str, Any],
     config: GoalVerificationConfig,
-) -> EventCandidate:
+) -> tuple[EventCandidate, ...]:
     verdict = str(payload["verdict"])
     corrected_type = str(payload["corrected_event_type"])
     if verdict == "confirmed_goal":
@@ -695,7 +712,7 @@ def _apply_goal_verification(
     phases: list[EventPhase] = []
     for index, phase in enumerate(event.phases):
         phase_type = phase_map.get(index, phase.phase_type)
-        if refined_type != "goal" and phase_type == "live_goal":
+        if refined_type != "goal" and (phase_type == "live_goal" or phase.phase_type == "live_goal"):
             phase_type = refined_type
         phases.append(
             EventPhase(
@@ -714,16 +731,149 @@ def _apply_goal_verification(
         f"confidence={float(payload['confidence']):.2f}, rationale={payload.get('rationale', '')}"
     )
     evidence_summary = "; ".join(part for part in [event.evidence_summary, verification_note] if part)
-    return EventCandidate(
-        event_id=event.event_id,
-        event_type=refined_type,
-        start_sec=event.start_sec,
-        end_sec=event.end_sec,
-        evidence_frames=event.evidence_frames,
-        confidence=max(event.confidence, float(payload["confidence"])),
-        evidence_summary=evidence_summary,
-        phases=tuple(phases),
+    confidence = max(event.confidence, float(payload["confidence"]))
+    if refined_type != "goal":
+        return _split_downgraded_goal_package(
+            event,
+            refined_type,
+            tuple(phases),
+            confidence,
+            evidence_summary,
+        )
+
+    return (
+        EventCandidate(
+            event_id=event.event_id,
+            event_type=refined_type,
+            start_sec=event.start_sec,
+            end_sec=event.end_sec,
+            evidence_frames=event.evidence_frames,
+            confidence=confidence,
+            evidence_summary=evidence_summary,
+            phases=tuple(phases),
+        ),
     )
+
+
+def _split_downgraded_goal_package(
+    event: EventCandidate,
+    refined_type: str,
+    phases: tuple[EventPhase, ...],
+    confidence: float,
+    evidence_summary: str,
+) -> tuple[EventCandidate, ...]:
+    if refined_type == "celebration_or_replay":
+        replay_phases = tuple(_as_replay_phase(phase) for phase in phases) or (
+            EventPhase("replay", event.start_sec, event.end_sec, event.evidence_frames, event.evidence_summary),
+        )
+        return (
+            _event_from_phases(
+                event.event_id,
+                "celebration_or_replay",
+                replay_phases,
+                confidence,
+                evidence_summary,
+            ),
+        )
+
+    primary_phases = tuple(phase for phase in phases if phase.phase_type not in GOAL_FOLLOWUP_PHASE_TYPES)
+    if not primary_phases:
+        primary_phases = (
+            EventPhase(refined_type, event.start_sec, event.end_sec, event.evidence_frames, event.evidence_summary),
+        )
+    primary_phases = _ensure_primary_phase_type(primary_phases, refined_type)
+    split_events = [
+        _event_from_phases(
+            event.event_id,
+            refined_type,
+            primary_phases,
+            confidence,
+            evidence_summary,
+        )
+    ]
+
+    followup_phases = tuple(phase for phase in phases if phase.phase_type in GOAL_FOLLOWUP_PHASE_TYPES)
+    if followup_phases:
+        followup_summary = "; ".join(
+            part
+            for part in [
+                "Split from downgraded goal package as replay/celebration follow-up.",
+                evidence_summary,
+            ]
+            if part
+        )
+        split_events.append(
+            _event_from_phases(
+                f"{event.event_id}_replay_01",
+                "celebration_or_replay",
+                followup_phases,
+                confidence,
+                followup_summary,
+            )
+        )
+    return tuple(split_events)
+
+
+def _ensure_primary_phase_type(phases: tuple[EventPhase, ...], refined_type: str) -> tuple[EventPhase, ...]:
+    if any(phase.phase_type == refined_type for phase in phases):
+        return phases
+    if refined_type not in NON_GOAL_PRIMARY_TYPES:
+        return phases
+    updated = list(phases)
+    target_index = next(
+        (index for index, phase in enumerate(updated) if phase.phase_type == "live_goal"),
+        len(updated) - 1,
+    )
+    phase = updated[target_index]
+    updated[target_index] = EventPhase(
+        phase_type=refined_type,
+        start_sec=phase.start_sec,
+        end_sec=phase.end_sec,
+        evidence_frames=phase.evidence_frames,
+        evidence_summary=phase.evidence_summary,
+    )
+    return tuple(updated)
+
+
+def _as_replay_phase(phase: EventPhase) -> EventPhase:
+    phase_type = phase.phase_type if phase.phase_type in GOAL_FOLLOWUP_PHASE_TYPES else "replay"
+    return EventPhase(
+        phase_type=phase_type,
+        start_sec=phase.start_sec,
+        end_sec=phase.end_sec,
+        evidence_frames=phase.evidence_frames,
+        evidence_summary=phase.evidence_summary,
+    )
+
+
+def _event_from_phases(
+    event_id: str,
+    event_type: str,
+    phases: tuple[EventPhase, ...],
+    confidence: float,
+    evidence_summary: str,
+) -> EventCandidate:
+    start_sec = min(phase.start_sec for phase in phases)
+    end_sec = max(phase.end_sec for phase in phases)
+    evidence_frames = tuple(
+        dict.fromkeys(frame_id for phase in phases for frame_id in phase.evidence_frames)
+    )
+    return EventCandidate(
+        event_id=event_id,
+        event_type=event_type,
+        start_sec=start_sec,
+        end_sec=end_sec,
+        evidence_frames=evidence_frames,
+        confidence=confidence,
+        evidence_summary=evidence_summary,
+        phases=phases,
+    )
+
+
+def _refined_type_summary(events: tuple[EventCandidate, ...]) -> str:
+    if len(events) == 1:
+        return events[0].event_type
+    return "split:" + ",".join(event.event_type for event in events)
 
 
 def _keep_single_live_goal(phases: list[EventPhase]) -> list[EventPhase]:
