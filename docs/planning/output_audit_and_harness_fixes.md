@@ -18,6 +18,7 @@ ZH: 本文总结对生成解说结果的审计，重点是当前 `outputs/commen
 | Public fact reference / 公开事实参考 | `reference/evaluation/germany_curacao_public_reference.json` | Evaluation-only final score and goal order. / 仅用于验证的比分和进球顺序。 |
 | Audit report / 审计报告 | `reference/evaluation/commentary_full_review_audit.md` | Detected conflicts and style issues. / 检出的冲突和风格问题。 |
 | Quality gate / 质量门禁 | `reference/evaluation/commentary_quality_eval.md` | Latest metrics, issue samples, and final-output gate status. / 最新指标、问题样例和终稿门禁状态。 |
+| Goal timeline alignment / 进球时间线对齐 | `reference/evaluation/goal_timeline_alignment.md` | Aligns generated goal assertions with manually verified score changes. / 将生成进球声明与人工核验比分变化对齐。 |
 | Manual scoreboard review / 人工比分牌核验 | `reference/evaluation/goal_scoreboard_manual_review.md` | 4fps visual evidence for score changes. / 基于 4fps 抽帧的比分变化证据。 |
 | Frame checklist / 帧核验清单 | `reference/evaluation/goal_frame_checklist.md` | 4fps probes and bisection plan for goal candidates. / 进球候选的 4fps 帧探针和二分核验计划。 |
 | Local contact sheets / 本地帧拼图 | `outputs/goal_frame_contact_sheets/` | Ignored PNG sheets generated from extracted frames for manual scoreboard checks. / 从抽帧生成、被 Git 忽略的 PNG 拼图，用于人工核验比分牌。 |
@@ -28,6 +29,7 @@ ZH: 本文总结对生成解说结果的审计，重点是当前 `outputs/commen
 | --- | --- | --- |
 | Current generated `goal` count is 21, while manual scoreboard review confirms 8 score changes. / 当前生成 `goal` 数为 21，人工比分牌核验确认 8 次比分变化。 | Severe over-detection and replay/summary confusion. / 严重多报，且把回放/总结混为现场进球。 | Add or enable live-goal verifier and score-state machine before final commentary. / 最终解说前加入或启用现场进球验证器和比分状态机。 |
 | Quality gate status is `fail`: wrong entities, goal overcount, and excessive score claims are blockers. / 质量门禁为 `fail`：错误实体、进球过计数和比分声明过多是阻塞项。 | Current output cannot be used directly as final demo narration. / 当前输出不能直接作为最终 demo 解说稿。 | Run `evaluate_commentary_quality.py --fail-on-gate` before final packaging. / 最终打包前运行 `evaluate_commentary_quality.py --fail-on-gate`。 |
+| Goal alignment gate status is `fail`: all 8 real score changes are covered, but there are 21 extra goal assertions and 5 duplicate goal groups. / 进球对齐门禁为 `fail`：8 个真实比分变化均被覆盖，但存在 21 个额外进球声明和 5 组重复进球声明。 | The system is recall-sufficient but precision-poor for goals. / 系统对进球召回够，但精度不足。 | Run `compare_goal_timeline.py --fail-on-alignment` and suppress or rewrite unaligned claims. / 运行 `compare_goal_timeline.py --fail-on-alignment`，抑制或重写无法对齐的进球声明。 |
 | ASR candidates cover several early score changes but miss late live goals and over-trigger on summary/stat text. / ASR 候选覆盖若干早期比分变化，但漏掉后段现场进球，并被总结/统计文本误触发。 | ASR-only event discovery is incomplete. / 只靠 ASR 发现事件不完整。 | Add independent scoreboard sweep over frames and use ASR only as a weak signal. / 增加独立比分牌 sweep，ASR 仅作为弱信号。 |
 | Some events are labeled `goal` but the text says the ball did not enter. / 有些事件标签是 `goal`，文本却说球没有进。 | Internal contradiction; unacceptable final output. / 内部自相矛盾，最终输出不可接受。 | Add event-label/text contradiction check. / 加事件标签与文本矛盾检查。 |
 | Wrong teams appear, especially Colombia/Colombian/哥伦比亚. / 出现错误球队，尤其是 Colombia/Colombian/哥伦比亚。 | Factual hallucination. / 事实幻觉。 | Restrict team names to video/event metadata and visible graphics. / 队名只能来自视频、事件元数据或可见图形。 |
@@ -58,6 +60,7 @@ ZH: 本地可见的 `origin/main@94d5933` 已经加入基于模型的 `goal_veri
 | --- | --- | --- |
 | Must | Run `reference/evaluation/tools/audit_commentary_output.py` after every full review output. | Audit report exists and critical issues are listed. |
 | Must | Run `reference/evaluation/tools/evaluate_commentary_quality.py --fail-on-gate` before final packaging. | Exit code is 0, or all blockers are explicitly reviewed and accepted. |
+| Must | Run `reference/evaluation/tools/compare_goal_timeline.py --fail-on-alignment` before final packaging. | Generated goals align with the 8 verified score changes, or unaligned claims are rewritten as replay/history/pending. |
 | Must | Add scoreboard cross-check for all `goal` events and score claims. | A goal cannot advance final score unless scoreboard evidence or high-confidence event evidence supports it. |
 | Must | Add independent scoreboard sweep beyond ASR goal windows. | Late score changes are found even when ASR does not mention a clean live goal. |
 | Must | Separate live goal, replay, halftime summary, historical mention, and possible disallowed goal. | Replay/summary no longer increments score. |

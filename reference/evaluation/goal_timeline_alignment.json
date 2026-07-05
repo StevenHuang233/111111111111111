@@ -1,0 +1,495 @@
+{
+  "policy": "Evaluation-only. Do not inject this report into target-agent prompt/runtime context.",
+  "summary": {
+    "verified_score_changes": 8,
+    "generated_goal_type_segments": 21,
+    "generated_goal_assertion_segments": 37,
+    "covered_verified_goals": 8,
+    "missing_verified_goals": 0,
+    "duplicate_verified_goal_groups": 5,
+    "extra_goal_assertions": 21,
+    "alignment_before_sec": 45.0,
+    "alignment_after_sec": 90.0
+  },
+  "alignment_gate": {
+    "status": "fail",
+    "blockers": [
+      "extra_goal_assertions"
+    ],
+    "warnings": [
+      "duplicate_verified_goal_groups"
+    ],
+    "en": "Fail means goal/score assertions are not aligned with verified scoreboard changes.",
+    "zh": "fail 表示进球/比分声明没有与已核验比分牌变化对齐。"
+  },
+  "verified_goals": [
+    {
+      "goal_id": "G01",
+      "score_change": "0-0 -> 1-0",
+      "verified_window": "00:14:03-00:14:41",
+      "match_clock": "04:56 to 05:34",
+      "status": "covered",
+      "assigned_generated_events": [
+        {
+          "event_id": "U036",
+          "event_type": "goal",
+          "time": "00:14:08-00:15:28",
+          "excerpt": "Germany takes the lead! A shot from inside the box finds the back of the net after a scramble in the penalty area. The goalkeeper dives but can't reach it as the ball rolls past hi"
+        }
+      ]
+    },
+    {
+      "goal_id": "G02",
+      "score_change": "1-0 -> 1-1",
+      "verified_window": "00:29:31-00:30:04",
+      "match_clock": "20:24 to 20:57",
+      "status": "covered_with_duplicates",
+      "assigned_generated_events": [
+        {
+          "event_id": "U080",
+          "event_type": "celebration_or_replay",
+          "time": "00:29:56-00:30:20",
+          "excerpt": "What a moment for Curacao! The players are piling on top of each other in celebration, and the fans are going absolutely wild. You can feel the energy in the stadium as everyone co"
+        },
+        {
+          "event_id": "U081",
+          "event_type": "goal",
+          "time": "00:30:48-00:32:44",
+          "excerpt": "And there it is! The ball finds the back of the net from a tight angle inside the box. The German attacker has beaten the diving goalkeeper with a precise strike into the bottom co"
+        }
+      ]
+    },
+    {
+      "goal_id": "G03",
+      "score_change": "1-1 -> 2-1",
+      "verified_window": "00:45:35-00:45:52",
+      "match_clock": "37:25 to 37:42",
+      "status": "covered",
+      "assigned_generated_events": [
+        {
+          "event_id": "U124",
+          "event_type": "goal",
+          "time": "00:45:16-00:46:36",
+          "excerpt": "Germany takes a free kick just outside the penalty area. The ball is struck with precision, curling past the defensive wall and into the top corner of the net. The goalkeeper dives"
+        }
+      ]
+    },
+    {
+      "goal_id": "G04",
+      "score_change": "2-1 -> 3-1",
+      "verified_window": "00:57:19-00:57:35",
+      "match_clock": "49:09 to 49:25",
+      "status": "covered_with_duplicates",
+      "assigned_generated_events": [
+        {
+          "event_id": "U147",
+          "event_type": "goal",
+          "time": "00:55:48-00:56:48",
+          "excerpt": "Germany takes a free kick just outside the penalty area. The ball is struck with precision, curling past the defensive wall and into the top corner of the net. The goalkeeper dives"
+        },
+        {
+          "event_id": "U149",
+          "event_type": "goal",
+          "time": "00:57:00-00:58:20",
+          "excerpt": "Germany awarded a penalty kick. The player steps up, takes the shot, and the ball goes into the net! The goalkeeper dives but cannot reach it. The German players celebrate as the s"
+        },
+        {
+          "event_id": "U150",
+          "event_type": "period_transition",
+          "time": "00:58:40-00:59:08",
+          "excerpt": "Half-time in this World Cup qualifier, and Germany lead 3-1 against Curaçao. Havertz, Schlotterbeck, and Nmecha have all found the net for the Germans, while Comenencia pulled one "
+        }
+      ]
+    },
+    {
+      "goal_id": "G05",
+      "score_change": "3-1 -> 4-1",
+      "verified_window": "01:01:41-01:01:58",
+      "match_clock": "46:03 to 46:20",
+      "status": "covered_with_duplicates",
+      "assigned_generated_events": [
+        {
+          "event_id": "U156",
+          "event_type": "period_transition",
+          "time": "01:00:36-01:01:08",
+          "excerpt": "The first half comes to an end, and Germany leads 3-1 over Curaçao as the referee blows the whistle for halftime. Players begin to regroup around the center circle, preparing for t"
+        },
+        {
+          "event_id": "U158",
+          "event_type": "goal",
+          "time": "01:01:40-01:02:44",
+          "excerpt": "Germany breaks through! Musiala, the number 10, receives the ball inside the penalty area, takes a touch to set himself, and fires a low shot that beats the diving goalkeeper. The "
+        },
+        {
+          "event_id": "U159",
+          "event_type": "celebration_or_replay",
+          "time": "01:02:56-01:03:00",
+          "excerpt": "Musiala finds the net, and Germany extend their lead to four goals. The scoreboard updates to reflect his 47th-minute strike as the players reset for the restart. / 穆西亚拉破门！德国队将领先优势"
+        }
+      ]
+    },
+    {
+      "goal_id": "G06",
+      "score_change": "4-1 -> 5-1",
+      "verified_window": "01:23:34-01:26:40",
+      "match_clock": "67:56 to 72:14",
+      "status": "covered_with_duplicates",
+      "assigned_generated_events": [
+        {
+          "event_id": "U203",
+          "event_type": "goal",
+          "time": "01:23:16-01:24:24",
+          "excerpt": "And there it is! Germany makes it five! The ball finds the back of the net as the German player fires a shot from inside the box that the goalkeeper cannot reach. The crowd erupts "
+        },
+        {
+          "event_id": "U211",
+          "event_type": "celebration_or_replay",
+          "time": "01:26:24-01:26:36",
+          "excerpt": "Germany extend their lead to 5-1, and the players are celebrating on the pitch. Tah and Raum are seen embracing, while Rüdiger runs back towards midfield. The crowd is in full swin"
+        },
+        {
+          "event_id": "U215",
+          "event_type": "dangerous_attack",
+          "time": "01:27:40-01:27:44",
+          "excerpt": "Germany are on the move, pushing forward with intent. A quick transition sees a German player carrying the ball past midfield, drawing defenders as he approaches the final third. T"
+        }
+      ]
+    },
+    {
+      "goal_id": "G07",
+      "score_change": "5-1 -> 6-1",
+      "verified_window": "01:31:30-01:33:20",
+      "match_clock": "77:04 to 78:54",
+      "status": "covered_with_duplicates",
+      "assigned_generated_events": [
+        {
+          "event_id": "U225",
+          "event_type": "goal",
+          "time": "01:31:28-01:32:36",
+          "excerpt": "Germany goes up 6-1! The ball finds the back of the net as the German players erupt in celebration. The crowd is on its feet, and the scoreboard confirms the goal. Nkunku and Kimmi"
+        },
+        {
+          "event_id": "U226",
+          "event_type": "celebration_or_replay",
+          "time": "01:33:40-01:33:48",
+          "excerpt": "Deniz Undav finds the back of the net once more, extending his remarkable scoring streak. The German striker, wearing number 26, is seen celebrating with a smile and a teammate emb"
+        }
+      ]
+    },
+    {
+      "goal_id": "G08",
+      "score_change": "6-1 -> 7-1",
+      "verified_window": "01:42:20-01:42:30",
+      "match_clock": "87:44 to 88:04",
+      "status": "covered",
+      "assigned_generated_events": [
+        {
+          "event_id": "U244",
+          "event_type": "goal",
+          "time": "01:42:08-01:43:24",
+          "excerpt": "And here comes the goal for Germany! Havetz with a sharp finish from inside the box, the ball finds the back of the net as the keeper is beaten. The crowd erupts — 7-1 now! Havertz"
+        }
+      ]
+    }
+  ],
+  "extra_goal_assertions": [
+    {
+      "event_id": "U042",
+      "event_type": "goal",
+      "time": "00:17:12-00:18:12",
+      "expected_score_state": {
+        "score_should_be": "1-0",
+        "previous_goal_id": "G01",
+        "next_goal_id": "G02",
+        "next_goal_window": "00:29:31-00:30:04"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "And here it is — Germany doubles their lead! A crisp, clinical finish from inside the box as the ball nestles into the back of the net. The keeper dives but can’t reach it — pure c"
+    },
+    {
+      "event_id": "U054",
+      "event_type": "celebration_or_replay",
+      "time": "00:21:00-00:21:00",
+      "expected_score_state": {
+        "score_should_be": "1-0",
+        "previous_goal_id": "G01",
+        "next_goal_id": "G02",
+        "next_goal_window": "00:29:31-00:30:04"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "And there it is — a moment of pure precision. The German striker connects cleanly on the volley, sending the ball past the keeper and into the net. The crowd erupts as the scoreboa"
+    },
+    {
+      "event_id": "U062",
+      "event_type": "dangerous_attack",
+      "time": "00:23:32-00:23:32",
+      "expected_score_state": {
+        "score_should_be": "1-0",
+        "previous_goal_id": "G01",
+        "next_goal_id": "G02",
+        "next_goal_window": "00:29:31-00:30:04"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany's #15 raises his arm in appeal as he advances — the team is pushing forward with intent, pressing into the final third. The momentum suggests a dangerous attack unfolding, "
+    },
+    {
+      "event_id": "U090",
+      "event_type": "goal",
+      "time": "00:34:52-00:36:16",
+      "expected_score_state": {
+        "score_should_be": "1-1",
+        "previous_goal_id": "G02",
+        "next_goal_id": "G03",
+        "next_goal_window": "00:45:35-00:45:52"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany takes a free kick near the penalty area. The ball is struck with precision, curling past the defensive wall and into the net. The German players celebrate as the goal is co"
+    },
+    {
+      "event_id": "U119",
+      "event_type": "dangerous_attack",
+      "time": "00:43:16-00:43:16",
+      "expected_score_state": {
+        "score_should_be": "1-1",
+        "previous_goal_id": "G02",
+        "next_goal_id": "G03",
+        "next_goal_window": "00:45:35-00:45:52"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany builds a dangerous attack in the final third, with multiple players entering the penalty area and a cross delivered into a crowded box. The chance looks promising as the ba"
+    },
+    {
+      "event_id": "U131",
+      "event_type": "goal",
+      "time": "00:49:40-00:50:40",
+      "expected_score_state": {
+        "score_should_be": "2-1",
+        "previous_goal_id": "G03",
+        "next_goal_id": "G04",
+        "next_goal_window": "00:57:19-00:57:35"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany takes a commanding lead! The attacking move builds with precision as the ball is moved into the final third. A player drives forward, evading defenders, and delivers a deci"
+    },
+    {
+      "event_id": "U135",
+      "event_type": "goal",
+      "time": "00:51:40-00:53:00",
+      "expected_score_state": {
+        "score_should_be": "2-1",
+        "previous_goal_id": "G03",
+        "next_goal_id": "G04",
+        "next_goal_window": "00:57:19-00:57:35"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany takes a free kick near the penalty area. The German player strikes the ball, and it goes into the net! The goalkeeper dives but cannot reach it. The German players celebrat"
+    },
+    {
+      "event_id": "U136",
+      "event_type": "celebration_or_replay",
+      "time": "00:53:12-00:53:20",
+      "expected_score_state": {
+        "score_should_be": "2-1",
+        "previous_goal_id": "G03",
+        "next_goal_id": "G04",
+        "next_goal_window": "00:57:19-00:57:35"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Curacao's player in blue and yellow celebrates as the crowd erupts. The scoreboard shows Germany leading 2-1 at 45:02, but the home fans are visibly energized. Close-ups reveal emo"
+    },
+    {
+      "event_id": "U162",
+      "event_type": "goal",
+      "time": "01:06:04-01:06:16",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "And there it is! Germany scores! The ball finds the back of the net as the goalkeeper is beaten. Sané and Musiala are seen celebrating in the moments following the goal. / 球进了！德国队破"
+    },
+    {
+      "event_id": "U176",
+      "event_type": "celebration_or_replay",
+      "time": "01:12:24-01:12:28",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "And there it is, Musiala with his 10th goal for Germany. The scoreboard confirms the 4-1 lead as Musiala catches his breath, bending over in exhaustion after the strike. / 进了！穆西亚拉为"
+    },
+    {
+      "event_id": "U180",
+      "event_type": "goal",
+      "time": "01:14:52-01:15:00",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "And there it is! A goal for Germany! The ball finds the back of the net as the goalkeeper is beaten on the dive. The German player who scored turns away with a focused look, and hi"
+    },
+    {
+      "event_id": "U186",
+      "event_type": "celebration_or_replay",
+      "time": "01:16:40-01:16:52",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "The German fans are absolutely losing it in the stands! Look at that sea of white and black-red-gold, everyone on their feet, arms raised, flags waving — pure electric atmosphere a"
+    },
+    {
+      "event_id": "U187",
+      "event_type": "free_kick",
+      "time": "01:16:56-01:17:08",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany awarded a free kick just outside the penalty area. The referee ensures the defensive wall is set, and the taker steps up to take control of the situation. With the scorelin"
+    },
+    {
+      "event_id": "U193",
+      "event_type": "goal",
+      "time": "01:18:08-01:18:52",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany scores! A fast break down the right flank sees Gnabry cut inside and strike a low shot that beats the goalkeeper and nestles into the bottom corner. The net ripples as the "
+    },
+    {
+      "event_id": "U200",
+      "event_type": "foul",
+      "time": "01:21:12-01:21:16",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Curaçao's Bacuna goes up for a header, but he's caught off balance by Undav's challenge. The German defender makes contact with his back, sending Bacuna crashing to the turf. The r"
+    },
+    {
+      "event_id": "U201",
+      "event_type": "other_relevant",
+      "time": "01:21:20-01:21:20",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Leandro Bacuna, wearing the number 10 for Curaçao, is shown on the field with a graphic indicating his 73rd cap for the national team. He stands next to an opponent in a Germany je"
+    },
+    {
+      "event_id": "U202",
+      "event_type": "goal",
+      "time": "01:21:32-01:22:04",
+      "expected_score_state": {
+        "score_should_be": "4-1",
+        "previous_goal_id": "G05",
+        "next_goal_id": "G06",
+        "next_goal_window": "01:23:34-01:26:40"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Curaçao takes a free kick near the penalty area. The ball is played into the box, and a Curaçao player makes a run towards the goal. He receives the ball and takes a shot from insi"
+    },
+    {
+      "event_id": "U222",
+      "event_type": "goal",
+      "time": "01:29:44-01:30:40",
+      "expected_score_state": {
+        "score_should_be": "5-1",
+        "previous_goal_id": "G06",
+        "next_goal_id": "G07",
+        "next_goal_window": "01:31:30-01:33:20"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany extends their lead! The attacker in white takes a shot from inside the box, the goalkeeper in green dives but can't reach it, and the ball finds the back of the net. The cr"
+    },
+    {
+      "event_id": "U238",
+      "event_type": "goal",
+      "time": "01:38:04-01:38:32",
+      "expected_score_state": {
+        "score_should_be": "6-1",
+        "previous_goal_id": "G07",
+        "next_goal_id": "G08",
+        "next_goal_window": "01:42:20-01:42:30"
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "Germany's #26, Wirtz, finds space in the box and fires a low shot past the keeper! The net ripples as the ball crosses the line. Confirmed: Germany extend their lead to 6-1. Wirtz "
+    },
+    {
+      "event_id": "U248",
+      "event_type": "goal",
+      "time": "01:46:32-01:47:44",
+      "expected_score_state": {
+        "score_should_be": "7-1",
+        "previous_goal_id": "G08",
+        "next_goal_id": null,
+        "next_goal_window": null
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "In stoppage time, Colombia’s number 10 breaks away with pace, chased by a German defender. He drives forward, enters the penalty area, and fires a shot. The ball finds the back of "
+    },
+    {
+      "event_id": "U252",
+      "event_type": "goal",
+      "time": "01:48:12-01:49:32",
+      "expected_score_state": {
+        "score_should_be": "7-1",
+        "previous_goal_id": "G08",
+        "next_goal_id": null,
+        "next_goal_window": null
+      },
+      "reason": "goal_or_score_assertion_not_near_verified_score_change",
+      "excerpt": "In stoppage time, Germany takes a free kick from just outside the penalty area. The ball is struck with precision, curling over the defensive wall and into the top corner of the ne"
+    }
+  ],
+  "missing_goal_ids": [],
+  "duplicate_goal_ids": [
+    "G02",
+    "G04",
+    "G05",
+    "G06",
+    "G07"
+  ],
+  "recommendations": [
+    {
+      "priority": "Must",
+      "en": "Only allow a final score-changing goal claim when it is aligned with a verified scoreboard state transition or passes a live-goal verifier.",
+      "zh": "只有当进球宣称能对齐已核验比分牌变化，或通过现场进球验证器时，才允许改变最终比分状态。"
+    },
+    {
+      "priority": "Must",
+      "en": "Treat unaligned goal assertions as replay, historical mention, possible disallowed goal, or manual-review pending instead of incrementing score.",
+      "zh": "未对齐的进球宣称应视为回放、历史提及、可能被吹或待人工复核，不应直接推进比分。"
+    },
+    {
+      "priority": "Should",
+      "en": "Use this report after every full run to decide whether to rerun goal verification, narrow frames around false positives, or rewrite final commentary.",
+      "zh": "每次全量运行后使用本报告判断是否重跑进球验证、收窄假阳性片段，或重写最终解说。"
+    }
+  ]
+}
