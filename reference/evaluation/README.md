@@ -24,12 +24,26 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 
 ## Teacher-Testable Entry / 老师可测试入口
 
+Generate a report / 生成报告：
+
 ```powershell
 python reference/evaluation/tools/evaluate_commentary_quality.py `
   --input outputs/commentary_bilingual.json `
   --output-json reference/evaluation/commentary_quality_eval.json `
   --output-md reference/evaluation/commentary_quality_eval.md
 ```
+
+Use it as a final-output gate / 作为终稿质量门禁：
+
+```powershell
+python reference/evaluation/tools/evaluate_commentary_quality.py `
+  --input outputs/commentary_bilingual.json `
+  --fail-on-gate
+```
+
+EN: Exit code `2` means the generated commentary should not be used as the final demo script without manual review.
+
+ZH: 退出码 `2` 表示生成解说不应未经人工复核直接作为最终 demo 稿。
 
 Python API / Python 接口：
 

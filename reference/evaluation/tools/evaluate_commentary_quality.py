@@ -446,12 +446,20 @@ def main() -> int:
     parser.add_argument("--output-json", type=Path, default=DEFAULT_JSON)
     parser.add_argument("--output-md", type=Path, default=DEFAULT_MD)
     parser.add_argument("--kickoff-sec", type=float, default=552.0)
+    parser.add_argument(
+        "--fail-on-gate",
+        action="store_true",
+        help="Return exit code 2 when the quality gate status is fail.",
+    )
     args = parser.parse_args()
 
     report = evaluate_commentary_quality(args.input, args.facts, args.manual_review, args.kickoff_sec)
     args.output_json.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     write_markdown(report, args.output_md)
     print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
+    if args.fail_on_gate and report["quality_gate"]["status"] == "fail":
+        print("quality_gate_status=fail")
+        return 2
     return 0
 
 
