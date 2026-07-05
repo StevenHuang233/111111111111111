@@ -15,6 +15,7 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | File | EN | ZH |
 | --- | --- | --- |
 | `germany_curacao_public_reference.json` | Evaluation-only public facts and expected goal sequence. | 仅用于验证的公开事实和预期进球顺序。 |
+| `quality_acceptance_standards.md` | Explains the gate scripts, standards, sources, and API-assisted reflection path. | 解释门禁脚本、验收标准、来源和 API 辅助反思路径。 |
 | `goal_scoreboard_manual_review.md` | Manual 4fps scoreboard review for live score changes. | 基于 4fps 抽帧的现场比分变化人工核验。 |
 | `goal_timeline_alignment.md` | Aligns generated goal claims with verified scoreboard changes. | 将生成进球声明与已核验比分变化对齐。 |
 | `identity_style_audit.md` | Audits supported identity wording and natural broadcast style. | 审计身份措辞依据和自然解说风格。 |
@@ -28,6 +29,7 @@ ZH: 公开比赛事实、ASR 字幕和审计报告可以指导验证和 Harness 
 | `tools/build_revision_queue.py` | Converts gate reports into concrete segment-level fix actions. | 将门禁报告转换成具体片段级修订动作。 |
 | `tools/annotate_commentary_for_revision.py` | Merges the revision queue back into commentary JSON for human/agent correction. | 将修订队列合并回解说 JSON，供人工或修订 Agent 使用。 |
 | `tools/export_demo_safe_script.py` | Exports an included/excluded commentary package from annotations. | 从标注结果导出保留/剔除片段包。 |
+| `tools/postprocess_goal_reflection.py` | Post-generation goal/replay/shot reflection with optional Intern-S2 API review. | 生成后进球、回放、射门反思修正，可选调用 Intern-S2 API 复核。 |
 | `tools/evaluate_commentary_quality.py` | General quality evaluator for bilingual commentary JSON. | 面向双语解说 JSON 的通用质量评测脚本。 |
 | `tools/compare_goal_timeline.py` | Goal/score assertion alignment gate. | 进球/比分声明时间线对齐门禁。 |
 | `tools/audit_identity_style.py` | Identity support and broadcast-style wording gate. | 身份依据与解说风格措辞门禁。 |
@@ -88,6 +90,21 @@ python reference/evaluation/tools/export_demo_safe_script.py `
 EN: This does not rewrite or correct facts; it only separates high-risk segments for final-demo triage.
 
 ZH: 这不会重写或修正事实，只是把高风险片段分离出来，便于最终 demo 取舍。
+
+Reflect and correct night commentary after generation / 对 night 解说做生成后反思修正：
+
+```powershell
+python reference/evaluation/tools/postprocess_goal_reflection.py `
+  --input outputs/commentary_bilingual-night.json `
+  --events outputs/events-night.json `
+  --output reference/evaluation/night_reflection/commentary_bilingual-night_reflected.json `
+  --report-json reference/evaluation/night_reflection/goal_reflection_report.json `
+  --report-md reference/evaluation/night_reflection/goal_reflection_report.md
+```
+
+EN: Add `--api-mode review --frame-root E:\worldcup_data\frames_4fps_q3 --max-api-calls 8 --api-concurrency 2` when bounded Intern-S2 visual review is needed.
+
+ZH: 如需受控调用 Intern-S2 做视觉复核，可追加 `--api-mode review --frame-root E:\worldcup_data\frames_4fps_q3 --max-api-calls 8 --api-concurrency 2`。
 
 Generate a report / 生成报告：
 
