@@ -221,10 +221,29 @@ def has_shot_hint(text: str) -> bool:
 
 def infer_team(text: str) -> str:
     lowered = text.lower()
-    if any(term in lowered for term in CURACAO_TERMS):
+    if re.search(r"\bgermany(?:'s)?\b.*\b(take|takes|create|creates|push|pushes|attack|attacks|shot|shoot|strike)", lowered):
+        return "Germany"
+    if re.search(r"\bcuracao(?:'s)?\b|\bcuraçao(?:'s)?\b", lowered) and re.search(
+        r"\b(take|takes|create|creates|push|pushes|attack|attacks|shot|shoot|strike)", lowered
+    ):
+        if "germany" not in lowered and "german" not in lowered:
+            return "Curacao"
+    if ("curacao goalkeeper" in lowered or "curacao defender" in lowered or "curaçao goalkeeper" in lowered) and (
+        "germany" in lowered or "german" in lowered
+    ):
+        return "Germany"
+    if ("german goalkeeper" in lowered or "germany goalkeeper" in lowered or "german defender" in lowered) and (
+        "curacao" in lowered or "curaçao" in lowered
+    ):
+        return "Curacao"
+    if "德国队" in text and ("库拉索门将" in text or "库拉索防守" in text or "库拉索后卫" in text):
+        return "Germany"
+    if "库拉索队" in text and ("德国门将" in text or "德国防守" in text or "德国后卫" in text):
         return "Curacao"
     if any(term in lowered for term in GERMANY_TERMS):
         return "Germany"
+    if any(term in lowered for term in CURACAO_TERMS):
+        return "Curacao"
     return "the attacking side"
 
 
@@ -303,40 +322,38 @@ def classify_false_positive(segment: SegmentRef, assigned_goal_id: str | None, p
 def rewrite_segment(segment: dict[str, Any], ref: SegmentRef, new_type: str, reason: str) -> None:
     team = infer_team(ref.text)
     zh_team = team_zh(team)
-    time_label = f"{stamp(ref.start_sec)}-{stamp(ref.end_sec)}"
     if new_type == "celebration_or_replay":
         en = (
-            f"Replay check at {time_label}: this sequence is treated as review footage or aftermath of an earlier attack, "
-            f"not a fresh scoring event. Watch how {team} created the chance and how the defense reacted."
+            f"The broadcast brings us back to that attacking sequence. {team} worked the ball into a dangerous area, "
+            "and the replay angle lets us focus on the movement, the defensive recovery, and the goalkeeper's reaction."
         )
         zh = (
-            f"{time_label} 回放再看这次攻防：这里按回放或前一次进攻的后续处理，不能当作新的得分事件。"
-            f"重点看{zh_team}怎样制造机会，以及防线如何应对。"
+            f"镜头再看刚才这次攻防，{zh_team}把球推进到危险区域。这个角度更适合观察跑位、"
+            "防线回收和门将的反应。"
         )
-        subtitle_en = "Replay/aftermath only; no fresh scoring event."
-        subtitle_zh = "回放或后续画面，不作为新的得分事件。"
+        subtitle_en = "Replay angle on the previous attack."
+        subtitle_zh = "镜头再看刚才的攻防。"
     elif new_type == "shot":
         en = (
-            f"{team} create a shooting chance, but this segment is not verified as a scoring event. "
-            "Treat it as a shot under pressure and wait for the broadcast graphics before changing the state."
+            f"{team} find a pocket of space and get the shot away under pressure. "
+            "The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball."
         )
         zh = (
-            f"{zh_team}形成一次射门机会，但该片段没有通过得分变化验证，不能直接判定为改写战局的结果。"
-            "先按起脚攻门处理，等待转播图形确认。"
+            f"{zh_team}在压力下找到起脚空间，这脚打门给防线制造了不小麻烦。"
+            "门将和身前防守球员都没有放松，第二落点依然很关键。"
         )
-        subtitle_en = "Shot chance; result not verified."
-        subtitle_zh = "射门机会，结果未确认。"
+        subtitle_en = "Shot under pressure, defense reacts."
+        subtitle_zh = "压力下起脚，防线迅速反应。"
     else:
         en = (
-            f"{team} push forward and create danger around the penalty area, but there is no verified scoring event here. "
-            "Keep the commentary on pressure and defensive reaction."
+            f"{team} keep the pressure on around the penalty area. The move stretches the back line, "
+            "forcing defenders to track runners and close the passing lane."
         )
         zh = (
-            f"{zh_team}推进到前场制造威胁，但这里没有核验到得分变化。"
-            "解说应落在攻势压力和防守反应上。"
+            f"{zh_team}继续在禁区周围施压，进攻把防线拉开，迫使防守球员跟住跑动、封住传球线路。"
         )
-        subtitle_en = "Dangerous attack; result not verified."
-        subtitle_zh = "危险进攻，结果未确认。"
+        subtitle_en = "Pressure around the penalty area."
+        subtitle_zh = "禁区周围持续施压。"
 
     segment["event_type"] = new_type
     segment["goal_reflection"] = {
@@ -373,23 +390,23 @@ def sanitize_non_goal_score_claim(segment: dict[str, Any], ref: SegmentRef) -> b
         return False
     event_type = str(segment.get("event_type", "other_relevant"))
     if event_type == "substitution":
-        en = "The broadcast cuts to a substitution sequence, with the fourth official and players preparing for the change."
-        zh = "转播画面切到换人调整，第四官员举牌，双方球员准备完成这次人员变化。"
+        en = "The broadcast cuts to the touchline for a substitution sequence, with the fourth official and players preparing for the change."
+        zh = "转播镜头切到场边换人调整，第四官员举牌，球员在边线旁等待完成这次人员变化。"
         subtitle_en = "Substitution sequence."
         subtitle_zh = "换人调整。"
     elif event_type == "period_transition":
-        en = "The match moves through a short transition phase as players reset positions and the broadcast re-establishes the field."
+        en = "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field."
         zh = "比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。"
         subtitle_en = "Transition phase as play resets."
         subtitle_zh = "阶段转换，比赛重新组织。"
     elif event_type == "celebration_or_replay":
-        en = "The broadcast shows reaction or replay context from the previous passage of play, useful for reviewing the chance without changing the current state."
-        zh = "转播正在展示上一段攻防后的反应或回放，可以用来复盘机会本身，不改变当前比赛状态。"
+        en = "The broadcast shows reaction and replay context from the previous passage of play, bringing the key movement back into focus."
+        zh = "转播正在展示上一段攻防后的反应和回放，把关键跑动和处理细节重新带回视野。"
         subtitle_en = "Reaction or replay context."
         subtitle_zh = "反应或回放背景。"
     else:
-        en = "This is contextual broadcast footage around a stoppage or reset, so the commentary should stay on visible organization and rhythm."
-        zh = "这是停顿或重新组织阶段的转播背景，解说应聚焦可见的站位、节奏和场上组织。"
+        en = "The broadcast stays with the reset around the pitch, showing player organization and the rhythm before play builds again."
+        zh = "转播继续交代场上的重新组织，球员站位和比赛节奏正在重新铺开。"
         subtitle_en = "Context during a reset."
         subtitle_zh = "重新组织阶段的背景画面。"
 
@@ -412,10 +429,10 @@ def sanitize_forbidden_entity(segment: dict[str, Any], ref: SegmentRef) -> bool:
     if not any(entity in lowered for entity in FORBIDDEN_ENTITIES):
         return False
     en = (
-        "The broadcast shows match-official and video-review context. Treat this as background information only, "
-        "and avoid naming countries or people unless the graphic is independently verified."
+        "The broadcast takes us inside the officials' setup and the video-review room, a useful glimpse of the support team "
+        "working behind the match."
     )
-    zh = "转播画面展示裁判组和视频复核背景。这里只作为赛前信息处理，未经核验不展开具体国籍或姓名。"
+    zh = "转播镜头给到裁判组和视频复核室，这是比赛背后执法支持团队的一次亮相。"
     segment.setdefault("english", {})
     segment.setdefault("chinese", {})
     if isinstance(segment["english"], dict):
@@ -434,10 +451,9 @@ def sanitize_prematch_action(segment: dict[str, Any], ref: SegmentRef, kickoff_s
         return False
     segment["event_type"] = "period_transition"
     en = (
-        "Before kickoff, this is treated as pre-match organization rather than live play: players gather, reset, "
-        "and prepare for the opening whistle."
+        "Before kickoff, the camera stays with the players as they gather, settle their shape, and prepare for the opening whistle."
     )
-    zh = "开球前这一段按赛前组织处理，而不是正式比赛攻防：球员集结、调整站位，等待开场哨。"
+    zh = "开球前，镜头继续跟随球员集结和调整站位，双方都在等待开场哨响。"
     segment.setdefault("english", {})
     segment.setdefault("chinese", {})
     if isinstance(segment["english"], dict):

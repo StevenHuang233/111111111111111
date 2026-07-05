@@ -1,0 +1,3637 @@
+{
+  "policy": "Evaluation-only. Do not inject this report into target-agent prompt/runtime context.",
+  "summary": {
+    "segment_count": 235,
+    "color_identity_segments": 4,
+    "team_identity_segments": 220,
+    "number_identity_segments": 104,
+    "role_identity_segments": 187,
+    "raw_visual_segments": 42,
+    "wrong_entity_segments": 0,
+    "unsupported_name_segments": 0,
+    "color_identity_ratio": 0.017,
+    "raw_visual_ratio": 0.1787
+  },
+  "style_gate": {
+    "status": "pass_with_warnings",
+    "blockers": [],
+    "warnings": [
+      "raw_visual_segments"
+    ],
+    "en": "Fail means the script contains unsupported identity facts. Warnings mean the style still sounds like raw visual description.",
+    "zh": "fail 表示解说稿包含无依据身份事实；warning 表示文本仍偏向原始画面描述。"
+  },
+  "recommended_identity_distribution": [
+    {
+      "identity_form": "verified_name",
+      "target_share": "35-50%",
+      "condition_en": "Use only when roster/OCR/broadcast graphic or prior verified fact supports it.",
+      "condition_zh": "仅在名单、OCR、转播图表或已验证事实支持时使用。"
+    },
+    {
+      "identity_form": "team_plus_role_or_number",
+      "target_share": "30-45%",
+      "condition_en": "Use when team and role/jersey number are visible but the name is not secure.",
+      "condition_zh": "球队与角色/号码可见但姓名不稳时使用。"
+    },
+    {
+      "identity_form": "team_only",
+      "target_share": "15-25%",
+      "condition_en": "Use for flowing play when exact identity is not important.",
+      "condition_zh": "普通推进或身份不关键时使用球队主语。"
+    },
+    {
+      "identity_form": "color_as_evidence",
+      "target_share": "<5%",
+      "condition_en": "Use color only as evidence, contrast, or occasional rhetoric, not as the default subject.",
+      "condition_zh": "颜色只作证据、对比或少量修辞，不能作为默认主语。"
+    }
+  ],
+  "repeated_starters": [
+    {
+      "starter": "The broadcast brings us",
+      "count": 21,
+      "example_event_id": "U023"
+    },
+    {
+      "starter": "Germany find a pocket",
+      "count": 16,
+      "example_event_id": "U034"
+    },
+    {
+      "starter": "Germany's No. 10 drives",
+      "count": 13,
+      "example_event_id": "U020"
+    },
+    {
+      "starter": "Germany keep the pressure",
+      "count": 10,
+      "example_event_id": "U032"
+    },
+    {
+      "starter": "A Curacao player goes",
+      "count": 7,
+      "example_event_id": "U072"
+    },
+    {
+      "starter": "The game moves through",
+      "count": 6,
+      "example_event_id": "U071"
+    },
+    {
+      "starter": "Germany make a change",
+      "count": 4,
+      "example_event_id": "U029"
+    },
+    {
+      "starter": "A German player goes",
+      "count": 4,
+      "example_event_id": "U088"
+    },
+    {
+      "starter": "Germany builds a dangerous",
+      "count": 4,
+      "example_event_id": "U092"
+    },
+    {
+      "starter": "The stage is set",
+      "count": 3,
+      "example_event_id": "U004"
+    },
+    {
+      "starter": "Curacao's goalkeeper makes a",
+      "count": 3,
+      "example_event_id": "U035"
+    },
+    {
+      "starter": "Germany's No. 19 drives",
+      "count": 3,
+      "example_event_id": "U044"
+    }
+  ],
+  "buckets": {
+    "color_identity": [
+      {
+        "event_id": "U001",
+        "event_type": "period_transition",
+        "time": "00:00:04-00:01:04",
+        "excerpt": "The pre-match ceremony is underway at the FIFA World Cup 2026, as Germany and Curacao make their grand entrance onto the pitch. Referees in bright yellow kits lead the procession, ",
+        "patterns": [
+          "身穿白色"
+        ]
+      },
+      {
+        "event_id": "U038",
+        "event_type": "dangerous_attack",
+        "time": "00:18:36-00:18:36",
+        "excerpt": "Germany pushes forward with pace, a white-shirted attacker surges into the final third, drawing defenders and creating space. The buildup is sharp, the movement fluid — Curacao’s b",
+        "patterns": [
+          "\\bwhite-shirted\\b",
+          "白衣"
+        ]
+      },
+      {
+        "event_id": "U138",
+        "event_type": "period_transition",
+        "time": "01:00:12-01:00:36",
+        "excerpt": "The second half is underway. Germany and Curacao line up at the center circle for the kickoff after halftime. The referee signals as players settle into position — Germany in white",
+        "patterns": [
+          "身穿白色"
+        ]
+      },
+      {
+        "event_id": "U208",
+        "event_type": "goal",
+        "time": "01:31:12-01:32:36",
+        "excerpt": "Germany in possession near Curacao's penalty area with multiple attackers advancing into the final third; German player dribbling toward Curacao box, drawing defenders; attacking b",
+        "patterns": [
+          "\\bplayer in white\\b",
+          "身穿白色",
+          "身穿橙色"
+        ]
+      }
+    ],
+    "team_identity": [
+      {
+        "event_id": "U001",
+        "event_type": "period_transition",
+        "time": "00:00:04-00:01:04",
+        "excerpt": "The pre-match ceremony is underway at the FIFA World Cup 2026, as Germany and Curacao make their grand entrance onto the pitch. Referees in bright yellow kits lead the procession, "
+      },
+      {
+        "event_id": "U002",
+        "event_type": "celebration_or_replay",
+        "time": "00:01:12-00:01:12",
+        "excerpt": "The German fans are on their feet, waving flags in unison as the stadium erupts in celebration — a powerful visual echo of Germany’s dominance in this World Cup encounter. / 德国队球迷全"
+      },
+      {
+        "event_id": "U003",
+        "event_type": "period_transition",
+        "time": "00:01:16-00:01:32",
+        "excerpt": "The atmosphere is electric as Germany and Curacao line up for the pre-match ceremony. Players from both teams are seen forming circles on the pitch, holding flags, and preparing fo"
+      },
+      {
+        "event_id": "U004",
+        "event_type": "period_transition",
+        "time": "00:01:40-00:02:24",
+        "excerpt": "The stage is set for a World Cup clash between Germany and Curacao. Players from both teams walk onto the pitch, donning their warm-up gear as they prepare for the pre-match ceremo"
+      },
+      {
+        "event_id": "U005",
+        "event_type": "period_transition",
+        "time": "00:02:40-00:02:52",
+        "excerpt": "The stage is set for the World Cup 2026 clash between Germany and Curacao. Both teams are lined up on the pitch, ready for the pre-match ceremony. The atmosphere is electric as the"
+      },
+      {
+        "event_id": "U006",
+        "event_type": "period_transition",
+        "time": "00:03:00-00:04:20",
+        "excerpt": "The stage is set for a historic encounter at the FIFA World Cup 2026. Germany and Curacao stand side by side on the pitch, flanked by young mascots, as the pre-match ceremonies com"
+      },
+      {
+        "event_id": "U007",
+        "event_type": "celebration_or_replay",
+        "time": "00:04:24-00:04:24",
+        "excerpt": "The Curacao fans in the stands are visibly emotional, with many placing their hands over their hearts as they sing along. The atmosphere is charged with pride and unity, capturing "
+      },
+      {
+        "event_id": "U008",
+        "event_type": "period_transition",
+        "time": "00:04:28-00:04:28",
+        "excerpt": "A sweeping view of the stadium as Germany and Curacao line up for the pre-match ceremony. The pitch is adorned with giant national flags — Germany’s black-red-gold on the left, Cur"
+      },
+      {
+        "event_id": "U009",
+        "event_type": "celebration_or_replay",
+        "time": "00:04:32-00:04:32",
+        "excerpt": "A close-up on a Curacao player, eyes closed and mouth open in a moment of deep focus or reflection before the match begins. / 镜头给到库拉索队一名球员的特写，他双眼紧闭，嘴巴微张，似乎在赛前进行着深度的专注与调整。"
+      },
+      {
+        "event_id": "U011",
+        "event_type": "celebration_or_replay",
+        "time": "00:04:40-00:04:44",
+        "excerpt": "The Curacao supporters are absolutely electric in the stands! You can feel the passion as they wave their flags and scarves, singing and cheering with pure joy. It's a vibrant sea "
+      },
+      {
+        "event_id": "U012",
+        "event_type": "period_transition",
+        "time": "00:04:48-00:05:24",
+        "excerpt": "The players are lined up on the pitch for pre-match handshakes, signaling the start of the match period. Germany and Curacao players, along with referees and mascots, are seen shak"
+      },
+      {
+        "event_id": "U013",
+        "event_type": "other_relevant",
+        "time": "00:05:28-00:05:32",
+        "excerpt": "The atmosphere in the stadium is electric, with fans from both teams showing their support. Curacao fans, donning blue jerseys and cowboy hats, watch intently, while German fans, s"
+      },
+      {
+        "event_id": "U014",
+        "event_type": "period_transition",
+        "time": "00:05:40-00:05:48",
+        "excerpt": "Germany and Curacao line up for the kickoff, players walking onto the pitch with mascots in tow. The stadium is electric as both teams prepare for what promises to be a thrilling e"
+      },
+      {
+        "event_id": "U015",
+        "event_type": "period_transition",
+        "time": "00:06:08-00:06:24",
+        "excerpt": "And here we go, the teams are lined up at the center circle for the kickoff. The stadium is electric as Germany and Curacao prepare for the opening whistle of this World Cup clash."
+      },
+      {
+        "event_id": "U016",
+        "event_type": "other_relevant",
+        "time": "00:06:28-00:06:36",
+        "excerpt": "The match officials are walking onto the pitch, ready to take control of the game. The referee and his assistants are seen in discussion, likely finalizing their pre-match briefing"
+      },
+      {
+        "event_id": "U018",
+        "event_type": "celebration_or_replay",
+        "time": "00:08:08-00:08:24",
+        "excerpt": "Germany players in white kits gather in a tight huddle, celebrating with visible emotion and unity — Sané (No. 19) among them, arms locked as teammates close in. The crowd behind t"
+      },
+      {
+        "event_id": "U019",
+        "event_type": "period_transition",
+        "time": "00:08:56-00:09:08",
+        "excerpt": "Germany and Curacao line up for the second-half kickoff at the center circle. The referee signals as players take their positions — a crisp restart under the stadium lights. The ba"
+      },
+      {
+        "event_id": "U020",
+        "event_type": "dangerous_attack",
+        "time": "00:09:28-00:09:28",
+        "excerpt": "Germany's No. 10 drives into the box, drawing two defenders before slipping a pass to the runner on the edge of the area. Curacao's defense scrambles to close down the angle, but t"
+      },
+      {
+        "event_id": "U021",
+        "event_type": "foul",
+        "time": "00:09:32-00:09:32",
+        "excerpt": "A German attacker goes down under challenge from a Curacao defender inside the box. The referee is watching closely to determine if contact was excessive. / 德国队的进攻球员在禁区内遭到库拉索队防守球员的"
+      },
+      {
+        "event_id": "U022",
+        "event_type": "dangerous_attack",
+        "time": "00:09:44-00:09:44",
+        "excerpt": "Kimmich (No. 6) for Germany carries the ball forward from the center circle, pressing ahead as Curacao's No. 24 closes in to challenge. The attack is building but has not yet reach"
+      },
+      {
+        "event_id": "U023",
+        "event_type": "celebration_or_replay",
+        "time": "00:11:00-00:11:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U024",
+        "event_type": "foul",
+        "time": "00:11:12-00:11:16",
+        "excerpt": "Germany's No. 5 makes contact with Curacao's No. 24, bringing him down cleanly. The referee blows for the foul as the Curacao player goes to ground. Play stops for the infringement"
+      },
+      {
+        "event_id": "U025",
+        "event_type": "other_relevant",
+        "time": "00:12:04-00:12:08",
+        "excerpt": "Julian Nagelsmann on the touchline, very animated. He's pointing up, then tapping his temple, then shouting instructions. The German head coach is fully engaged, using sharp hand s"
+      },
+      {
+        "event_id": "U026",
+        "event_type": "dangerous_attack",
+        "time": "00:12:28-00:12:32",
+        "excerpt": "Germany's No. 19, Sane, drives forward with the ball into the final third. He cuts inside, drawing multiple Curacao defenders towards him. With space opening up, he delivers a shar"
+      },
+      {
+        "event_id": "U027",
+        "event_type": "foul",
+        "time": "00:13:16-00:13:16",
+        "excerpt": "Germany's No. 13 goes down under a challenge and immediately appeals to the referee for a foul. The ball rolls away as the German player stays on the ground, seeking a decision. / "
+      },
+      {
+        "event_id": "U028",
+        "event_type": "goal",
+        "time": "00:14:08-00:15:28",
+        "excerpt": "Germany takes an early lead! Nmecha (No. 23) finds the back of the net with a powerful strike from inside the box, beating the Curacao goalkeeper. The German fans erupt in celebrat"
+      },
+      {
+        "event_id": "U029",
+        "event_type": "substitution",
+        "time": "00:14:56-00:14:56",
+        "excerpt": "Germany make a change at the break, with Nmecha coming on for the home side. / 德国队在半场休息时做出换人调整，内梅查替补登场。"
+      },
+      {
+        "event_id": "U030",
+        "event_type": "celebration_or_replay",
+        "time": "00:15:44-00:15:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U031",
+        "event_type": "dangerous_attack",
+        "time": "00:17:12-00:17:12",
+        "excerpt": "Germany in possession in the final third, advancing toward Curacao's penalty area with multiple players in attacking positions. / 德国队掌控着球权，在对方半场组织进攻，多名进攻球员前插，直逼库拉索队的禁区。"
+      },
+      {
+        "event_id": "U032",
+        "event_type": "dangerous_attack",
+        "time": "00:17:16-00:17:16",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U033",
+        "event_type": "foul",
+        "time": "00:17:24-00:17:24",
+        "excerpt": "Curacao's No. 7 makes a late challenge on Germany's No. 23, who goes down under the contact. The referee will need to decide if that was a trip or just a clean tackle gone wrong. /"
+      },
+      {
+        "event_id": "U034",
+        "event_type": "shot",
+        "time": "00:17:28-00:17:28",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U035",
+        "event_type": "save",
+        "time": "00:17:32-00:17:32",
+        "excerpt": "Curacao's goalkeeper makes a stunning full-stretch save to his left, snatching the ball away from the goal line just in time. The keeper dives low and extends fully, securing posse"
+      },
+      {
+        "event_id": "U036",
+        "event_type": "dangerous_attack",
+        "time": "00:18:08-00:18:08",
+        "excerpt": "Germany pushes forward into the final third with multiple runners approaching the penalty area. Curacao defenders are retreating under pressure as the attack develops. / 德国队压上，多名进攻"
+      },
+      {
+        "event_id": "U037",
+        "event_type": "shot",
+        "time": "00:18:12-00:18:12",
+        "excerpt": "Germany's No. 4 takes a shot from inside the box — the ball is struck with intent toward goal, and the Curacao goalkeeper reacts in time to parry it away. The crowd holds its breat"
+      },
+      {
+        "event_id": "U038",
+        "event_type": "dangerous_attack",
+        "time": "00:18:36-00:18:36",
+        "excerpt": "Germany pushes forward with pace, a white-shirted attacker surges into the final third, drawing defenders and creating space. The buildup is sharp, the movement fluid — Curacao’s b"
+      },
+      {
+        "event_id": "U039",
+        "event_type": "shot",
+        "time": "00:18:40-00:18:40",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp reaction save. / 德国队10号禁区起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U040",
+        "event_type": "dangerous_attack",
+        "time": "00:18:52-00:18:52",
+        "excerpt": "Germany's No. 10, Kai Havertz, finds space inside the box under pressure from a Curacao defender. He controls the ball centrally near the penalty spot, drawing multiple defenders a"
+      },
+      {
+        "event_id": "U041",
+        "event_type": "foul",
+        "time": "00:19:04-00:19:04",
+        "excerpt": "Germany's No. 73 goes down under contact from a Curacao player in midfield — the referee will need to decide if that was a trip or push. The ball rolls loose as players react. / 德国"
+      },
+      {
+        "event_id": "U042",
+        "event_type": "dangerous_attack",
+        "time": "00:19:24-00:19:24",
+        "excerpt": "Germany's No. 10 drives into the box, but Curacao's defense holds firm. A promising attack is halted before a shot can be taken. / 德国队10号球员带球突入禁区，但库拉索队防守稳固，攻势在射门前被化解。"
+      },
+      {
+        "event_id": "U043",
+        "event_type": "foul",
+        "time": "00:19:28-00:19:28",
+        "excerpt": "Curacao's defender brings down Germany's No. 10 inside the box — a clear foul as the referee immediately points to the spot. / 库拉索后卫在禁区内放倒了德国队10号——裁判立即指向了点球点，这毫无疑问是个犯规。"
+      },
+      {
+        "event_id": "U044",
+        "event_type": "dangerous_attack",
+        "time": "00:19:44-00:19:44",
+        "excerpt": "Germany's No. 19 drives into the box, surrounded by Curacao defenders. He holds off pressure and lays it off to a teammate on the edge of the area — a dangerous moment as the ball "
+      },
+      {
+        "event_id": "U045",
+        "event_type": "shot",
+        "time": "00:19:48-00:19:48",
+        "excerpt": "Germany's No. 19, Sane, drives forward under pressure from two Curacao defenders and unleashes a powerful shot on goal. The ball is struck cleanly with the right foot, heading towa"
+      },
+      {
+        "event_id": "U046",
+        "event_type": "dangerous_attack",
+        "time": "00:20:04-00:20:08",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U047",
+        "event_type": "celebration_or_replay",
+        "time": "00:20:36-00:21:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U048",
+        "event_type": "foul",
+        "time": "00:21:12-00:21:24",
+        "excerpt": "Curacao's Locadia #9 is penalized for a foul near the center circle as Germany's Tah #4 goes down. The referee immediately blows the whistle and gestures to stop play, then approac"
+      },
+      {
+        "event_id": "U049",
+        "event_type": "celebration_or_replay",
+        "time": "00:22:52-00:23:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U050",
+        "event_type": "foul",
+        "time": "00:23:04-00:23:04",
+        "excerpt": "Germany's No. 17, Wirtz, closes down a Curacao player with a sharp challenge — slight lean and arm contact as he tries to dispossess. The Curacao defender absorbs the contact and s"
+      },
+      {
+        "event_id": "U051",
+        "event_type": "dangerous_attack",
+        "time": "00:24:16-00:24:16",
+        "excerpt": "Germany's No. 10 drives forward with the ball, entering the penalty area as multiple attackers and defenders converge — a promising chance developing in the box. / 德国队10号带球突入禁区，多名进"
+      },
+      {
+        "event_id": "U052",
+        "event_type": "shot",
+        "time": "00:24:20-00:24:20",
+        "excerpt": "Germany's No. 23 takes a shot from inside the penalty area as the Curacao goalkeeper reacts to the ball heading toward goal. / 德国队23号在禁区之内起脚射门，库拉索门将迅速反应，试图扑救这记直奔球门的攻势。"
+      },
+      {
+        "event_id": "U053",
+        "event_type": "foul",
+        "time": "00:24:24-00:24:24",
+        "excerpt": "Curacao's No. 7 makes a sliding challenge inside the penalty area, catching the German attacker off balance and bringing him down. The referee immediately blows for the foul as the"
+      },
+      {
+        "event_id": "U054",
+        "event_type": "other_relevant",
+        "time": "00:25:52-00:25:56",
+        "excerpt": "Germany's No. 10, Sané, turns away with a focused look as the referee checks his communication device — a moment of quiet intensity in the build-up to the next phase. / 德国队10号萨内转身离"
+      },
+      {
+        "event_id": "U055",
+        "event_type": "foul",
+        "time": "00:26:52-00:26:52",
+        "excerpt": "Curacao's No. 21 is brought down by a challenge from Germany's No. 23 near the center circle. The referee immediately blows the whistle and approaches to assess the situation. / 库拉"
+      },
+      {
+        "event_id": "U056",
+        "event_type": "dangerous_attack",
+        "time": "00:27:04-00:27:04",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U057",
+        "event_type": "shot",
+        "time": "00:27:48-00:27:52",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U058",
+        "event_type": "shot",
+        "time": "00:27:56-00:27:56",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U059",
+        "event_type": "dangerous_attack",
+        "time": "00:28:00-00:28:00",
+        "excerpt": "Germany's No. 10 drives into the penalty area, closely tracked by a Curacao defender. The attacking move is building pressure in the final third, with space and options emerging as"
+      },
+      {
+        "event_id": "U060",
+        "event_type": "dangerous_attack",
+        "time": "00:28:52-00:28:52",
+        "excerpt": "Germany pushes forward with urgency, multiple attackers converging in the penalty area as a cross or shot looms. The ball is delivered into the box under pressure, but Curacao’s de"
+      },
+      {
+        "event_id": "U061",
+        "event_type": "shot",
+        "time": "00:28:56-00:28:56",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but the ball goes just wide of the post. The goalkeeper in red watches it go by, and play continues. / 德国队19号在禁区起脚射门，皮球稍稍偏出球门立柱。身"
+      },
+      {
+        "event_id": "U062",
+        "event_type": "celebration_or_replay",
+        "time": "00:29:00-00:29:00",
+        "excerpt": "Germany's No. 8 Havertz brings his hand to his head in clear frustration — a missed opportunity just moments ago, and the weight of it settling in fast. / 德国队8号哈弗茨双手抱头，显然十分懊恼——就在刚刚"
+      },
+      {
+        "event_id": "U063",
+        "event_type": "other_relevant",
+        "time": "00:29:08-00:29:08",
+        "excerpt": "Germany's No. 1, Manuel Neuer, stands on the pitch as a broadcast graphic reminds us he is Germany's oldest ever player at 40 years and 79 days. / 德国队门将诺伊尔站在场上，屏幕上的数据显示，他已成为德国队历史上年"
+      },
+      {
+        "event_id": "U064",
+        "event_type": "dangerous_attack",
+        "time": "00:29:44-00:29:44",
+        "excerpt": "Curacao launch a swift counter-attack, pushing forward with pace into Germany's half. Multiple attackers thread through the midfield, drawing defenders out of position as they appr"
+      },
+      {
+        "event_id": "U065",
+        "event_type": "shot",
+        "time": "00:29:48-00:29:48",
+        "excerpt": "Curacao's No. 9 gets a shot away from inside the box, but the German goalkeeper is down to make a diving save. / 库拉索队的9号在禁区之内起脚射门，但德国队门将迅速倒地，完成了一次精彩的扑救。"
+      },
+      {
+        "event_id": "U066",
+        "event_type": "save",
+        "time": "00:29:52-00:29:52",
+        "excerpt": "A sharp shot from Curacao finds the German keeper low and to his left — he dives full extension, palms the ball clear before it crosses the line. The defense scrambles as the rebou"
+      },
+      {
+        "event_id": "U067",
+        "event_type": "celebration_or_replay",
+        "time": "00:29:56-00:29:56",
+        "excerpt": "Curacao's No. 8 celebrates after a key moment, as the crowd erupts in cheers. / 库拉索队的8号球员在关键时刻后庆祝，现场球迷欢呼雀跃。"
+      },
+      {
+        "event_id": "U068",
+        "event_type": "goal",
+        "time": "00:30:32-00:31:20",
+        "excerpt": "Curacao strike first! The blue and yellow team breaks through Germany's defense with a precise shot from inside the penalty area. The ball finds the bottom corner of the net as the"
+      },
+      {
+        "event_id": "U069",
+        "event_type": "foul",
+        "time": "00:31:28-00:31:28",
+        "excerpt": "Germany's attacker is fouled by a Curacao defender, the referee blows the whistle and points to the spot for a penalty kick. / 德国队的进攻球员遭到库拉索队后卫犯规，裁判吹哨并指向点球点，判罚点球！"
+      },
+      {
+        "event_id": "U070",
+        "event_type": "foul",
+        "time": "00:31:40-00:31:40",
+        "excerpt": "Curacao's No. 9, Locadia, goes down under contact from Germany's No. 4. The referee is likely to award a free kick after this challenge. / 库拉索队的9号洛卡迪亚在受到德国队4号球员的冲撞后倒地，裁判很可能会判罚这次犯规为"
+      },
+      {
+        "event_id": "U072",
+        "event_type": "foul",
+        "time": "00:33:00-00:33:00",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 17 — contact looks heavy, referee is on it immediately. / 库拉索球员在遭遇德国队17号球员的铲抢后倒地，这次接触力度很大，裁判立刻做出了反应。"
+      },
+      {
+        "event_id": "U073",
+        "event_type": "shot",
+        "time": "00:33:04-00:33:16",
+        "excerpt": "Curacao find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U074",
+        "event_type": "dangerous_attack",
+        "time": "00:33:20-00:33:24",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U075",
+        "event_type": "foul",
+        "time": "00:34:28-00:34:28",
+        "excerpt": "Curacao's No. 17 goes in on a German attacker and brings him down with a sliding tackle. The referee blows for the foul immediately. / 库拉索队17号球员铲倒了德国队的一名进攻球员，裁判立即吹罚犯规。"
+      },
+      {
+        "event_id": "U076",
+        "event_type": "foul",
+        "time": "00:34:40-00:34:40",
+        "excerpt": "Germany's No. 10, Musiala, goes down under a challenge from Curacao's No. 10. The German attacker hits the turf as contact is made, and he appeals for a foul as the Curacao player "
+      },
+      {
+        "event_id": "U077",
+        "event_type": "celebration_or_replay",
+        "time": "00:34:52-00:36:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U078",
+        "event_type": "foul",
+        "time": "00:35:48-00:36:00",
+        "excerpt": "A foul is called in the middle of the pitch, and the referee immediately steps in to manage the situation. He gestures with both hands raised, signaling a stoppage, and begins comm"
+      },
+      {
+        "event_id": "U079",
+        "event_type": "foul",
+        "time": "00:36:24-00:36:24",
+        "excerpt": "Curacao's No. 12 makes a sharp challenge inside the penalty area, catching the German attacker off balance and sending him tumbling to the ground. The referee is on the spot immedi"
+      },
+      {
+        "event_id": "U080",
+        "event_type": "free_kick",
+        "time": "00:36:28-00:36:28",
+        "excerpt": "Germany awarded a free kick just outside the box, referee signals direction as players set up for the restart. / 德国队在禁区外获得任意球，裁判示意进攻方向，球员们开始重新组织。"
+      },
+      {
+        "event_id": "U081",
+        "event_type": "foul",
+        "time": "00:36:36-00:36:36",
+        "excerpt": "Germany's No. 10 is fouled by a Curacao player as he drives forward with the ball. The Curacao defender attempts a sliding tackle but makes contact with the German attacker, causin"
+      },
+      {
+        "event_id": "U082",
+        "event_type": "free_kick",
+        "time": "00:36:44-00:36:44",
+        "excerpt": "Germany's No. 17 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The stadium holds its breath as the ball is struck"
+      },
+      {
+        "event_id": "U083",
+        "event_type": "dangerous_attack",
+        "time": "00:36:52-00:36:52",
+        "excerpt": "Germany's No. 10 drives a shot from the edge of the box, but Curacao's goalkeeper makes a sharp save to deny the lead. / 德国队10号在禁区边缘起脚射门，但库拉索门将反应神勇，迅速扑救化解了这次威胁，阻止了比分领先。"
+      },
+      {
+        "event_id": "U084",
+        "event_type": "shot",
+        "time": "00:36:56-00:36:56",
+        "excerpt": "Germany's No. 10 drives a shot from range, the ball thundering toward the top corner as the Curacao keeper dives in vain — it’s a strike that rattles the crossbar and sends the cro"
+      },
+      {
+        "event_id": "U085",
+        "event_type": "shot",
+        "time": "00:37:24-00:38:36",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U086",
+        "event_type": "dangerous_attack",
+        "time": "00:40:08-00:40:08",
+        "excerpt": "Germany's No. 10 drives forward into the penalty area, drawing multiple Curacao defenders. The pressure is intense as he looks to create a chance. / 德国队10号带球突入禁区，库拉索多名后卫上前包夹。他面临巨大压"
+      },
+      {
+        "event_id": "U087",
+        "event_type": "shot",
+        "time": "00:40:12-00:40:12",
+        "excerpt": "Germany's No. 19 fires a shot from inside the penalty area — the ball is on target and the Curacao keeper reacts instantly. A crisp strike under pressure in a tightly contested mat"
+      },
+      {
+        "event_id": "U088",
+        "event_type": "foul",
+        "time": "00:40:16-00:40:16",
+        "excerpt": "A German player goes down near the sideline after contact with a Curacao defender. The referee immediately points to spot the foul, and players react as play stops for the infringe"
+      },
+      {
+        "event_id": "U089",
+        "event_type": "save",
+        "time": "00:40:32-00:40:32",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but Curacao's goalkeeper dives low to his right and parries the ball away. A sharp save denies Germany the lead as the ball rolls"
+      },
+      {
+        "event_id": "U090",
+        "event_type": "shot",
+        "time": "00:40:36-00:40:36",
+        "excerpt": "Germany's No. 19 unleashes a powerful strike from range, the ball thundering towards the goal as Curacao's defenders scramble to react. The shot is on target, forcing a crucial sav"
+      },
+      {
+        "event_id": "U092",
+        "event_type": "dangerous_attack",
+        "time": "00:41:16-00:41:20",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player receives the ball near the edge of the penalty area, surrounded by Curacao defenders. The pressure mounts as m"
+      },
+      {
+        "event_id": "U093",
+        "event_type": "shot",
+        "time": "00:41:24-00:41:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U094",
+        "event_type": "save",
+        "time": "00:41:28-00:41:28",
+        "excerpt": "Curacao's goalkeeper makes a crucial save, diving to his right to deny Germany's attacker from close range. The ball is well-stopped, preventing what looked like a certain goal. / "
+      },
+      {
+        "event_id": "U096",
+        "event_type": "celebration_or_replay",
+        "time": "00:41:48-00:41:52",
+        "excerpt": "Curacao's No. 7 takes a shot from close range, but Germany's goalkeeper makes a spectacular diving save to his right, pushing the ball away just in time. The German players react w"
+      },
+      {
+        "event_id": "U097",
+        "event_type": "shot",
+        "time": "00:42:52-00:43:08",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U098",
+        "event_type": "dangerous_attack",
+        "time": "00:44:24-00:44:28",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player drives into the penalty area and takes a shot from close range, but the Curacao goalkeeper makes a diving save"
+      },
+      {
+        "event_id": "U099",
+        "event_type": "save",
+        "time": "00:44:32-00:44:32",
+        "excerpt": "Curacao's goalkeeper stretches to his left and parries the shot away with a diving save, denying Germany a clear chance. / 库拉索队门将飞身向左，用一次扑救化解了射门，阻止了德国队的得分良机。"
+      },
+      {
+        "event_id": "U100",
+        "event_type": "corner",
+        "time": "00:45:00-00:45:08",
+        "excerpt": "Germany takes a corner kick at the end of the first half. The ball is placed at the corner arc as players from both teams position themselves in the penalty area. Germany's No. 19 "
+      },
+      {
+        "event_id": "U101",
+        "event_type": "foul",
+        "time": "00:45:12-00:45:12",
+        "excerpt": "The referee steps in to call a foul, pointing decisively as play halts. Curacao's No. 21 stands nearby, observing the decision as Germany players regroup. / 裁判果断吹罚犯规，手势示意比赛暂停。库拉索队2"
+      },
+      {
+        "event_id": "U102",
+        "event_type": "goal",
+        "time": "00:45:16-00:46:36",
+        "excerpt": "Germany takes a free kick near the edge of the penalty area. The ball is struck with precision, flying past the defensive wall and into the net. The net ripples as the ball crosses"
+      },
+      {
+        "event_id": "U103",
+        "event_type": "foul",
+        "time": "00:45:24-00:45:24",
+        "excerpt": "A brief scuffle breaks down as Curacao's Floranus #5 and a German player come to blows, but the referee steps in quickly to separate them before it escalates further. / 库拉索队5号弗洛拉努斯"
+      },
+      {
+        "event_id": "U104",
+        "event_type": "foul",
+        "time": "00:47:52-00:47:56",
+        "excerpt": "A German player goes down under contact near the penalty area — the referee immediately signals a foul. Play stops as the fallen player remains on the ground while teammates and op"
+      },
+      {
+        "event_id": "U105",
+        "event_type": "dangerous_attack",
+        "time": "00:48:24-00:48:28",
+        "excerpt": "Germany in possession in the attacking third, approaching the penalty area with multiple players involved in the build-up. The ball is being circulated near the edge of the box, in"
+      },
+      {
+        "event_id": "U106",
+        "event_type": "foul",
+        "time": "00:48:32-00:48:32",
+        "excerpt": "Curacao's No. 21 brings down Germany's No. 5 with a late challenge in midfield — the German player goes down cleanly, and the referee is already on the spot to assess the foul. / 库"
+      },
+      {
+        "event_id": "U107",
+        "event_type": "free_kick",
+        "time": "00:48:36-00:48:36",
+        "excerpt": "Germany awarded a free kick just outside the box. The referee has blown for the restart, and Germany's No. 19 steps up to take it as Curacao sets their wall. / 德国队在禁区外获得任意球。裁判鸣哨恢复比"
+      },
+      {
+        "event_id": "U108",
+        "event_type": "dangerous_attack",
+        "time": "00:48:40-00:48:40",
+        "excerpt": "Germany takes the free kick and the ball is passed into the penalty area, creating a dangerous situation with multiple German players in the box. / 德国队开出任意球，皮球传入禁区，多名德国球员包抄，制造出极具威胁"
+      },
+      {
+        "event_id": "U109",
+        "event_type": "shot",
+        "time": "00:48:44-00:48:44",
+        "excerpt": "Germany's No. 17 takes a shot from inside the penalty area. The ball is heading towards the goal, but it's not clear if it will result in a goal or be saved by the goalkeeper. / 德国"
+      },
+      {
+        "event_id": "U111",
+        "event_type": "shot",
+        "time": "00:49:40-00:50:36",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U112",
+        "event_type": "shot",
+        "time": "00:50:48-00:50:48",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp save. / 德国队10号在禁区前沿起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U113",
+        "event_type": "dangerous_attack",
+        "time": "00:51:12-00:51:16",
+        "excerpt": "Germany builds a dangerous attack in Curacao's half. A German attacker drives into the penalty area, surrounded by defenders, creating a promising chance before the play transition"
+      },
+      {
+        "event_id": "U114",
+        "event_type": "corner",
+        "time": "00:51:24-00:51:32",
+        "excerpt": "Germany's No. 17 takes the corner kick from the right side. The ball is delivered into the penalty area, where players from both teams are positioned to challenge for it. / 德国队17号球"
+      },
+      {
+        "event_id": "U117",
+        "event_type": "dangerous_attack",
+        "time": "00:53:24-00:53:24",
+        "excerpt": "Curacao's No. 10 drives forward with pace, the ball at his feet as a German defender closes in to challenge. The attack is building in the final third, threatening to break through"
+      },
+      {
+        "event_id": "U118",
+        "event_type": "other_relevant",
+        "time": "00:53:28-00:53:28",
+        "excerpt": "A German player in a training bib raises both hands in a clear appeal or communication during the stoppage, his expression intense as he engages with officials or teammates near th"
+      },
+      {
+        "event_id": "U119",
+        "event_type": "dangerous_attack",
+        "time": "00:53:44-00:53:44",
+        "excerpt": "Germany moves into the final third with purpose, multiple attackers drifting into the box as the ball is worked toward the edge of the area. Curacao's defenders are scrambling to c"
+      },
+      {
+        "event_id": "U120",
+        "event_type": "shot",
+        "time": "00:53:48-00:53:48",
+        "excerpt": "Germany's No. 19 takes a shot under pressure from Curacao's defender. / 德国队19号在库拉索队防守球员的紧逼下起脚射门。"
+      },
+      {
+        "event_id": "U121",
+        "event_type": "save",
+        "time": "00:54:28-00:54:28",
+        "excerpt": "Curacao's No. 7 takes a shot from inside the penalty area, but Germany's goalkeeper dives to his left and catches it cleanly. A vital save keeps Germany's lead intact. / 库拉索队7号在禁区前"
+      },
+      {
+        "event_id": "U122",
+        "event_type": "celebration_or_replay",
+        "time": "00:54:32-00:54:32",
+        "excerpt": "Germany's goalkeeper makes a sharp save, diving low to his left to parry the ball away. The Curacao attacker had a clean shot on target, but the keeper's reaction was instant and d"
+      },
+      {
+        "event_id": "U123",
+        "event_type": "foul",
+        "time": "00:54:56-00:54:56",
+        "excerpt": "Curacao's No. 12 goes down under contact near the center circle — a foul called by the referee. The whistle blows as play stops, and Curacao players react to the decision. / 库拉索队12"
+      },
+      {
+        "event_id": "U124",
+        "event_type": "dangerous_attack",
+        "time": "00:55:08-00:55:08",
+        "excerpt": "Germany moves into the final third with multiple players in the penalty area, creating a promising attacking opportunity. / 德国队攻入前场，禁区内外多名球员接应，攻势一触即发。"
+      },
+      {
+        "event_id": "U125",
+        "event_type": "dangerous_attack",
+        "time": "00:55:16-00:55:16",
+        "excerpt": "Germany's No. 23 drives into the penalty area, drawing multiple defenders and creating a promising attacking opportunity in the final third. / 德国队23号球员突入禁区，吸引多名防守队员，在对方半场制造了极具威胁的进攻"
+      },
+      {
+        "event_id": "U126",
+        "event_type": "foul",
+        "time": "00:55:20-00:55:20",
+        "excerpt": "Curacao's defender brings down a German attacker inside the box — the referee immediately blows the whistle for the foul. / 库拉索队后卫在禁区内放倒了德国队进攻球员——裁判立即吹罚犯规。"
+      },
+      {
+        "event_id": "U128",
+        "event_type": "other_relevant",
+        "time": "00:55:28-00:55:28",
+        "excerpt": "A German player goes down under a challenge, clutching his leg as the referee checks on him. Medical staff rush in to assess the injury while play pauses momentarily. / 德国队球员在拼抢中倒地"
+      },
+      {
+        "event_id": "U129",
+        "event_type": "foul",
+        "time": "00:55:48-00:55:48",
+        "excerpt": "Germany's No. 7 makes contact with Curacao's No. 3 in the penalty area, causing the defender to go down. The referee is closely observing the incident. / 德国队7号在禁区内与库拉索队3号发生接触，导致这名后"
+      },
+      {
+        "event_id": "U130",
+        "event_type": "dangerous_attack",
+        "time": "00:55:52-00:55:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U131",
+        "event_type": "free_kick",
+        "time": "00:56:08-00:56:08",
+        "excerpt": "Germany's No. 10 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The ball is placed precisely as players from both "
+      },
+      {
+        "event_id": "U133",
+        "event_type": "celebration_or_replay",
+        "time": "00:56:16-00:56:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U134",
+        "event_type": "goal",
+        "time": "00:57:00-00:58:20",
+        "excerpt": "Germany's No. 7, Havertz, steps up to take the penalty kick. He approaches the ball with composure, the Curacao goalkeeper ready in goal. Havertz strikes it cleanly — the ball find"
+      },
+      {
+        "event_id": "U135",
+        "event_type": "celebration_or_replay",
+        "time": "00:58:40-00:59:08",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U136",
+        "event_type": "period_transition",
+        "time": "00:59:28-00:59:32",
+        "excerpt": "Germany and Curacao are set for the second half kickoff at the center circle. The teams are lined up, the referee is in position, and the stadium is ready for play to resume. / 下半场"
+      },
+      {
+        "event_id": "U137",
+        "event_type": "substitution",
+        "time": "00:59:40-01:00:08",
+        "excerpt": "At half-time, Curacao make a change on the touchline. Antonisse (#11) comes off and is replaced by Hansen (#12). The fourth official holds up the board as the players swap roles. /"
+      },
+      {
+        "event_id": "U138",
+        "event_type": "period_transition",
+        "time": "01:00:12-01:00:36",
+        "excerpt": "The second half is underway. Germany and Curacao line up at the center circle for the kickoff after halftime. The referee signals as players settle into position — Germany in white"
+      },
+      {
+        "event_id": "U140",
+        "event_type": "foul",
+        "time": "01:01:28-01:01:28",
+        "excerpt": "A Curacao player goes down near the center circle after contact, and the referee immediately points for a foul. / 库拉索球员在中圈附近接触后倒地，裁判立即判罚犯规。"
+      },
+      {
+        "event_id": "U141",
+        "event_type": "dangerous_attack",
+        "time": "01:01:36-01:01:40",
+        "excerpt": "Germany maintains pressure in the final third, with multiple attackers positioning themselves around Curacao's penalty area. The ball is moved quickly through the lines, creating a"
+      },
+      {
+        "event_id": "U142",
+        "event_type": "shot",
+        "time": "01:01:44-01:01:44",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, but Curacao's goalkeeper makes a sharp save to keep it level. / 德国队10号在禁区前沿起脚劲射，但库拉索门将反应神勇，迅速做出扑救，力保球门不失。"
+      },
+      {
+        "event_id": "U143",
+        "event_type": "goal",
+        "time": "01:01:48-01:02:00",
+        "excerpt": "Germany scores! Musiala finds the back of the net and the stadium erupts. The No. 10 sprints forward, arms outstretched, as Nmecha rushes to embrace him. Schlotterbeck, Kimmich, an"
+      },
+      {
+        "event_id": "U144",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:28-01:02:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U145",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:56-01:03:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U146",
+        "event_type": "foul",
+        "time": "01:04:24-01:04:24",
+        "excerpt": "Curacao's No. 10 goes down under a challenge from Germany's No. 10 near the edge of the penalty area. The referee is close by and will assess whether contact warranted a stoppage. "
+      },
+      {
+        "event_id": "U147",
+        "event_type": "foul",
+        "time": "01:04:44-01:04:44",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 10, and the referee is stepping in to assess the contact. / 库拉索球员在德国队10号球员的逼抢下倒地，裁判正在介入评估这次接触是否犯规。"
+      },
+      {
+        "event_id": "U148",
+        "event_type": "dangerous_attack",
+        "time": "01:05:20-01:05:20",
+        "excerpt": "Germany's No. 7 makes a run towards the Curacao penalty area with the ball, while defenders in blue/yellow are positioned to defend. This indicates an attacking move developing in "
+      },
+      {
+        "event_id": "U149",
+        "event_type": "celebration_or_replay",
+        "time": "01:06:04-01:06:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U150",
+        "event_type": "shot",
+        "time": "01:07:36-01:07:44",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U151",
+        "event_type": "save",
+        "time": "01:07:48-01:07:48",
+        "excerpt": "Curacao's goalkeeper makes a sharp save to his right, denying the shot and keeping the scoreline intact. / 库拉索门将向右神勇扑救，力保球门不失。"
+      },
+      {
+        "event_id": "U152",
+        "event_type": "foul",
+        "time": "01:07:52-01:07:52",
+        "excerpt": "A German player goes down under contact from a Curacao challenger near the center circle — referee steps in immediately to assess the situation. / 德国队球员在中圈附近与库拉索队一名对手接触后倒地——裁判立即介入，"
+      },
+      {
+        "event_id": "U153",
+        "event_type": "free_kick",
+        "time": "01:07:56-01:07:56",
+        "excerpt": "The referee points to the spot, signaling a free kick for Germany. The game pauses as players prepare for the restart. / 裁判指向了点球点，示意德国队获得任意球。比赛暂停，球员们准备重新开始。"
+      },
+      {
+        "event_id": "U154",
+        "event_type": "dangerous_attack",
+        "time": "01:08:32-01:08:32",
+        "excerpt": "Germany's No. 10 drives into the penalty area, swarmed by Curacao defenders. He holds off pressure and threads a pass through the gap — a moment of sharp vision under fire. The cha"
+      },
+      {
+        "event_id": "U155",
+        "event_type": "shot",
+        "time": "01:09:12-01:10:04",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U156",
+        "event_type": "foul",
+        "time": "01:10:12-01:10:12",
+        "excerpt": "Germany's No. 10, Musiala, makes a sharp challenge on the Curacao attacker — the ball stays loose as the Curacao player tumbles under contact. The referee steps in to manage the si"
+      },
+      {
+        "event_id": "U157",
+        "event_type": "foul",
+        "time": "01:11:52-01:11:52",
+        "excerpt": "Curacao's No. 2 brings down Germany's No. 17 with a sharp challenge near the penalty area. The German attacker goes down cleanly, and the referee is on the spot to award a free kic"
+      },
+      {
+        "event_id": "U158",
+        "event_type": "foul",
+        "time": "01:12:00-01:12:00",
+        "excerpt": "Germany's No. 27 goes down under a challenge, clutching his leg in pain as the ball rolls away. The referee will need to assess whether contact was excessive. / 德国队27号球员在对抗中倒地，捂着腿部"
+      },
+      {
+        "event_id": "U159",
+        "event_type": "foul",
+        "time": "01:12:08-01:12:20",
+        "excerpt": "Curacao's No. 8 gets a bit too eager on the tackle, catching Germany's No. 10 down with a late challenge on the leg. The German player goes down hard as the ball rolls loose, and t"
+      },
+      {
+        "event_id": "U160",
+        "event_type": "shot",
+        "time": "01:12:24-01:12:32",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U161",
+        "event_type": "save",
+        "time": "01:13:12-01:13:12",
+        "excerpt": "Curacao's attacker breaks through, but Germany's goalkeeper in orange makes a sharp diving save to his left, snatching the ball just before it crosses the goal line. / 库拉索队的前锋突入禁区，"
+      },
+      {
+        "event_id": "U162",
+        "event_type": "foul",
+        "time": "01:13:40-01:13:40",
+        "excerpt": "Germany's No. 8, Choupo-Moting, commits a sliding tackle on Curacao's No. 24, bringing him down cleanly but illegally. The referee will award a free kick to Curacao. / 德国队8号舒波-莫廷对库"
+      },
+      {
+        "event_id": "U163",
+        "event_type": "foul",
+        "time": "01:14:32-01:14:32",
+        "excerpt": "Germany's No. 6, Kimmich, makes contact with Curacao's No. 21 near the sideline — a quick stumble as the Curacao player loses balance. The referee is right there, watching closely."
+      },
+      {
+        "event_id": "U164",
+        "event_type": "celebration_or_replay",
+        "time": "01:14:52-01:15:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U165",
+        "event_type": "foul",
+        "time": "01:15:36-01:15:36",
+        "excerpt": "A Curacao player goes down in the middle of the pitch after a challenge, and the referee is ready to intervene as play stops. / 库拉索球员在中路拼抢后倒地，裁判准备介入，比赛随即暂停。"
+      },
+      {
+        "event_id": "U166",
+        "event_type": "dangerous_attack",
+        "time": "01:16:04-01:16:04",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U167",
+        "event_type": "foul",
+        "time": "01:16:20-01:16:20",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 4, and the referee is likely to award a free kick after the contact. / 库拉索球员在德国队4号球员的逼抢下倒地，裁判很可能会判罚一个任意球。"
+      },
+      {
+        "event_id": "U168",
+        "event_type": "foul",
+        "time": "01:16:36-01:16:36",
+        "excerpt": "Germany's Tah (4) makes contact with Curacao player (9), causing him to fall while challenging for ball — clear foul indication. / 德国队的塔赫（4号）在拼抢中与库拉索队球员（9号）发生接触，导致对方倒地——这是一个明显的犯规。"
+      },
+      {
+        "event_id": "U169",
+        "event_type": "dangerous_attack",
+        "time": "01:16:48-01:16:52",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U170",
+        "event_type": "dangerous_attack",
+        "time": "01:16:56-01:16:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U171",
+        "event_type": "corner",
+        "time": "01:17:00-01:17:08",
+        "excerpt": "Germany takes a corner kick on the right flank. The ball is delivered into the box, and players from both teams jump to head it. The clearance is made by a Curacao defender, and th"
+      },
+      {
+        "event_id": "U172",
+        "event_type": "free_kick",
+        "time": "01:17:12-01:17:28",
+        "excerpt": "Germany's No. 10 takes the free kick outside the box, delivering a curling shot that sails just over the crossbar as Curacao's defenders watch helplessly. / 德国队10号球员在禁区主罚任意球，踢出一记弧线"
+      },
+      {
+        "event_id": "U173",
+        "event_type": "shot",
+        "time": "01:17:32-01:17:32",
+        "excerpt": "Curacao's No. 21 takes a shot from inside the box during the free-kick situation. The ball is struck with intent, heading toward goal, as the German goalkeeper reacts to make a sav"
+      },
+      {
+        "event_id": "U174",
+        "event_type": "shot",
+        "time": "01:17:40-01:17:40",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U175",
+        "event_type": "shot",
+        "time": "01:17:44-01:17:44",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U176",
+        "event_type": "celebration_or_replay",
+        "time": "01:18:08-01:18:40",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U177",
+        "event_type": "foul",
+        "time": "01:18:52-01:18:52",
+        "excerpt": "A German player makes contact with a Curacao player during a chase for the ball, prompting a potential foul call. / 德国队球员在拼抢过程中与库拉索队球员发生身体接触，裁判可能会判罚犯规。"
+      },
+      {
+        "event_id": "U178",
+        "event_type": "substitution",
+        "time": "01:19:08-01:19:56",
+        "excerpt": "Germany make a change at the break, bringing on Undav for No. 10. The fourth official raises the board as Undav, wearing 26, steps onto the pitch to take his place. Meanwhile, Cura"
+      },
+      {
+        "event_id": "U179",
+        "event_type": "dangerous_attack",
+        "time": "01:20:08-01:20:08",
+        "excerpt": "Curacao's attacker bursts into Germany's penalty area, drawing multiple defenders. A cross or shot is imminent — a dangerous attack setup. / 库拉索队的进攻球员突入德国队禁区，吸引多名防守队员。传中或射门一触即发——攻势"
+      },
+      {
+        "event_id": "U180",
+        "event_type": "dangerous_attack",
+        "time": "01:20:52-01:20:52",
+        "excerpt": "Germany's No. 10 drives into the box and goes down under pressure, but the ball rolls free to a teammate who keeps the attack alive. Curacao scramble to recover as Germany presses "
+      },
+      {
+        "event_id": "U181",
+        "event_type": "foul",
+        "time": "01:20:56-01:20:56",
+        "excerpt": "Curacao's No. 21 attempts a sliding tackle on Germany's No. 10 inside the penalty area, and the German attacker goes down under the challenge. The referee blows for a foul. / 库拉索队的"
+      },
+      {
+        "event_id": "U182",
+        "event_type": "other_relevant",
+        "time": "01:21:00-01:21:00",
+        "excerpt": "L. Bacuna of Curacao is down on the pitch, clutching his head/neck area in apparent pain. Teammates are gathered around him as medical attention is sought. / 库拉索队的L.巴库纳倒在了球场上，他捂着颈部"
+      },
+      {
+        "event_id": "U183",
+        "event_type": "foul",
+        "time": "01:21:12-01:21:16",
+        "excerpt": "Curacao's No. 10 goes down in a challenge with Germany's Undav, No. 26. The Curacao player loses his balance and falls hard to the ground after contact, clearly in pain. The refere"
+      },
+      {
+        "event_id": "U184",
+        "event_type": "dangerous_attack",
+        "time": "01:21:32-01:22:04",
+        "excerpt": "Curacao keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 库拉索队继续在禁区周围施压，进攻把防线拉开，迫使防守球"
+      },
+      {
+        "event_id": "U185",
+        "event_type": "celebration_or_replay",
+        "time": "01:23:16-01:24:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U186",
+        "event_type": "celebration_or_replay",
+        "time": "01:24:16-01:24:24",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U187",
+        "event_type": "var_review",
+        "time": "01:24:28-01:24:32",
+        "excerpt": "VAR review in progress: Germany's No. 18 is checked for offside against Curacao's No. 10. The graphic confirms 'ONSIDE' — the goal stands. / VAR正在回放：德国队18号球员在库拉索队10号防守下的越位情况。画面显示‘越"
+      },
+      {
+        "event_id": "U189",
+        "event_type": "period_transition",
+        "time": "01:24:44-01:25:08",
+        "excerpt": "Germany and Curacao take a hydration break as the match pauses. Players head to the sidelines for refreshments while the crowd waits. The 'HYDRATION BREAK' graphic confirms the sto"
+      },
+      {
+        "event_id": "U190",
+        "event_type": "goal",
+        "time": "01:25:12-01:25:24",
+        "excerpt": "Germany have just scored! The German coaching staff erupts on the bench, and the player who was involved raises his arm in celebration. You can see the joy on his face as he looks "
+      },
+      {
+        "event_id": "U192",
+        "event_type": "substitution",
+        "time": "01:26:04-01:26:12",
+        "excerpt": "Germany makes a change on the sideline. Goretzka, wearing number 8, is seen interacting with the coaching staff and preparing to leave the pitch as a substitute comes in. The subst"
+      },
+      {
+        "event_id": "U193",
+        "event_type": "celebration_or_replay",
+        "time": "01:26:24-01:26:36",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U194",
+        "event_type": "substitution",
+        "time": "01:26:44-01:26:56",
+        "excerpt": "Germany make a change at the break, bringing on #22 for #15. The fourth official raises the board as Goretzka watches from the sideline. Raum embraces staff before heading off, and"
+      },
+      {
+        "event_id": "U195",
+        "event_type": "substitution",
+        "time": "01:27:04-01:27:08",
+        "excerpt": "Germany make their second double substitution of the match. Nmecha replaces Tah, and Brown comes on for Raum. Goretzka is also set to replace Rüdiger, with one sub still to go. / 德"
+      },
+      {
+        "event_id": "U196",
+        "event_type": "foul",
+        "time": "01:27:20-01:27:20",
+        "excerpt": "A Curacao player goes down under challenge from a German defender near the center circle. The referee is approaching to assess whether contact was excessive. / 库拉索球员在中圈附近与德国队防守队员拼抢"
+      },
+      {
+        "event_id": "U197",
+        "event_type": "celebration_or_replay",
+        "time": "01:27:44-01:27:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U198",
+        "event_type": "shot",
+        "time": "01:27:48-01:27:48",
+        "excerpt": "Germany's No. 10 drives a low shot from inside the box, forcing the Curacao keeper to stretch and parry it away. The rebound falls to a German attacker who tries to follow up, but "
+      },
+      {
+        "event_id": "U199",
+        "event_type": "shot",
+        "time": "01:28:00-01:28:00",
+        "excerpt": "Curacao's No. 10 takes a shot from the edge of the area, German defender No. 17 reacts to the strike. / 库拉索队10号在禁区边缘起脚射门，德国队17号后卫迅速做出反应。"
+      },
+      {
+        "event_id": "U200",
+        "event_type": "dangerous_attack",
+        "time": "01:28:36-01:28:40",
+        "excerpt": "Curacao's No. 11 breaks forward with the ball, driving a quick counter-attack down the flank. He carries the pace into Germany's half, drawing defenders as he advances. The build-u"
+      },
+      {
+        "event_id": "U201",
+        "event_type": "shot",
+        "time": "01:28:56-01:29:00",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U202",
+        "event_type": "shot",
+        "time": "01:29:04-01:29:04",
+        "excerpt": "Curacao's No. 11 fires a shot from inside the box, but Germany's goalkeeper gathers it cleanly under pressure. / 库拉索队11号在禁区前沿起脚射门，但德国队门将在此压力下稳稳将球收下。"
+      },
+      {
+        "event_id": "U203",
+        "event_type": "save",
+        "time": "01:29:08-01:29:08",
+        "excerpt": "Curacao's attacker finds space inside the box and fires a low shot toward the near post, but Germany's goalkeeper is alert and dives to his right to gather the ball cleanly at the "
+      },
+      {
+        "event_id": "U204",
+        "event_type": "dangerous_attack",
+        "time": "01:29:40-01:29:40",
+        "excerpt": "Germany in transition, pushing forward with purpose. The ball is moving into the final third as attackers find space behind Curacao’s line. A promising opportunity brewing — watch "
+      },
+      {
+        "event_id": "U205",
+        "event_type": "celebration_or_replay",
+        "time": "01:29:44-01:30:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U206",
+        "event_type": "foul",
+        "time": "01:29:56-01:29:56",
+        "excerpt": "Germany's No. 2 steps in to challenge for the ball, but makes contact with Curacao's No. 16 that looks like a trip. The referee will likely blow up for a foul as Curacao's player g"
+      },
+      {
+        "event_id": "U207",
+        "event_type": "dangerous_attack",
+        "time": "01:31:00-01:31:00",
+        "excerpt": "Germany's No. 19 drives forward with pace, carrying the ball into the attacking third — a sharp, direct run that puts Curacao’s defense on alert. / 德国队19号球员带球快速推进，直插对方前场——这一犀利且直接的突"
+      },
+      {
+        "event_id": "U208",
+        "event_type": "goal",
+        "time": "01:31:12-01:32:36",
+        "excerpt": "Germany in possession near Curacao's penalty area with multiple attackers advancing into the final third; German player dribbling toward Curacao box, drawing defenders; attacking b"
+      },
+      {
+        "event_id": "U209",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:12-01:33:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U210",
+        "event_type": "foul",
+        "time": "01:33:24-01:33:24",
+        "excerpt": "Curacao's No. 10 gets a hand on Germany's No. 2, causing him to stumble under pressure. The referee will need to decide if that was a trip or just a clean challenge. / 库拉索队的10号球员在防"
+      },
+      {
+        "event_id": "U211",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:40-01:33:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U212",
+        "event_type": "dangerous_attack",
+        "time": "01:35:12-01:35:12",
+        "excerpt": "Germany's No. 19 drives forward with the ball, cutting inside past Curacao's No. 24 in the attacking half. A sharp dribbling move that opens up space and keeps the pressure on. / 德"
+      },
+      {
+        "event_id": "U213",
+        "event_type": "free_kick",
+        "time": "01:35:36-01:35:44",
+        "excerpt": "Germany awarded a free kick just outside the penalty area. The referee ensures the wall is set as Germany's No. 10 steps up to take the set piece. / 德国队在禁区前沿获得任意球。裁判确认人墙站好，德国队10号球员"
+      },
+      {
+        "event_id": "U214",
+        "event_type": "dangerous_attack",
+        "time": "01:35:48-01:36:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U215",
+        "event_type": "substitution",
+        "time": "01:36:20-01:36:52",
+        "excerpt": "A substitution is underway for Curacao. The fourth official holds up the board as Kastaneer, wearing number 19, makes his way off the pitch. Chong, number 21, can be seen clapping "
+      },
+      {
+        "event_id": "U216",
+        "event_type": "substitution",
+        "time": "01:37:04-01:37:04",
+        "excerpt": "Germany make a change at the back as Anton, wearing number 3, heads off the pitch to be replaced by Kimmich, who comes on wearing number 6. / 德国队在后防线上做出调整，身穿3号球衣的安东被换下，取而代之的是身披6号战袍"
+      },
+      {
+        "event_id": "U217",
+        "event_type": "dangerous_attack",
+        "time": "01:37:44-01:37:48",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player drives forward with the ball towards the penalty area, supported by teammates, while Curacao defenders retreat"
+      },
+      {
+        "event_id": "U218",
+        "event_type": "shot",
+        "time": "01:38:04-01:38:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U219",
+        "event_type": "shot",
+        "time": "01:39:36-01:40:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U220",
+        "event_type": "goal",
+        "time": "01:42:00-01:43:24",
+        "excerpt": "Germany's No. 7 drives forward into the Curacao penalty area, drawing a defender before unleashing a low shot from close range. The ball beats the diving Curacao goalkeeper and nes"
+      },
+      {
+        "event_id": "U221",
+        "event_type": "celebration_or_replay",
+        "time": "01:43:40-01:43:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U223",
+        "event_type": "dangerous_attack",
+        "time": "01:45:20-01:45:20",
+        "excerpt": "Germany's No. 7 drives into the box, drawing multiple defenders as he looks to thread a pass or take a shot under pressure. / 德国队7号球员带球突入禁区，在对方多名防守球员的紧逼下，他试图送出传球或完成射门。"
+      },
+      {
+        "event_id": "U224",
+        "event_type": "corner",
+        "time": "01:46:08-01:46:16",
+        "excerpt": "Germany's No. 10 takes the corner kick from the right flank. The ball is delivered into the penalty area, where players from both teams are gathered. A German attacker rises to mee"
+      },
+      {
+        "event_id": "U225",
+        "event_type": "celebration_or_replay",
+        "time": "01:46:32-01:47:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U226",
+        "event_type": "foul",
+        "time": "01:46:36-01:46:36",
+        "excerpt": "Germany's No. 22 and Curacao's No. 10 are neck and neck down the flank, but the assistant referee raises his flag for a foul on the touchline. Play stops as the ball rolls loose ne"
+      },
+      {
+        "event_id": "U227",
+        "event_type": "foul",
+        "time": "01:46:48-01:46:48",
+        "excerpt": "Late in stoppage time, Germany's No. 10 drives forward with the ball, but Curacao's defender closes in and makes contact from behind, sending the German attacker to the turf. The r"
+      },
+      {
+        "event_id": "U228",
+        "event_type": "foul",
+        "time": "01:47:04-01:47:04",
+        "excerpt": "Curacao's No. 7 brings down a German player in midfield with a late challenge — both go down, referee blows for the foul. Germany retain possession from the stoppage as the match e"
+      },
+      {
+        "event_id": "U229",
+        "event_type": "foul",
+        "time": "01:48:00-01:48:08",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 5. The contact looks sharp and the Curacao player is clearly in pain as he lies on the ground. Teammates rush to his s"
+      },
+      {
+        "event_id": "U230",
+        "event_type": "shot",
+        "time": "01:48:12-01:49:28",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U232",
+        "event_type": "celebration_or_replay",
+        "time": "01:49:44-01:49:56",
+        "excerpt": "The final whistle blows and the stadium erupts! A sea of black, red, and gold fills the stands as Germany celebrates a dominant victory. Julian Nagelsmann walks along the sideline,"
+      },
+      {
+        "event_id": "U233",
+        "event_type": "dangerous_attack",
+        "time": "01:50:12-01:50:24",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U234",
+        "event_type": "celebration_or_replay",
+        "time": "01:50:28-01:50:36",
+        "excerpt": "The final whistle has blown, and the players are coming together for the traditional post-match handshakes. We see Curacao's No. 8, Comenencia, exchanging a respectful handshake wi"
+      },
+      {
+        "event_id": "U235",
+        "event_type": "period_transition",
+        "time": "01:50:48-01:50:52",
+        "excerpt": "The final whistle has blown in Houston, and the players are walking off the pitch. Germany's No. 2 is seen shaking hands with a Curacao player as the two teams begin to leave the f"
+      }
+    ],
+    "number_identity": [
+      {
+        "event_id": "U018",
+        "event_type": "celebration_or_replay",
+        "time": "00:08:08-00:08:24",
+        "excerpt": "Germany players in white kits gather in a tight huddle, celebrating with visible emotion and unity — Sané (No. 19) among them, arms locked as teammates close in. The crowd behind t"
+      },
+      {
+        "event_id": "U020",
+        "event_type": "dangerous_attack",
+        "time": "00:09:28-00:09:28",
+        "excerpt": "Germany's No. 10 drives into the box, drawing two defenders before slipping a pass to the runner on the edge of the area. Curacao's defense scrambles to close down the angle, but t"
+      },
+      {
+        "event_id": "U022",
+        "event_type": "dangerous_attack",
+        "time": "00:09:44-00:09:44",
+        "excerpt": "Kimmich (No. 6) for Germany carries the ball forward from the center circle, pressing ahead as Curacao's No. 24 closes in to challenge. The attack is building but has not yet reach"
+      },
+      {
+        "event_id": "U024",
+        "event_type": "foul",
+        "time": "00:11:12-00:11:16",
+        "excerpt": "Germany's No. 5 makes contact with Curacao's No. 24, bringing him down cleanly. The referee blows for the foul as the Curacao player goes to ground. Play stops for the infringement"
+      },
+      {
+        "event_id": "U026",
+        "event_type": "dangerous_attack",
+        "time": "00:12:28-00:12:32",
+        "excerpt": "Germany's No. 19, Sane, drives forward with the ball into the final third. He cuts inside, drawing multiple Curacao defenders towards him. With space opening up, he delivers a shar"
+      },
+      {
+        "event_id": "U027",
+        "event_type": "foul",
+        "time": "00:13:16-00:13:16",
+        "excerpt": "Germany's No. 13 goes down under a challenge and immediately appeals to the referee for a foul. The ball rolls away as the German player stays on the ground, seeking a decision. / "
+      },
+      {
+        "event_id": "U028",
+        "event_type": "goal",
+        "time": "00:14:08-00:15:28",
+        "excerpt": "Germany takes an early lead! Nmecha (No. 23) finds the back of the net with a powerful strike from inside the box, beating the Curacao goalkeeper. The German fans erupt in celebrat"
+      },
+      {
+        "event_id": "U033",
+        "event_type": "foul",
+        "time": "00:17:24-00:17:24",
+        "excerpt": "Curacao's No. 7 makes a late challenge on Germany's No. 23, who goes down under the contact. The referee will need to decide if that was a trip or just a clean tackle gone wrong. /"
+      },
+      {
+        "event_id": "U037",
+        "event_type": "shot",
+        "time": "00:18:12-00:18:12",
+        "excerpt": "Germany's No. 4 takes a shot from inside the box — the ball is struck with intent toward goal, and the Curacao goalkeeper reacts in time to parry it away. The crowd holds its breat"
+      },
+      {
+        "event_id": "U039",
+        "event_type": "shot",
+        "time": "00:18:40-00:18:40",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp reaction save. / 德国队10号禁区起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U040",
+        "event_type": "dangerous_attack",
+        "time": "00:18:52-00:18:52",
+        "excerpt": "Germany's No. 10, Kai Havertz, finds space inside the box under pressure from a Curacao defender. He controls the ball centrally near the penalty spot, drawing multiple defenders a"
+      },
+      {
+        "event_id": "U041",
+        "event_type": "foul",
+        "time": "00:19:04-00:19:04",
+        "excerpt": "Germany's No. 73 goes down under contact from a Curacao player in midfield — the referee will need to decide if that was a trip or push. The ball rolls loose as players react. / 德国"
+      },
+      {
+        "event_id": "U042",
+        "event_type": "dangerous_attack",
+        "time": "00:19:24-00:19:24",
+        "excerpt": "Germany's No. 10 drives into the box, but Curacao's defense holds firm. A promising attack is halted before a shot can be taken. / 德国队10号球员带球突入禁区，但库拉索队防守稳固，攻势在射门前被化解。"
+      },
+      {
+        "event_id": "U043",
+        "event_type": "foul",
+        "time": "00:19:28-00:19:28",
+        "excerpt": "Curacao's defender brings down Germany's No. 10 inside the box — a clear foul as the referee immediately points to the spot. / 库拉索后卫在禁区内放倒了德国队10号——裁判立即指向了点球点，这毫无疑问是个犯规。"
+      },
+      {
+        "event_id": "U044",
+        "event_type": "dangerous_attack",
+        "time": "00:19:44-00:19:44",
+        "excerpt": "Germany's No. 19 drives into the box, surrounded by Curacao defenders. He holds off pressure and lays it off to a teammate on the edge of the area — a dangerous moment as the ball "
+      },
+      {
+        "event_id": "U045",
+        "event_type": "shot",
+        "time": "00:19:48-00:19:48",
+        "excerpt": "Germany's No. 19, Sane, drives forward under pressure from two Curacao defenders and unleashes a powerful shot on goal. The ball is struck cleanly with the right foot, heading towa"
+      },
+      {
+        "event_id": "U048",
+        "event_type": "foul",
+        "time": "00:21:12-00:21:24",
+        "excerpt": "Curacao's Locadia #9 is penalized for a foul near the center circle as Germany's Tah #4 goes down. The referee immediately blows the whistle and gestures to stop play, then approac"
+      },
+      {
+        "event_id": "U050",
+        "event_type": "foul",
+        "time": "00:23:04-00:23:04",
+        "excerpt": "Germany's No. 17, Wirtz, closes down a Curacao player with a sharp challenge — slight lean and arm contact as he tries to dispossess. The Curacao defender absorbs the contact and s"
+      },
+      {
+        "event_id": "U051",
+        "event_type": "dangerous_attack",
+        "time": "00:24:16-00:24:16",
+        "excerpt": "Germany's No. 10 drives forward with the ball, entering the penalty area as multiple attackers and defenders converge — a promising chance developing in the box. / 德国队10号带球突入禁区，多名进"
+      },
+      {
+        "event_id": "U052",
+        "event_type": "shot",
+        "time": "00:24:20-00:24:20",
+        "excerpt": "Germany's No. 23 takes a shot from inside the penalty area as the Curacao goalkeeper reacts to the ball heading toward goal. / 德国队23号在禁区之内起脚射门，库拉索门将迅速反应，试图扑救这记直奔球门的攻势。"
+      },
+      {
+        "event_id": "U053",
+        "event_type": "foul",
+        "time": "00:24:24-00:24:24",
+        "excerpt": "Curacao's No. 7 makes a sliding challenge inside the penalty area, catching the German attacker off balance and bringing him down. The referee immediately blows for the foul as the"
+      },
+      {
+        "event_id": "U054",
+        "event_type": "other_relevant",
+        "time": "00:25:52-00:25:56",
+        "excerpt": "Germany's No. 10, Sané, turns away with a focused look as the referee checks his communication device — a moment of quiet intensity in the build-up to the next phase. / 德国队10号萨内转身离"
+      },
+      {
+        "event_id": "U055",
+        "event_type": "foul",
+        "time": "00:26:52-00:26:52",
+        "excerpt": "Curacao's No. 21 is brought down by a challenge from Germany's No. 23 near the center circle. The referee immediately blows the whistle and approaches to assess the situation. / 库拉"
+      },
+      {
+        "event_id": "U059",
+        "event_type": "dangerous_attack",
+        "time": "00:28:00-00:28:00",
+        "excerpt": "Germany's No. 10 drives into the penalty area, closely tracked by a Curacao defender. The attacking move is building pressure in the final third, with space and options emerging as"
+      },
+      {
+        "event_id": "U061",
+        "event_type": "shot",
+        "time": "00:28:56-00:28:56",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but the ball goes just wide of the post. The goalkeeper in red watches it go by, and play continues. / 德国队19号在禁区起脚射门，皮球稍稍偏出球门立柱。身"
+      },
+      {
+        "event_id": "U062",
+        "event_type": "celebration_or_replay",
+        "time": "00:29:00-00:29:00",
+        "excerpt": "Germany's No. 8 Havertz brings his hand to his head in clear frustration — a missed opportunity just moments ago, and the weight of it settling in fast. / 德国队8号哈弗茨双手抱头，显然十分懊恼——就在刚刚"
+      },
+      {
+        "event_id": "U065",
+        "event_type": "shot",
+        "time": "00:29:48-00:29:48",
+        "excerpt": "Curacao's No. 9 gets a shot away from inside the box, but the German goalkeeper is down to make a diving save. / 库拉索队的9号在禁区之内起脚射门，但德国队门将迅速倒地，完成了一次精彩的扑救。"
+      },
+      {
+        "event_id": "U067",
+        "event_type": "celebration_or_replay",
+        "time": "00:29:56-00:29:56",
+        "excerpt": "Curacao's No. 8 celebrates after a key moment, as the crowd erupts in cheers. / 库拉索队的8号球员在关键时刻后庆祝，现场球迷欢呼雀跃。"
+      },
+      {
+        "event_id": "U070",
+        "event_type": "foul",
+        "time": "00:31:40-00:31:40",
+        "excerpt": "Curacao's No. 9, Locadia, goes down under contact from Germany's No. 4. The referee is likely to award a free kick after this challenge. / 库拉索队的9号洛卡迪亚在受到德国队4号球员的冲撞后倒地，裁判很可能会判罚这次犯规为"
+      },
+      {
+        "event_id": "U072",
+        "event_type": "foul",
+        "time": "00:33:00-00:33:00",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 17 — contact looks heavy, referee is on it immediately. / 库拉索球员在遭遇德国队17号球员的铲抢后倒地，这次接触力度很大，裁判立刻做出了反应。"
+      },
+      {
+        "event_id": "U075",
+        "event_type": "foul",
+        "time": "00:34:28-00:34:28",
+        "excerpt": "Curacao's No. 17 goes in on a German attacker and brings him down with a sliding tackle. The referee blows for the foul immediately. / 库拉索队17号球员铲倒了德国队的一名进攻球员，裁判立即吹罚犯规。"
+      },
+      {
+        "event_id": "U076",
+        "event_type": "foul",
+        "time": "00:34:40-00:34:40",
+        "excerpt": "Germany's No. 10, Musiala, goes down under a challenge from Curacao's No. 10. The German attacker hits the turf as contact is made, and he appeals for a foul as the Curacao player "
+      },
+      {
+        "event_id": "U078",
+        "event_type": "foul",
+        "time": "00:35:48-00:36:00",
+        "excerpt": "A foul is called in the middle of the pitch, and the referee immediately steps in to manage the situation. He gestures with both hands raised, signaling a stoppage, and begins comm"
+      },
+      {
+        "event_id": "U079",
+        "event_type": "foul",
+        "time": "00:36:24-00:36:24",
+        "excerpt": "Curacao's No. 12 makes a sharp challenge inside the penalty area, catching the German attacker off balance and sending him tumbling to the ground. The referee is on the spot immedi"
+      },
+      {
+        "event_id": "U081",
+        "event_type": "foul",
+        "time": "00:36:36-00:36:36",
+        "excerpt": "Germany's No. 10 is fouled by a Curacao player as he drives forward with the ball. The Curacao defender attempts a sliding tackle but makes contact with the German attacker, causin"
+      },
+      {
+        "event_id": "U082",
+        "event_type": "free_kick",
+        "time": "00:36:44-00:36:44",
+        "excerpt": "Germany's No. 17 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The stadium holds its breath as the ball is struck"
+      },
+      {
+        "event_id": "U083",
+        "event_type": "dangerous_attack",
+        "time": "00:36:52-00:36:52",
+        "excerpt": "Germany's No. 10 drives a shot from the edge of the box, but Curacao's goalkeeper makes a sharp save to deny the lead. / 德国队10号在禁区边缘起脚射门，但库拉索门将反应神勇，迅速扑救化解了这次威胁，阻止了比分领先。"
+      },
+      {
+        "event_id": "U084",
+        "event_type": "shot",
+        "time": "00:36:56-00:36:56",
+        "excerpt": "Germany's No. 10 drives a shot from range, the ball thundering toward the top corner as the Curacao keeper dives in vain — it’s a strike that rattles the crossbar and sends the cro"
+      },
+      {
+        "event_id": "U086",
+        "event_type": "dangerous_attack",
+        "time": "00:40:08-00:40:08",
+        "excerpt": "Germany's No. 10 drives forward into the penalty area, drawing multiple Curacao defenders. The pressure is intense as he looks to create a chance. / 德国队10号带球突入禁区，库拉索多名后卫上前包夹。他面临巨大压"
+      },
+      {
+        "event_id": "U087",
+        "event_type": "shot",
+        "time": "00:40:12-00:40:12",
+        "excerpt": "Germany's No. 19 fires a shot from inside the penalty area — the ball is on target and the Curacao keeper reacts instantly. A crisp strike under pressure in a tightly contested mat"
+      },
+      {
+        "event_id": "U089",
+        "event_type": "save",
+        "time": "00:40:32-00:40:32",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but Curacao's goalkeeper dives low to his right and parries the ball away. A sharp save denies Germany the lead as the ball rolls"
+      },
+      {
+        "event_id": "U090",
+        "event_type": "shot",
+        "time": "00:40:36-00:40:36",
+        "excerpt": "Germany's No. 19 unleashes a powerful strike from range, the ball thundering towards the goal as Curacao's defenders scramble to react. The shot is on target, forcing a crucial sav"
+      },
+      {
+        "event_id": "U096",
+        "event_type": "celebration_or_replay",
+        "time": "00:41:48-00:41:52",
+        "excerpt": "Curacao's No. 7 takes a shot from close range, but Germany's goalkeeper makes a spectacular diving save to his right, pushing the ball away just in time. The German players react w"
+      },
+      {
+        "event_id": "U100",
+        "event_type": "corner",
+        "time": "00:45:00-00:45:08",
+        "excerpt": "Germany takes a corner kick at the end of the first half. The ball is placed at the corner arc as players from both teams position themselves in the penalty area. Germany's No. 19 "
+      },
+      {
+        "event_id": "U101",
+        "event_type": "foul",
+        "time": "00:45:12-00:45:12",
+        "excerpt": "The referee steps in to call a foul, pointing decisively as play halts. Curacao's No. 21 stands nearby, observing the decision as Germany players regroup. / 裁判果断吹罚犯规，手势示意比赛暂停。库拉索队2"
+      },
+      {
+        "event_id": "U103",
+        "event_type": "foul",
+        "time": "00:45:24-00:45:24",
+        "excerpt": "A brief scuffle breaks down as Curacao's Floranus #5 and a German player come to blows, but the referee steps in quickly to separate them before it escalates further. / 库拉索队5号弗洛拉努斯"
+      },
+      {
+        "event_id": "U106",
+        "event_type": "foul",
+        "time": "00:48:32-00:48:32",
+        "excerpt": "Curacao's No. 21 brings down Germany's No. 5 with a late challenge in midfield — the German player goes down cleanly, and the referee is already on the spot to assess the foul. / 库"
+      },
+      {
+        "event_id": "U107",
+        "event_type": "free_kick",
+        "time": "00:48:36-00:48:36",
+        "excerpt": "Germany awarded a free kick just outside the box. The referee has blown for the restart, and Germany's No. 19 steps up to take it as Curacao sets their wall. / 德国队在禁区外获得任意球。裁判鸣哨恢复比"
+      },
+      {
+        "event_id": "U109",
+        "event_type": "shot",
+        "time": "00:48:44-00:48:44",
+        "excerpt": "Germany's No. 17 takes a shot from inside the penalty area. The ball is heading towards the goal, but it's not clear if it will result in a goal or be saved by the goalkeeper. / 德国"
+      },
+      {
+        "event_id": "U112",
+        "event_type": "shot",
+        "time": "00:50:48-00:50:48",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp save. / 德国队10号在禁区前沿起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U114",
+        "event_type": "corner",
+        "time": "00:51:24-00:51:32",
+        "excerpt": "Germany's No. 17 takes the corner kick from the right side. The ball is delivered into the penalty area, where players from both teams are positioned to challenge for it. / 德国队17号球"
+      },
+      {
+        "event_id": "U117",
+        "event_type": "dangerous_attack",
+        "time": "00:53:24-00:53:24",
+        "excerpt": "Curacao's No. 10 drives forward with pace, the ball at his feet as a German defender closes in to challenge. The attack is building in the final third, threatening to break through"
+      },
+      {
+        "event_id": "U120",
+        "event_type": "shot",
+        "time": "00:53:48-00:53:48",
+        "excerpt": "Germany's No. 19 takes a shot under pressure from Curacao's defender. / 德国队19号在库拉索队防守球员的紧逼下起脚射门。"
+      },
+      {
+        "event_id": "U121",
+        "event_type": "save",
+        "time": "00:54:28-00:54:28",
+        "excerpt": "Curacao's No. 7 takes a shot from inside the penalty area, but Germany's goalkeeper dives to his left and catches it cleanly. A vital save keeps Germany's lead intact. / 库拉索队7号在禁区前"
+      },
+      {
+        "event_id": "U123",
+        "event_type": "foul",
+        "time": "00:54:56-00:54:56",
+        "excerpt": "Curacao's No. 12 goes down under contact near the center circle — a foul called by the referee. The whistle blows as play stops, and Curacao players react to the decision. / 库拉索队12"
+      },
+      {
+        "event_id": "U125",
+        "event_type": "dangerous_attack",
+        "time": "00:55:16-00:55:16",
+        "excerpt": "Germany's No. 23 drives into the penalty area, drawing multiple defenders and creating a promising attacking opportunity in the final third. / 德国队23号球员突入禁区，吸引多名防守队员，在对方半场制造了极具威胁的进攻"
+      },
+      {
+        "event_id": "U129",
+        "event_type": "foul",
+        "time": "00:55:48-00:55:48",
+        "excerpt": "Germany's No. 7 makes contact with Curacao's No. 3 in the penalty area, causing the defender to go down. The referee is closely observing the incident. / 德国队7号在禁区内与库拉索队3号发生接触，导致这名后"
+      },
+      {
+        "event_id": "U131",
+        "event_type": "free_kick",
+        "time": "00:56:08-00:56:08",
+        "excerpt": "Germany's No. 10 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The ball is placed precisely as players from both "
+      },
+      {
+        "event_id": "U134",
+        "event_type": "goal",
+        "time": "00:57:00-00:58:20",
+        "excerpt": "Germany's No. 7, Havertz, steps up to take the penalty kick. He approaches the ball with composure, the Curacao goalkeeper ready in goal. Havertz strikes it cleanly — the ball find"
+      },
+      {
+        "event_id": "U137",
+        "event_type": "substitution",
+        "time": "00:59:40-01:00:08",
+        "excerpt": "At half-time, Curacao make a change on the touchline. Antonisse (#11) comes off and is replaced by Hansen (#12). The fourth official holds up the board as the players swap roles. /"
+      },
+      {
+        "event_id": "U142",
+        "event_type": "shot",
+        "time": "01:01:44-01:01:44",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, but Curacao's goalkeeper makes a sharp save to keep it level. / 德国队10号在禁区前沿起脚劲射，但库拉索门将反应神勇，迅速做出扑救，力保球门不失。"
+      },
+      {
+        "event_id": "U143",
+        "event_type": "goal",
+        "time": "01:01:48-01:02:00",
+        "excerpt": "Germany scores! Musiala finds the back of the net and the stadium erupts. The No. 10 sprints forward, arms outstretched, as Nmecha rushes to embrace him. Schlotterbeck, Kimmich, an"
+      },
+      {
+        "event_id": "U146",
+        "event_type": "foul",
+        "time": "01:04:24-01:04:24",
+        "excerpt": "Curacao's No. 10 goes down under a challenge from Germany's No. 10 near the edge of the penalty area. The referee is close by and will assess whether contact warranted a stoppage. "
+      },
+      {
+        "event_id": "U147",
+        "event_type": "foul",
+        "time": "01:04:44-01:04:44",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 10, and the referee is stepping in to assess the contact. / 库拉索球员在德国队10号球员的逼抢下倒地，裁判正在介入评估这次接触是否犯规。"
+      },
+      {
+        "event_id": "U148",
+        "event_type": "dangerous_attack",
+        "time": "01:05:20-01:05:20",
+        "excerpt": "Germany's No. 7 makes a run towards the Curacao penalty area with the ball, while defenders in blue/yellow are positioned to defend. This indicates an attacking move developing in "
+      },
+      {
+        "event_id": "U154",
+        "event_type": "dangerous_attack",
+        "time": "01:08:32-01:08:32",
+        "excerpt": "Germany's No. 10 drives into the penalty area, swarmed by Curacao defenders. He holds off pressure and threads a pass through the gap — a moment of sharp vision under fire. The cha"
+      },
+      {
+        "event_id": "U156",
+        "event_type": "foul",
+        "time": "01:10:12-01:10:12",
+        "excerpt": "Germany's No. 10, Musiala, makes a sharp challenge on the Curacao attacker — the ball stays loose as the Curacao player tumbles under contact. The referee steps in to manage the si"
+      },
+      {
+        "event_id": "U157",
+        "event_type": "foul",
+        "time": "01:11:52-01:11:52",
+        "excerpt": "Curacao's No. 2 brings down Germany's No. 17 with a sharp challenge near the penalty area. The German attacker goes down cleanly, and the referee is on the spot to award a free kic"
+      },
+      {
+        "event_id": "U158",
+        "event_type": "foul",
+        "time": "01:12:00-01:12:00",
+        "excerpt": "Germany's No. 27 goes down under a challenge, clutching his leg in pain as the ball rolls away. The referee will need to assess whether contact was excessive. / 德国队27号球员在对抗中倒地，捂着腿部"
+      },
+      {
+        "event_id": "U159",
+        "event_type": "foul",
+        "time": "01:12:08-01:12:20",
+        "excerpt": "Curacao's No. 8 gets a bit too eager on the tackle, catching Germany's No. 10 down with a late challenge on the leg. The German player goes down hard as the ball rolls loose, and t"
+      },
+      {
+        "event_id": "U162",
+        "event_type": "foul",
+        "time": "01:13:40-01:13:40",
+        "excerpt": "Germany's No. 8, Choupo-Moting, commits a sliding tackle on Curacao's No. 24, bringing him down cleanly but illegally. The referee will award a free kick to Curacao. / 德国队8号舒波-莫廷对库"
+      },
+      {
+        "event_id": "U163",
+        "event_type": "foul",
+        "time": "01:14:32-01:14:32",
+        "excerpt": "Germany's No. 6, Kimmich, makes contact with Curacao's No. 21 near the sideline — a quick stumble as the Curacao player loses balance. The referee is right there, watching closely."
+      },
+      {
+        "event_id": "U167",
+        "event_type": "foul",
+        "time": "01:16:20-01:16:20",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 4, and the referee is likely to award a free kick after the contact. / 库拉索球员在德国队4号球员的逼抢下倒地，裁判很可能会判罚一个任意球。"
+      },
+      {
+        "event_id": "U168",
+        "event_type": "foul",
+        "time": "01:16:36-01:16:36",
+        "excerpt": "Germany's Tah (4) makes contact with Curacao player (9), causing him to fall while challenging for ball — clear foul indication. / 德国队的塔赫（4号）在拼抢中与库拉索队球员（9号）发生接触，导致对方倒地——这是一个明显的犯规。"
+      },
+      {
+        "event_id": "U172",
+        "event_type": "free_kick",
+        "time": "01:17:12-01:17:28",
+        "excerpt": "Germany's No. 10 takes the free kick outside the box, delivering a curling shot that sails just over the crossbar as Curacao's defenders watch helplessly. / 德国队10号球员在禁区主罚任意球，踢出一记弧线"
+      },
+      {
+        "event_id": "U173",
+        "event_type": "shot",
+        "time": "01:17:32-01:17:32",
+        "excerpt": "Curacao's No. 21 takes a shot from inside the box during the free-kick situation. The ball is struck with intent, heading toward goal, as the German goalkeeper reacts to make a sav"
+      },
+      {
+        "event_id": "U178",
+        "event_type": "substitution",
+        "time": "01:19:08-01:19:56",
+        "excerpt": "Germany make a change at the break, bringing on Undav for No. 10. The fourth official raises the board as Undav, wearing 26, steps onto the pitch to take his place. Meanwhile, Cura"
+      },
+      {
+        "event_id": "U180",
+        "event_type": "dangerous_attack",
+        "time": "01:20:52-01:20:52",
+        "excerpt": "Germany's No. 10 drives into the box and goes down under pressure, but the ball rolls free to a teammate who keeps the attack alive. Curacao scramble to recover as Germany presses "
+      },
+      {
+        "event_id": "U181",
+        "event_type": "foul",
+        "time": "01:20:56-01:20:56",
+        "excerpt": "Curacao's No. 21 attempts a sliding tackle on Germany's No. 10 inside the penalty area, and the German attacker goes down under the challenge. The referee blows for a foul. / 库拉索队的"
+      },
+      {
+        "event_id": "U183",
+        "event_type": "foul",
+        "time": "01:21:12-01:21:16",
+        "excerpt": "Curacao's No. 10 goes down in a challenge with Germany's Undav, No. 26. The Curacao player loses his balance and falls hard to the ground after contact, clearly in pain. The refere"
+      },
+      {
+        "event_id": "U187",
+        "event_type": "var_review",
+        "time": "01:24:28-01:24:32",
+        "excerpt": "VAR review in progress: Germany's No. 18 is checked for offside against Curacao's No. 10. The graphic confirms 'ONSIDE' — the goal stands. / VAR正在回放：德国队18号球员在库拉索队10号防守下的越位情况。画面显示‘越"
+      },
+      {
+        "event_id": "U192",
+        "event_type": "substitution",
+        "time": "01:26:04-01:26:12",
+        "excerpt": "Germany makes a change on the sideline. Goretzka, wearing number 8, is seen interacting with the coaching staff and preparing to leave the pitch as a substitute comes in. The subst"
+      },
+      {
+        "event_id": "U194",
+        "event_type": "substitution",
+        "time": "01:26:44-01:26:56",
+        "excerpt": "Germany make a change at the break, bringing on #22 for #15. The fourth official raises the board as Goretzka watches from the sideline. Raum embraces staff before heading off, and"
+      },
+      {
+        "event_id": "U198",
+        "event_type": "shot",
+        "time": "01:27:48-01:27:48",
+        "excerpt": "Germany's No. 10 drives a low shot from inside the box, forcing the Curacao keeper to stretch and parry it away. The rebound falls to a German attacker who tries to follow up, but "
+      },
+      {
+        "event_id": "U199",
+        "event_type": "shot",
+        "time": "01:28:00-01:28:00",
+        "excerpt": "Curacao's No. 10 takes a shot from the edge of the area, German defender No. 17 reacts to the strike. / 库拉索队10号在禁区边缘起脚射门，德国队17号后卫迅速做出反应。"
+      },
+      {
+        "event_id": "U200",
+        "event_type": "dangerous_attack",
+        "time": "01:28:36-01:28:40",
+        "excerpt": "Curacao's No. 11 breaks forward with the ball, driving a quick counter-attack down the flank. He carries the pace into Germany's half, drawing defenders as he advances. The build-u"
+      },
+      {
+        "event_id": "U202",
+        "event_type": "shot",
+        "time": "01:29:04-01:29:04",
+        "excerpt": "Curacao's No. 11 fires a shot from inside the box, but Germany's goalkeeper gathers it cleanly under pressure. / 库拉索队11号在禁区前沿起脚射门，但德国队门将在此压力下稳稳将球收下。"
+      },
+      {
+        "event_id": "U206",
+        "event_type": "foul",
+        "time": "01:29:56-01:29:56",
+        "excerpt": "Germany's No. 2 steps in to challenge for the ball, but makes contact with Curacao's No. 16 that looks like a trip. The referee will likely blow up for a foul as Curacao's player g"
+      },
+      {
+        "event_id": "U207",
+        "event_type": "dangerous_attack",
+        "time": "01:31:00-01:31:00",
+        "excerpt": "Germany's No. 19 drives forward with pace, carrying the ball into the attacking third — a sharp, direct run that puts Curacao’s defense on alert. / 德国队19号球员带球快速推进，直插对方前场——这一犀利且直接的突"
+      },
+      {
+        "event_id": "U208",
+        "event_type": "goal",
+        "time": "01:31:12-01:32:36",
+        "excerpt": "Germany in possession near Curacao's penalty area with multiple attackers advancing into the final third; German player dribbling toward Curacao box, drawing defenders; attacking b"
+      },
+      {
+        "event_id": "U210",
+        "event_type": "foul",
+        "time": "01:33:24-01:33:24",
+        "excerpt": "Curacao's No. 10 gets a hand on Germany's No. 2, causing him to stumble under pressure. The referee will need to decide if that was a trip or just a clean challenge. / 库拉索队的10号球员在防"
+      },
+      {
+        "event_id": "U212",
+        "event_type": "dangerous_attack",
+        "time": "01:35:12-01:35:12",
+        "excerpt": "Germany's No. 19 drives forward with the ball, cutting inside past Curacao's No. 24 in the attacking half. A sharp dribbling move that opens up space and keeps the pressure on. / 德"
+      },
+      {
+        "event_id": "U213",
+        "event_type": "free_kick",
+        "time": "01:35:36-01:35:44",
+        "excerpt": "Germany awarded a free kick just outside the penalty area. The referee ensures the wall is set as Germany's No. 10 steps up to take the set piece. / 德国队在禁区前沿获得任意球。裁判确认人墙站好，德国队10号球员"
+      },
+      {
+        "event_id": "U215",
+        "event_type": "substitution",
+        "time": "01:36:20-01:36:52",
+        "excerpt": "A substitution is underway for Curacao. The fourth official holds up the board as Kastaneer, wearing number 19, makes his way off the pitch. Chong, number 21, can be seen clapping "
+      },
+      {
+        "event_id": "U216",
+        "event_type": "substitution",
+        "time": "01:37:04-01:37:04",
+        "excerpt": "Germany make a change at the back as Anton, wearing number 3, heads off the pitch to be replaced by Kimmich, who comes on wearing number 6. / 德国队在后防线上做出调整，身穿3号球衣的安东被换下，取而代之的是身披6号战袍"
+      },
+      {
+        "event_id": "U220",
+        "event_type": "goal",
+        "time": "01:42:00-01:43:24",
+        "excerpt": "Germany's No. 7 drives forward into the Curacao penalty area, drawing a defender before unleashing a low shot from close range. The ball beats the diving Curacao goalkeeper and nes"
+      },
+      {
+        "event_id": "U223",
+        "event_type": "dangerous_attack",
+        "time": "01:45:20-01:45:20",
+        "excerpt": "Germany's No. 7 drives into the box, drawing multiple defenders as he looks to thread a pass or take a shot under pressure. / 德国队7号球员带球突入禁区，在对方多名防守球员的紧逼下，他试图送出传球或完成射门。"
+      },
+      {
+        "event_id": "U224",
+        "event_type": "corner",
+        "time": "01:46:08-01:46:16",
+        "excerpt": "Germany's No. 10 takes the corner kick from the right flank. The ball is delivered into the penalty area, where players from both teams are gathered. A German attacker rises to mee"
+      },
+      {
+        "event_id": "U226",
+        "event_type": "foul",
+        "time": "01:46:36-01:46:36",
+        "excerpt": "Germany's No. 22 and Curacao's No. 10 are neck and neck down the flank, but the assistant referee raises his flag for a foul on the touchline. Play stops as the ball rolls loose ne"
+      },
+      {
+        "event_id": "U227",
+        "event_type": "foul",
+        "time": "01:46:48-01:46:48",
+        "excerpt": "Late in stoppage time, Germany's No. 10 drives forward with the ball, but Curacao's defender closes in and makes contact from behind, sending the German attacker to the turf. The r"
+      },
+      {
+        "event_id": "U228",
+        "event_type": "foul",
+        "time": "01:47:04-01:47:04",
+        "excerpt": "Curacao's No. 7 brings down a German player in midfield with a late challenge — both go down, referee blows for the foul. Germany retain possession from the stoppage as the match e"
+      },
+      {
+        "event_id": "U229",
+        "event_type": "foul",
+        "time": "01:48:00-01:48:08",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 5. The contact looks sharp and the Curacao player is clearly in pain as he lies on the ground. Teammates rush to his s"
+      },
+      {
+        "event_id": "U234",
+        "event_type": "celebration_or_replay",
+        "time": "01:50:28-01:50:36",
+        "excerpt": "The final whistle has blown, and the players are coming together for the traditional post-match handshakes. We see Curacao's No. 8, Comenencia, exchanging a respectful handshake wi"
+      },
+      {
+        "event_id": "U235",
+        "event_type": "period_transition",
+        "time": "01:50:48-01:50:52",
+        "excerpt": "The final whistle has blown in Houston, and the players are walking off the pitch. Germany's No. 2 is seen shaking hands with a Curacao player as the two teams begin to leave the f"
+      }
+    ],
+    "role_identity": [
+      {
+        "event_id": "U001",
+        "event_type": "period_transition",
+        "time": "00:00:04-00:01:04",
+        "excerpt": "The pre-match ceremony is underway at the FIFA World Cup 2026, as Germany and Curacao make their grand entrance onto the pitch. Referees in bright yellow kits lead the procession, "
+      },
+      {
+        "event_id": "U004",
+        "event_type": "period_transition",
+        "time": "00:01:40-00:02:24",
+        "excerpt": "The stage is set for a World Cup clash between Germany and Curacao. Players from both teams walk onto the pitch, donning their warm-up gear as they prepare for the pre-match ceremo"
+      },
+      {
+        "event_id": "U006",
+        "event_type": "period_transition",
+        "time": "00:03:00-00:04:20",
+        "excerpt": "The stage is set for a historic encounter at the FIFA World Cup 2026. Germany and Curacao stand side by side on the pitch, flanked by young mascots, as the pre-match ceremonies com"
+      },
+      {
+        "event_id": "U010",
+        "event_type": "period_transition",
+        "time": "00:04:36-00:04:36",
+        "excerpt": "The players line up for the pre-match anthem, standing tall with young mascots beside them as the crowd fills the stadium in anticipation. / 比赛即将开始，球员们在队旗旁列队，身旁站着可爱的吉祥物，看台上座无虚席，球迷们"
+      },
+      {
+        "event_id": "U012",
+        "event_type": "period_transition",
+        "time": "00:04:48-00:05:24",
+        "excerpt": "The players are lined up on the pitch for pre-match handshakes, signaling the start of the match period. Germany and Curacao players, along with referees and mascots, are seen shak"
+      },
+      {
+        "event_id": "U014",
+        "event_type": "period_transition",
+        "time": "00:05:40-00:05:48",
+        "excerpt": "Germany and Curacao line up for the kickoff, players walking onto the pitch with mascots in tow. The stadium is electric as both teams prepare for what promises to be a thrilling e"
+      },
+      {
+        "event_id": "U015",
+        "event_type": "period_transition",
+        "time": "00:06:08-00:06:24",
+        "excerpt": "And here we go, the teams are lined up at the center circle for the kickoff. The stadium is electric as Germany and Curacao prepare for the opening whistle of this World Cup clash."
+      },
+      {
+        "event_id": "U016",
+        "event_type": "other_relevant",
+        "time": "00:06:28-00:06:36",
+        "excerpt": "The match officials are walking onto the pitch, ready to take control of the game. The referee and his assistants are seen in discussion, likely finalizing their pre-match briefing"
+      },
+      {
+        "event_id": "U018",
+        "event_type": "celebration_or_replay",
+        "time": "00:08:08-00:08:24",
+        "excerpt": "Germany players in white kits gather in a tight huddle, celebrating with visible emotion and unity — Sané (No. 19) among them, arms locked as teammates close in. The crowd behind t"
+      },
+      {
+        "event_id": "U019",
+        "event_type": "period_transition",
+        "time": "00:08:56-00:09:08",
+        "excerpt": "Germany and Curacao line up for the second-half kickoff at the center circle. The referee signals as players take their positions — a crisp restart under the stadium lights. The ba"
+      },
+      {
+        "event_id": "U020",
+        "event_type": "dangerous_attack",
+        "time": "00:09:28-00:09:28",
+        "excerpt": "Germany's No. 10 drives into the box, drawing two defenders before slipping a pass to the runner on the edge of the area. Curacao's defense scrambles to close down the angle, but t"
+      },
+      {
+        "event_id": "U021",
+        "event_type": "foul",
+        "time": "00:09:32-00:09:32",
+        "excerpt": "A German attacker goes down under challenge from a Curacao defender inside the box. The referee is watching closely to determine if contact was excessive. / 德国队的进攻球员在禁区内遭到库拉索队防守球员的"
+      },
+      {
+        "event_id": "U023",
+        "event_type": "celebration_or_replay",
+        "time": "00:11:00-00:11:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U024",
+        "event_type": "foul",
+        "time": "00:11:12-00:11:16",
+        "excerpt": "Germany's No. 5 makes contact with Curacao's No. 24, bringing him down cleanly. The referee blows for the foul as the Curacao player goes to ground. Play stops for the infringement"
+      },
+      {
+        "event_id": "U026",
+        "event_type": "dangerous_attack",
+        "time": "00:12:28-00:12:32",
+        "excerpt": "Germany's No. 19, Sane, drives forward with the ball into the final third. He cuts inside, drawing multiple Curacao defenders towards him. With space opening up, he delivers a shar"
+      },
+      {
+        "event_id": "U027",
+        "event_type": "foul",
+        "time": "00:13:16-00:13:16",
+        "excerpt": "Germany's No. 13 goes down under a challenge and immediately appeals to the referee for a foul. The ball rolls away as the German player stays on the ground, seeking a decision. / "
+      },
+      {
+        "event_id": "U028",
+        "event_type": "goal",
+        "time": "00:14:08-00:15:28",
+        "excerpt": "Germany takes an early lead! Nmecha (No. 23) finds the back of the net with a powerful strike from inside the box, beating the Curacao goalkeeper. The German fans erupt in celebrat"
+      },
+      {
+        "event_id": "U030",
+        "event_type": "celebration_or_replay",
+        "time": "00:15:44-00:15:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U031",
+        "event_type": "dangerous_attack",
+        "time": "00:17:12-00:17:12",
+        "excerpt": "Germany in possession in the final third, advancing toward Curacao's penalty area with multiple players in attacking positions. / 德国队掌控着球权，在对方半场组织进攻，多名进攻球员前插，直逼库拉索队的禁区。"
+      },
+      {
+        "event_id": "U032",
+        "event_type": "dangerous_attack",
+        "time": "00:17:16-00:17:16",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U033",
+        "event_type": "foul",
+        "time": "00:17:24-00:17:24",
+        "excerpt": "Curacao's No. 7 makes a late challenge on Germany's No. 23, who goes down under the contact. The referee will need to decide if that was a trip or just a clean tackle gone wrong. /"
+      },
+      {
+        "event_id": "U034",
+        "event_type": "shot",
+        "time": "00:17:28-00:17:28",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U035",
+        "event_type": "save",
+        "time": "00:17:32-00:17:32",
+        "excerpt": "Curacao's goalkeeper makes a stunning full-stretch save to his left, snatching the ball away from the goal line just in time. The keeper dives low and extends fully, securing posse"
+      },
+      {
+        "event_id": "U036",
+        "event_type": "dangerous_attack",
+        "time": "00:18:08-00:18:08",
+        "excerpt": "Germany pushes forward into the final third with multiple runners approaching the penalty area. Curacao defenders are retreating under pressure as the attack develops. / 德国队压上，多名进攻"
+      },
+      {
+        "event_id": "U037",
+        "event_type": "shot",
+        "time": "00:18:12-00:18:12",
+        "excerpt": "Germany's No. 4 takes a shot from inside the box — the ball is struck with intent toward goal, and the Curacao goalkeeper reacts in time to parry it away. The crowd holds its breat"
+      },
+      {
+        "event_id": "U038",
+        "event_type": "dangerous_attack",
+        "time": "00:18:36-00:18:36",
+        "excerpt": "Germany pushes forward with pace, a white-shirted attacker surges into the final third, drawing defenders and creating space. The buildup is sharp, the movement fluid — Curacao’s b"
+      },
+      {
+        "event_id": "U039",
+        "event_type": "shot",
+        "time": "00:18:40-00:18:40",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp reaction save. / 德国队10号禁区起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U040",
+        "event_type": "dangerous_attack",
+        "time": "00:18:52-00:18:52",
+        "excerpt": "Germany's No. 10, Kai Havertz, finds space inside the box under pressure from a Curacao defender. He controls the ball centrally near the penalty spot, drawing multiple defenders a"
+      },
+      {
+        "event_id": "U041",
+        "event_type": "foul",
+        "time": "00:19:04-00:19:04",
+        "excerpt": "Germany's No. 73 goes down under contact from a Curacao player in midfield — the referee will need to decide if that was a trip or push. The ball rolls loose as players react. / 德国"
+      },
+      {
+        "event_id": "U043",
+        "event_type": "foul",
+        "time": "00:19:28-00:19:28",
+        "excerpt": "Curacao's defender brings down Germany's No. 10 inside the box — a clear foul as the referee immediately points to the spot. / 库拉索后卫在禁区内放倒了德国队10号——裁判立即指向了点球点，这毫无疑问是个犯规。"
+      },
+      {
+        "event_id": "U044",
+        "event_type": "dangerous_attack",
+        "time": "00:19:44-00:19:44",
+        "excerpt": "Germany's No. 19 drives into the box, surrounded by Curacao defenders. He holds off pressure and lays it off to a teammate on the edge of the area — a dangerous moment as the ball "
+      },
+      {
+        "event_id": "U045",
+        "event_type": "shot",
+        "time": "00:19:48-00:19:48",
+        "excerpt": "Germany's No. 19, Sane, drives forward under pressure from two Curacao defenders and unleashes a powerful shot on goal. The ball is struck cleanly with the right foot, heading towa"
+      },
+      {
+        "event_id": "U046",
+        "event_type": "dangerous_attack",
+        "time": "00:20:04-00:20:08",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U047",
+        "event_type": "celebration_or_replay",
+        "time": "00:20:36-00:21:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U048",
+        "event_type": "foul",
+        "time": "00:21:12-00:21:24",
+        "excerpt": "Curacao's Locadia #9 is penalized for a foul near the center circle as Germany's Tah #4 goes down. The referee immediately blows the whistle and gestures to stop play, then approac"
+      },
+      {
+        "event_id": "U049",
+        "event_type": "celebration_or_replay",
+        "time": "00:22:52-00:23:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U050",
+        "event_type": "foul",
+        "time": "00:23:04-00:23:04",
+        "excerpt": "Germany's No. 17, Wirtz, closes down a Curacao player with a sharp challenge — slight lean and arm contact as he tries to dispossess. The Curacao defender absorbs the contact and s"
+      },
+      {
+        "event_id": "U051",
+        "event_type": "dangerous_attack",
+        "time": "00:24:16-00:24:16",
+        "excerpt": "Germany's No. 10 drives forward with the ball, entering the penalty area as multiple attackers and defenders converge — a promising chance developing in the box. / 德国队10号带球突入禁区，多名进"
+      },
+      {
+        "event_id": "U052",
+        "event_type": "shot",
+        "time": "00:24:20-00:24:20",
+        "excerpt": "Germany's No. 23 takes a shot from inside the penalty area as the Curacao goalkeeper reacts to the ball heading toward goal. / 德国队23号在禁区之内起脚射门，库拉索门将迅速反应，试图扑救这记直奔球门的攻势。"
+      },
+      {
+        "event_id": "U053",
+        "event_type": "foul",
+        "time": "00:24:24-00:24:24",
+        "excerpt": "Curacao's No. 7 makes a sliding challenge inside the penalty area, catching the German attacker off balance and bringing him down. The referee immediately blows for the foul as the"
+      },
+      {
+        "event_id": "U054",
+        "event_type": "other_relevant",
+        "time": "00:25:52-00:25:56",
+        "excerpt": "Germany's No. 10, Sané, turns away with a focused look as the referee checks his communication device — a moment of quiet intensity in the build-up to the next phase. / 德国队10号萨内转身离"
+      },
+      {
+        "event_id": "U055",
+        "event_type": "foul",
+        "time": "00:26:52-00:26:52",
+        "excerpt": "Curacao's No. 21 is brought down by a challenge from Germany's No. 23 near the center circle. The referee immediately blows the whistle and approaches to assess the situation. / 库拉"
+      },
+      {
+        "event_id": "U056",
+        "event_type": "dangerous_attack",
+        "time": "00:27:04-00:27:04",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U057",
+        "event_type": "shot",
+        "time": "00:27:48-00:27:52",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U058",
+        "event_type": "shot",
+        "time": "00:27:56-00:27:56",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U059",
+        "event_type": "dangerous_attack",
+        "time": "00:28:00-00:28:00",
+        "excerpt": "Germany's No. 10 drives into the penalty area, closely tracked by a Curacao defender. The attacking move is building pressure in the final third, with space and options emerging as"
+      },
+      {
+        "event_id": "U060",
+        "event_type": "dangerous_attack",
+        "time": "00:28:52-00:28:52",
+        "excerpt": "Germany pushes forward with urgency, multiple attackers converging in the penalty area as a cross or shot looms. The ball is delivered into the box under pressure, but Curacao’s de"
+      },
+      {
+        "event_id": "U061",
+        "event_type": "shot",
+        "time": "00:28:56-00:28:56",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but the ball goes just wide of the post. The goalkeeper in red watches it go by, and play continues. / 德国队19号在禁区起脚射门，皮球稍稍偏出球门立柱。身"
+      },
+      {
+        "event_id": "U063",
+        "event_type": "other_relevant",
+        "time": "00:29:08-00:29:08",
+        "excerpt": "Germany's No. 1, Manuel Neuer, stands on the pitch as a broadcast graphic reminds us he is Germany's oldest ever player at 40 years and 79 days. / 德国队门将诺伊尔站在场上，屏幕上的数据显示，他已成为德国队历史上年"
+      },
+      {
+        "event_id": "U064",
+        "event_type": "dangerous_attack",
+        "time": "00:29:44-00:29:44",
+        "excerpt": "Curacao launch a swift counter-attack, pushing forward with pace into Germany's half. Multiple attackers thread through the midfield, drawing defenders out of position as they appr"
+      },
+      {
+        "event_id": "U065",
+        "event_type": "shot",
+        "time": "00:29:48-00:29:48",
+        "excerpt": "Curacao's No. 9 gets a shot away from inside the box, but the German goalkeeper is down to make a diving save. / 库拉索队的9号在禁区之内起脚射门，但德国队门将迅速倒地，完成了一次精彩的扑救。"
+      },
+      {
+        "event_id": "U066",
+        "event_type": "save",
+        "time": "00:29:52-00:29:52",
+        "excerpt": "A sharp shot from Curacao finds the German keeper low and to his left — he dives full extension, palms the ball clear before it crosses the line. The defense scrambles as the rebou"
+      },
+      {
+        "event_id": "U068",
+        "event_type": "goal",
+        "time": "00:30:32-00:31:20",
+        "excerpt": "Curacao strike first! The blue and yellow team breaks through Germany's defense with a precise shot from inside the penalty area. The ball finds the bottom corner of the net as the"
+      },
+      {
+        "event_id": "U069",
+        "event_type": "foul",
+        "time": "00:31:28-00:31:28",
+        "excerpt": "Germany's attacker is fouled by a Curacao defender, the referee blows the whistle and points to the spot for a penalty kick. / 德国队的进攻球员遭到库拉索队后卫犯规，裁判吹哨并指向点球点，判罚点球！"
+      },
+      {
+        "event_id": "U070",
+        "event_type": "foul",
+        "time": "00:31:40-00:31:40",
+        "excerpt": "Curacao's No. 9, Locadia, goes down under contact from Germany's No. 4. The referee is likely to award a free kick after this challenge. / 库拉索队的9号洛卡迪亚在受到德国队4号球员的冲撞后倒地，裁判很可能会判罚这次犯规为"
+      },
+      {
+        "event_id": "U072",
+        "event_type": "foul",
+        "time": "00:33:00-00:33:00",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 17 — contact looks heavy, referee is on it immediately. / 库拉索球员在遭遇德国队17号球员的铲抢后倒地，这次接触力度很大，裁判立刻做出了反应。"
+      },
+      {
+        "event_id": "U073",
+        "event_type": "shot",
+        "time": "00:33:04-00:33:16",
+        "excerpt": "Curacao find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U074",
+        "event_type": "dangerous_attack",
+        "time": "00:33:20-00:33:24",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U075",
+        "event_type": "foul",
+        "time": "00:34:28-00:34:28",
+        "excerpt": "Curacao's No. 17 goes in on a German attacker and brings him down with a sliding tackle. The referee blows for the foul immediately. / 库拉索队17号球员铲倒了德国队的一名进攻球员，裁判立即吹罚犯规。"
+      },
+      {
+        "event_id": "U076",
+        "event_type": "foul",
+        "time": "00:34:40-00:34:40",
+        "excerpt": "Germany's No. 10, Musiala, goes down under a challenge from Curacao's No. 10. The German attacker hits the turf as contact is made, and he appeals for a foul as the Curacao player "
+      },
+      {
+        "event_id": "U077",
+        "event_type": "celebration_or_replay",
+        "time": "00:34:52-00:36:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U078",
+        "event_type": "foul",
+        "time": "00:35:48-00:36:00",
+        "excerpt": "A foul is called in the middle of the pitch, and the referee immediately steps in to manage the situation. He gestures with both hands raised, signaling a stoppage, and begins comm"
+      },
+      {
+        "event_id": "U079",
+        "event_type": "foul",
+        "time": "00:36:24-00:36:24",
+        "excerpt": "Curacao's No. 12 makes a sharp challenge inside the penalty area, catching the German attacker off balance and sending him tumbling to the ground. The referee is on the spot immedi"
+      },
+      {
+        "event_id": "U080",
+        "event_type": "free_kick",
+        "time": "00:36:28-00:36:28",
+        "excerpt": "Germany awarded a free kick just outside the box, referee signals direction as players set up for the restart. / 德国队在禁区外获得任意球，裁判示意进攻方向，球员们开始重新组织。"
+      },
+      {
+        "event_id": "U081",
+        "event_type": "foul",
+        "time": "00:36:36-00:36:36",
+        "excerpt": "Germany's No. 10 is fouled by a Curacao player as he drives forward with the ball. The Curacao defender attempts a sliding tackle but makes contact with the German attacker, causin"
+      },
+      {
+        "event_id": "U082",
+        "event_type": "free_kick",
+        "time": "00:36:44-00:36:44",
+        "excerpt": "Germany's No. 17 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The stadium holds its breath as the ball is struck"
+      },
+      {
+        "event_id": "U083",
+        "event_type": "dangerous_attack",
+        "time": "00:36:52-00:36:52",
+        "excerpt": "Germany's No. 10 drives a shot from the edge of the box, but Curacao's goalkeeper makes a sharp save to deny the lead. / 德国队10号在禁区边缘起脚射门，但库拉索门将反应神勇，迅速扑救化解了这次威胁，阻止了比分领先。"
+      },
+      {
+        "event_id": "U084",
+        "event_type": "shot",
+        "time": "00:36:56-00:36:56",
+        "excerpt": "Germany's No. 10 drives a shot from range, the ball thundering toward the top corner as the Curacao keeper dives in vain — it’s a strike that rattles the crossbar and sends the cro"
+      },
+      {
+        "event_id": "U085",
+        "event_type": "shot",
+        "time": "00:37:24-00:38:36",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U086",
+        "event_type": "dangerous_attack",
+        "time": "00:40:08-00:40:08",
+        "excerpt": "Germany's No. 10 drives forward into the penalty area, drawing multiple Curacao defenders. The pressure is intense as he looks to create a chance. / 德国队10号带球突入禁区，库拉索多名后卫上前包夹。他面临巨大压"
+      },
+      {
+        "event_id": "U087",
+        "event_type": "shot",
+        "time": "00:40:12-00:40:12",
+        "excerpt": "Germany's No. 19 fires a shot from inside the penalty area — the ball is on target and the Curacao keeper reacts instantly. A crisp strike under pressure in a tightly contested mat"
+      },
+      {
+        "event_id": "U088",
+        "event_type": "foul",
+        "time": "00:40:16-00:40:16",
+        "excerpt": "A German player goes down near the sideline after contact with a Curacao defender. The referee immediately points to spot the foul, and players react as play stops for the infringe"
+      },
+      {
+        "event_id": "U089",
+        "event_type": "save",
+        "time": "00:40:32-00:40:32",
+        "excerpt": "Germany's No. 19 takes a shot from inside the box, but Curacao's goalkeeper dives low to his right and parries the ball away. A sharp save denies Germany the lead as the ball rolls"
+      },
+      {
+        "event_id": "U090",
+        "event_type": "shot",
+        "time": "00:40:36-00:40:36",
+        "excerpt": "Germany's No. 19 unleashes a powerful strike from range, the ball thundering towards the goal as Curacao's defenders scramble to react. The shot is on target, forcing a crucial sav"
+      },
+      {
+        "event_id": "U092",
+        "event_type": "dangerous_attack",
+        "time": "00:41:16-00:41:20",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player receives the ball near the edge of the penalty area, surrounded by Curacao defenders. The pressure mounts as m"
+      },
+      {
+        "event_id": "U093",
+        "event_type": "shot",
+        "time": "00:41:24-00:41:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U094",
+        "event_type": "save",
+        "time": "00:41:28-00:41:28",
+        "excerpt": "Curacao's goalkeeper makes a crucial save, diving to his right to deny Germany's attacker from close range. The ball is well-stopped, preventing what looked like a certain goal. / "
+      },
+      {
+        "event_id": "U096",
+        "event_type": "celebration_or_replay",
+        "time": "00:41:48-00:41:52",
+        "excerpt": "Curacao's No. 7 takes a shot from close range, but Germany's goalkeeper makes a spectacular diving save to his right, pushing the ball away just in time. The German players react w"
+      },
+      {
+        "event_id": "U097",
+        "event_type": "shot",
+        "time": "00:42:52-00:43:08",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U098",
+        "event_type": "dangerous_attack",
+        "time": "00:44:24-00:44:28",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player drives into the penalty area and takes a shot from close range, but the Curacao goalkeeper makes a diving save"
+      },
+      {
+        "event_id": "U099",
+        "event_type": "save",
+        "time": "00:44:32-00:44:32",
+        "excerpt": "Curacao's goalkeeper stretches to his left and parries the shot away with a diving save, denying Germany a clear chance. / 库拉索队门将飞身向左，用一次扑救化解了射门，阻止了德国队的得分良机。"
+      },
+      {
+        "event_id": "U101",
+        "event_type": "foul",
+        "time": "00:45:12-00:45:12",
+        "excerpt": "The referee steps in to call a foul, pointing decisively as play halts. Curacao's No. 21 stands nearby, observing the decision as Germany players regroup. / 裁判果断吹罚犯规，手势示意比赛暂停。库拉索队2"
+      },
+      {
+        "event_id": "U102",
+        "event_type": "goal",
+        "time": "00:45:16-00:46:36",
+        "excerpt": "Germany takes a free kick near the edge of the penalty area. The ball is struck with precision, flying past the defensive wall and into the net. The net ripples as the ball crosses"
+      },
+      {
+        "event_id": "U103",
+        "event_type": "foul",
+        "time": "00:45:24-00:45:24",
+        "excerpt": "A brief scuffle breaks down as Curacao's Floranus #5 and a German player come to blows, but the referee steps in quickly to separate them before it escalates further. / 库拉索队5号弗洛拉努斯"
+      },
+      {
+        "event_id": "U104",
+        "event_type": "foul",
+        "time": "00:47:52-00:47:56",
+        "excerpt": "A German player goes down under contact near the penalty area — the referee immediately signals a foul. Play stops as the fallen player remains on the ground while teammates and op"
+      },
+      {
+        "event_id": "U106",
+        "event_type": "foul",
+        "time": "00:48:32-00:48:32",
+        "excerpt": "Curacao's No. 21 brings down Germany's No. 5 with a late challenge in midfield — the German player goes down cleanly, and the referee is already on the spot to assess the foul. / 库"
+      },
+      {
+        "event_id": "U107",
+        "event_type": "free_kick",
+        "time": "00:48:36-00:48:36",
+        "excerpt": "Germany awarded a free kick just outside the box. The referee has blown for the restart, and Germany's No. 19 steps up to take it as Curacao sets their wall. / 德国队在禁区外获得任意球。裁判鸣哨恢复比"
+      },
+      {
+        "event_id": "U109",
+        "event_type": "shot",
+        "time": "00:48:44-00:48:44",
+        "excerpt": "Germany's No. 17 takes a shot from inside the penalty area. The ball is heading towards the goal, but it's not clear if it will result in a goal or be saved by the goalkeeper. / 德国"
+      },
+      {
+        "event_id": "U111",
+        "event_type": "shot",
+        "time": "00:49:40-00:50:36",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U112",
+        "event_type": "shot",
+        "time": "00:50:48-00:50:48",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, forcing the Curacao goalkeeper into a sharp save. / 德国队10号在禁区前沿起脚劲射，库拉索门将迅速反应做出精彩扑救。"
+      },
+      {
+        "event_id": "U113",
+        "event_type": "dangerous_attack",
+        "time": "00:51:12-00:51:16",
+        "excerpt": "Germany builds a dangerous attack in Curacao's half. A German attacker drives into the penalty area, surrounded by defenders, creating a promising chance before the play transition"
+      },
+      {
+        "event_id": "U117",
+        "event_type": "dangerous_attack",
+        "time": "00:53:24-00:53:24",
+        "excerpt": "Curacao's No. 10 drives forward with pace, the ball at his feet as a German defender closes in to challenge. The attack is building in the final third, threatening to break through"
+      },
+      {
+        "event_id": "U118",
+        "event_type": "other_relevant",
+        "time": "00:53:28-00:53:28",
+        "excerpt": "A German player in a training bib raises both hands in a clear appeal or communication during the stoppage, his expression intense as he engages with officials or teammates near th"
+      },
+      {
+        "event_id": "U119",
+        "event_type": "dangerous_attack",
+        "time": "00:53:44-00:53:44",
+        "excerpt": "Germany moves into the final third with purpose, multiple attackers drifting into the box as the ball is worked toward the edge of the area. Curacao's defenders are scrambling to c"
+      },
+      {
+        "event_id": "U120",
+        "event_type": "shot",
+        "time": "00:53:48-00:53:48",
+        "excerpt": "Germany's No. 19 takes a shot under pressure from Curacao's defender. / 德国队19号在库拉索队防守球员的紧逼下起脚射门。"
+      },
+      {
+        "event_id": "U121",
+        "event_type": "save",
+        "time": "00:54:28-00:54:28",
+        "excerpt": "Curacao's No. 7 takes a shot from inside the penalty area, but Germany's goalkeeper dives to his left and catches it cleanly. A vital save keeps Germany's lead intact. / 库拉索队7号在禁区前"
+      },
+      {
+        "event_id": "U122",
+        "event_type": "celebration_or_replay",
+        "time": "00:54:32-00:54:32",
+        "excerpt": "Germany's goalkeeper makes a sharp save, diving low to his left to parry the ball away. The Curacao attacker had a clean shot on target, but the keeper's reaction was instant and d"
+      },
+      {
+        "event_id": "U123",
+        "event_type": "foul",
+        "time": "00:54:56-00:54:56",
+        "excerpt": "Curacao's No. 12 goes down under contact near the center circle — a foul called by the referee. The whistle blows as play stops, and Curacao players react to the decision. / 库拉索队12"
+      },
+      {
+        "event_id": "U126",
+        "event_type": "foul",
+        "time": "00:55:20-00:55:20",
+        "excerpt": "Curacao's defender brings down a German attacker inside the box — the referee immediately blows the whistle for the foul. / 库拉索队后卫在禁区内放倒了德国队进攻球员——裁判立即吹罚犯规。"
+      },
+      {
+        "event_id": "U127",
+        "event_type": "var_review",
+        "time": "00:55:24-00:55:24",
+        "excerpt": "The referee raises his hand to his earpiece — a clear signal that the VAR team is being consulted on the penalty decision. Players pause, tension mounts as the on-field call hangs "
+      },
+      {
+        "event_id": "U128",
+        "event_type": "other_relevant",
+        "time": "00:55:28-00:55:28",
+        "excerpt": "A German player goes down under a challenge, clutching his leg as the referee checks on him. Medical staff rush in to assess the injury while play pauses momentarily. / 德国队球员在拼抢中倒地"
+      },
+      {
+        "event_id": "U129",
+        "event_type": "foul",
+        "time": "00:55:48-00:55:48",
+        "excerpt": "Germany's No. 7 makes contact with Curacao's No. 3 in the penalty area, causing the defender to go down. The referee is closely observing the incident. / 德国队7号在禁区内与库拉索队3号发生接触，导致这名后"
+      },
+      {
+        "event_id": "U130",
+        "event_type": "dangerous_attack",
+        "time": "00:55:52-00:55:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U131",
+        "event_type": "free_kick",
+        "time": "00:56:08-00:56:08",
+        "excerpt": "Germany's No. 10 steps up to take a free kick just outside the penalty area, with the referee ensuring the defensive wall is set. The ball is placed precisely as players from both "
+      },
+      {
+        "event_id": "U132",
+        "event_type": "foul",
+        "time": "00:56:12-00:56:12",
+        "excerpt": "A foul is called as the referee steps in to manage the situation, engaging with the players to restore order on the field. / 裁判吹罚犯规，立即介入现场，与球员沟通以恢复场上秩序。"
+      },
+      {
+        "event_id": "U133",
+        "event_type": "celebration_or_replay",
+        "time": "00:56:16-00:56:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U134",
+        "event_type": "goal",
+        "time": "00:57:00-00:58:20",
+        "excerpt": "Germany's No. 7, Havertz, steps up to take the penalty kick. He approaches the ball with composure, the Curacao goalkeeper ready in goal. Havertz strikes it cleanly — the ball find"
+      },
+      {
+        "event_id": "U135",
+        "event_type": "celebration_or_replay",
+        "time": "00:58:40-00:59:08",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U136",
+        "event_type": "period_transition",
+        "time": "00:59:28-00:59:32",
+        "excerpt": "Germany and Curacao are set for the second half kickoff at the center circle. The teams are lined up, the referee is in position, and the stadium is ready for play to resume. / 下半场"
+      },
+      {
+        "event_id": "U137",
+        "event_type": "substitution",
+        "time": "00:59:40-01:00:08",
+        "excerpt": "At half-time, Curacao make a change on the touchline. Antonisse (#11) comes off and is replaced by Hansen (#12). The fourth official holds up the board as the players swap roles. /"
+      },
+      {
+        "event_id": "U138",
+        "event_type": "period_transition",
+        "time": "01:00:12-01:00:36",
+        "excerpt": "The second half is underway. Germany and Curacao line up at the center circle for the kickoff after halftime. The referee signals as players settle into position — Germany in white"
+      },
+      {
+        "event_id": "U140",
+        "event_type": "foul",
+        "time": "01:01:28-01:01:28",
+        "excerpt": "A Curacao player goes down near the center circle after contact, and the referee immediately points for a foul. / 库拉索球员在中圈附近接触后倒地，裁判立即判罚犯规。"
+      },
+      {
+        "event_id": "U141",
+        "event_type": "dangerous_attack",
+        "time": "01:01:36-01:01:40",
+        "excerpt": "Germany maintains pressure in the final third, with multiple attackers positioning themselves around Curacao's penalty area. The ball is moved quickly through the lines, creating a"
+      },
+      {
+        "event_id": "U142",
+        "event_type": "shot",
+        "time": "01:01:44-01:01:44",
+        "excerpt": "Germany's No. 10 drives a shot from inside the box, but Curacao's goalkeeper makes a sharp save to keep it level. / 德国队10号在禁区前沿起脚劲射，但库拉索门将反应神勇，迅速做出扑救，力保球门不失。"
+      },
+      {
+        "event_id": "U144",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:28-01:02:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U145",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:56-01:03:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U146",
+        "event_type": "foul",
+        "time": "01:04:24-01:04:24",
+        "excerpt": "Curacao's No. 10 goes down under a challenge from Germany's No. 10 near the edge of the penalty area. The referee is close by and will assess whether contact warranted a stoppage. "
+      },
+      {
+        "event_id": "U147",
+        "event_type": "foul",
+        "time": "01:04:44-01:04:44",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 10, and the referee is stepping in to assess the contact. / 库拉索球员在德国队10号球员的逼抢下倒地，裁判正在介入评估这次接触是否犯规。"
+      },
+      {
+        "event_id": "U148",
+        "event_type": "dangerous_attack",
+        "time": "01:05:20-01:05:20",
+        "excerpt": "Germany's No. 7 makes a run towards the Curacao penalty area with the ball, while defenders in blue/yellow are positioned to defend. This indicates an attacking move developing in "
+      },
+      {
+        "event_id": "U149",
+        "event_type": "celebration_or_replay",
+        "time": "01:06:04-01:06:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U150",
+        "event_type": "shot",
+        "time": "01:07:36-01:07:44",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U151",
+        "event_type": "save",
+        "time": "01:07:48-01:07:48",
+        "excerpt": "Curacao's goalkeeper makes a sharp save to his right, denying the shot and keeping the scoreline intact. / 库拉索门将向右神勇扑救，力保球门不失。"
+      },
+      {
+        "event_id": "U152",
+        "event_type": "foul",
+        "time": "01:07:52-01:07:52",
+        "excerpt": "A German player goes down under contact from a Curacao challenger near the center circle — referee steps in immediately to assess the situation. / 德国队球员在中圈附近与库拉索队一名对手接触后倒地——裁判立即介入，"
+      },
+      {
+        "event_id": "U153",
+        "event_type": "free_kick",
+        "time": "01:07:56-01:07:56",
+        "excerpt": "The referee points to the spot, signaling a free kick for Germany. The game pauses as players prepare for the restart. / 裁判指向了点球点，示意德国队获得任意球。比赛暂停，球员们准备重新开始。"
+      },
+      {
+        "event_id": "U155",
+        "event_type": "shot",
+        "time": "01:09:12-01:10:04",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U156",
+        "event_type": "foul",
+        "time": "01:10:12-01:10:12",
+        "excerpt": "Germany's No. 10, Musiala, makes a sharp challenge on the Curacao attacker — the ball stays loose as the Curacao player tumbles under contact. The referee steps in to manage the si"
+      },
+      {
+        "event_id": "U157",
+        "event_type": "foul",
+        "time": "01:11:52-01:11:52",
+        "excerpt": "Curacao's No. 2 brings down Germany's No. 17 with a sharp challenge near the penalty area. The German attacker goes down cleanly, and the referee is on the spot to award a free kic"
+      },
+      {
+        "event_id": "U158",
+        "event_type": "foul",
+        "time": "01:12:00-01:12:00",
+        "excerpt": "Germany's No. 27 goes down under a challenge, clutching his leg in pain as the ball rolls away. The referee will need to assess whether contact was excessive. / 德国队27号球员在对抗中倒地，捂着腿部"
+      },
+      {
+        "event_id": "U159",
+        "event_type": "foul",
+        "time": "01:12:08-01:12:20",
+        "excerpt": "Curacao's No. 8 gets a bit too eager on the tackle, catching Germany's No. 10 down with a late challenge on the leg. The German player goes down hard as the ball rolls loose, and t"
+      },
+      {
+        "event_id": "U160",
+        "event_type": "shot",
+        "time": "01:12:24-01:12:32",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U161",
+        "event_type": "save",
+        "time": "01:13:12-01:13:12",
+        "excerpt": "Curacao's attacker breaks through, but Germany's goalkeeper in orange makes a sharp diving save to his left, snatching the ball just before it crosses the goal line. / 库拉索队的前锋突入禁区，"
+      },
+      {
+        "event_id": "U162",
+        "event_type": "foul",
+        "time": "01:13:40-01:13:40",
+        "excerpt": "Germany's No. 8, Choupo-Moting, commits a sliding tackle on Curacao's No. 24, bringing him down cleanly but illegally. The referee will award a free kick to Curacao. / 德国队8号舒波-莫廷对库"
+      },
+      {
+        "event_id": "U163",
+        "event_type": "foul",
+        "time": "01:14:32-01:14:32",
+        "excerpt": "Germany's No. 6, Kimmich, makes contact with Curacao's No. 21 near the sideline — a quick stumble as the Curacao player loses balance. The referee is right there, watching closely."
+      },
+      {
+        "event_id": "U164",
+        "event_type": "celebration_or_replay",
+        "time": "01:14:52-01:15:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U165",
+        "event_type": "foul",
+        "time": "01:15:36-01:15:36",
+        "excerpt": "A Curacao player goes down in the middle of the pitch after a challenge, and the referee is ready to intervene as play stops. / 库拉索球员在中路拼抢后倒地，裁判准备介入，比赛随即暂停。"
+      },
+      {
+        "event_id": "U166",
+        "event_type": "dangerous_attack",
+        "time": "01:16:04-01:16:04",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U167",
+        "event_type": "foul",
+        "time": "01:16:20-01:16:20",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 4, and the referee is likely to award a free kick after the contact. / 库拉索球员在德国队4号球员的逼抢下倒地，裁判很可能会判罚一个任意球。"
+      },
+      {
+        "event_id": "U169",
+        "event_type": "dangerous_attack",
+        "time": "01:16:48-01:16:52",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U170",
+        "event_type": "dangerous_attack",
+        "time": "01:16:56-01:16:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U171",
+        "event_type": "corner",
+        "time": "01:17:00-01:17:08",
+        "excerpt": "Germany takes a corner kick on the right flank. The ball is delivered into the box, and players from both teams jump to head it. The clearance is made by a Curacao defender, and th"
+      },
+      {
+        "event_id": "U173",
+        "event_type": "shot",
+        "time": "01:17:32-01:17:32",
+        "excerpt": "Curacao's No. 21 takes a shot from inside the box during the free-kick situation. The ball is struck with intent, heading toward goal, as the German goalkeeper reacts to make a sav"
+      },
+      {
+        "event_id": "U174",
+        "event_type": "shot",
+        "time": "01:17:40-01:17:40",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U175",
+        "event_type": "shot",
+        "time": "01:17:44-01:17:44",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U176",
+        "event_type": "celebration_or_replay",
+        "time": "01:18:08-01:18:40",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U177",
+        "event_type": "foul",
+        "time": "01:18:52-01:18:52",
+        "excerpt": "A German player makes contact with a Curacao player during a chase for the ball, prompting a potential foul call. / 德国队球员在拼抢过程中与库拉索队球员发生身体接触，裁判可能会判罚犯规。"
+      },
+      {
+        "event_id": "U178",
+        "event_type": "substitution",
+        "time": "01:19:08-01:19:56",
+        "excerpt": "Germany make a change at the break, bringing on Undav for No. 10. The fourth official raises the board as Undav, wearing 26, steps onto the pitch to take his place. Meanwhile, Cura"
+      },
+      {
+        "event_id": "U179",
+        "event_type": "dangerous_attack",
+        "time": "01:20:08-01:20:08",
+        "excerpt": "Curacao's attacker bursts into Germany's penalty area, drawing multiple defenders. A cross or shot is imminent — a dangerous attack setup. / 库拉索队的进攻球员突入德国队禁区，吸引多名防守队员。传中或射门一触即发——攻势"
+      },
+      {
+        "event_id": "U181",
+        "event_type": "foul",
+        "time": "01:20:56-01:20:56",
+        "excerpt": "Curacao's No. 21 attempts a sliding tackle on Germany's No. 10 inside the penalty area, and the German attacker goes down under the challenge. The referee blows for a foul. / 库拉索队的"
+      },
+      {
+        "event_id": "U183",
+        "event_type": "foul",
+        "time": "01:21:12-01:21:16",
+        "excerpt": "Curacao's No. 10 goes down in a challenge with Germany's Undav, No. 26. The Curacao player loses his balance and falls hard to the ground after contact, clearly in pain. The refere"
+      },
+      {
+        "event_id": "U184",
+        "event_type": "dangerous_attack",
+        "time": "01:21:32-01:22:04",
+        "excerpt": "Curacao keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 库拉索队继续在禁区周围施压，进攻把防线拉开，迫使防守球"
+      },
+      {
+        "event_id": "U185",
+        "event_type": "celebration_or_replay",
+        "time": "01:23:16-01:24:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U186",
+        "event_type": "celebration_or_replay",
+        "time": "01:24:16-01:24:24",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U189",
+        "event_type": "period_transition",
+        "time": "01:24:44-01:25:08",
+        "excerpt": "Germany and Curacao take a hydration break as the match pauses. Players head to the sidelines for refreshments while the crowd waits. The 'HYDRATION BREAK' graphic confirms the sto"
+      },
+      {
+        "event_id": "U193",
+        "event_type": "celebration_or_replay",
+        "time": "01:26:24-01:26:36",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U194",
+        "event_type": "substitution",
+        "time": "01:26:44-01:26:56",
+        "excerpt": "Germany make a change at the break, bringing on #22 for #15. The fourth official raises the board as Goretzka watches from the sideline. Raum embraces staff before heading off, and"
+      },
+      {
+        "event_id": "U196",
+        "event_type": "foul",
+        "time": "01:27:20-01:27:20",
+        "excerpt": "A Curacao player goes down under challenge from a German defender near the center circle. The referee is approaching to assess whether contact was excessive. / 库拉索球员在中圈附近与德国队防守队员拼抢"
+      },
+      {
+        "event_id": "U197",
+        "event_type": "celebration_or_replay",
+        "time": "01:27:44-01:27:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U198",
+        "event_type": "shot",
+        "time": "01:27:48-01:27:48",
+        "excerpt": "Germany's No. 10 drives a low shot from inside the box, forcing the Curacao keeper to stretch and parry it away. The rebound falls to a German attacker who tries to follow up, but "
+      },
+      {
+        "event_id": "U199",
+        "event_type": "shot",
+        "time": "01:28:00-01:28:00",
+        "excerpt": "Curacao's No. 10 takes a shot from the edge of the area, German defender No. 17 reacts to the strike. / 库拉索队10号在禁区边缘起脚射门，德国队17号后卫迅速做出反应。"
+      },
+      {
+        "event_id": "U200",
+        "event_type": "dangerous_attack",
+        "time": "01:28:36-01:28:40",
+        "excerpt": "Curacao's No. 11 breaks forward with the ball, driving a quick counter-attack down the flank. He carries the pace into Germany's half, drawing defenders as he advances. The build-u"
+      },
+      {
+        "event_id": "U201",
+        "event_type": "shot",
+        "time": "01:28:56-01:29:00",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U202",
+        "event_type": "shot",
+        "time": "01:29:04-01:29:04",
+        "excerpt": "Curacao's No. 11 fires a shot from inside the box, but Germany's goalkeeper gathers it cleanly under pressure. / 库拉索队11号在禁区前沿起脚射门，但德国队门将在此压力下稳稳将球收下。"
+      },
+      {
+        "event_id": "U203",
+        "event_type": "save",
+        "time": "01:29:08-01:29:08",
+        "excerpt": "Curacao's attacker finds space inside the box and fires a low shot toward the near post, but Germany's goalkeeper is alert and dives to his right to gather the ball cleanly at the "
+      },
+      {
+        "event_id": "U204",
+        "event_type": "dangerous_attack",
+        "time": "01:29:40-01:29:40",
+        "excerpt": "Germany in transition, pushing forward with purpose. The ball is moving into the final third as attackers find space behind Curacao’s line. A promising opportunity brewing — watch "
+      },
+      {
+        "event_id": "U205",
+        "event_type": "celebration_or_replay",
+        "time": "01:29:44-01:30:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U206",
+        "event_type": "foul",
+        "time": "01:29:56-01:29:56",
+        "excerpt": "Germany's No. 2 steps in to challenge for the ball, but makes contact with Curacao's No. 16 that looks like a trip. The referee will likely blow up for a foul as Curacao's player g"
+      },
+      {
+        "event_id": "U208",
+        "event_type": "goal",
+        "time": "01:31:12-01:32:36",
+        "excerpt": "Germany in possession near Curacao's penalty area with multiple attackers advancing into the final third; German player dribbling toward Curacao box, drawing defenders; attacking b"
+      },
+      {
+        "event_id": "U209",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:12-01:33:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U210",
+        "event_type": "foul",
+        "time": "01:33:24-01:33:24",
+        "excerpt": "Curacao's No. 10 gets a hand on Germany's No. 2, causing him to stumble under pressure. The referee will need to decide if that was a trip or just a clean challenge. / 库拉索队的10号球员在防"
+      },
+      {
+        "event_id": "U211",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:40-01:33:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U213",
+        "event_type": "free_kick",
+        "time": "01:35:36-01:35:44",
+        "excerpt": "Germany awarded a free kick just outside the penalty area. The referee ensures the wall is set as Germany's No. 10 steps up to take the set piece. / 德国队在禁区前沿获得任意球。裁判确认人墙站好，德国队10号球员"
+      },
+      {
+        "event_id": "U214",
+        "event_type": "dangerous_attack",
+        "time": "01:35:48-01:36:56",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      },
+      {
+        "event_id": "U215",
+        "event_type": "substitution",
+        "time": "01:36:20-01:36:52",
+        "excerpt": "A substitution is underway for Curacao. The fourth official holds up the board as Kastaneer, wearing number 19, makes his way off the pitch. Chong, number 21, can be seen clapping "
+      },
+      {
+        "event_id": "U217",
+        "event_type": "dangerous_attack",
+        "time": "01:37:44-01:37:48",
+        "excerpt": "Germany builds a dangerous attack in the final third. A German player drives forward with the ball towards the penalty area, supported by teammates, while Curacao defenders retreat"
+      },
+      {
+        "event_id": "U218",
+        "event_type": "shot",
+        "time": "01:38:04-01:38:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U219",
+        "event_type": "shot",
+        "time": "01:39:36-01:40:24",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U220",
+        "event_type": "goal",
+        "time": "01:42:00-01:43:24",
+        "excerpt": "Germany's No. 7 drives forward into the Curacao penalty area, drawing a defender before unleashing a low shot from close range. The ball beats the diving Curacao goalkeeper and nes"
+      },
+      {
+        "event_id": "U221",
+        "event_type": "celebration_or_replay",
+        "time": "01:43:40-01:43:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U223",
+        "event_type": "dangerous_attack",
+        "time": "01:45:20-01:45:20",
+        "excerpt": "Germany's No. 7 drives into the box, drawing multiple defenders as he looks to thread a pass or take a shot under pressure. / 德国队7号球员带球突入禁区，在对方多名防守球员的紧逼下，他试图送出传球或完成射门。"
+      },
+      {
+        "event_id": "U224",
+        "event_type": "corner",
+        "time": "01:46:08-01:46:16",
+        "excerpt": "Germany's No. 10 takes the corner kick from the right flank. The ball is delivered into the penalty area, where players from both teams are gathered. A German attacker rises to mee"
+      },
+      {
+        "event_id": "U225",
+        "event_type": "celebration_or_replay",
+        "time": "01:46:32-01:47:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, "
+      },
+      {
+        "event_id": "U226",
+        "event_type": "foul",
+        "time": "01:46:36-01:46:36",
+        "excerpt": "Germany's No. 22 and Curacao's No. 10 are neck and neck down the flank, but the assistant referee raises his flag for a foul on the touchline. Play stops as the ball rolls loose ne"
+      },
+      {
+        "event_id": "U227",
+        "event_type": "foul",
+        "time": "01:46:48-01:46:48",
+        "excerpt": "Late in stoppage time, Germany's No. 10 drives forward with the ball, but Curacao's defender closes in and makes contact from behind, sending the German attacker to the turf. The r"
+      },
+      {
+        "event_id": "U228",
+        "event_type": "foul",
+        "time": "01:47:04-01:47:04",
+        "excerpt": "Curacao's No. 7 brings down a German player in midfield with a late challenge — both go down, referee blows for the foul. Germany retain possession from the stoppage as the match e"
+      },
+      {
+        "event_id": "U229",
+        "event_type": "foul",
+        "time": "01:48:00-01:48:08",
+        "excerpt": "A Curacao player goes down under challenge from Germany's No. 5. The contact looks sharp and the Curacao player is clearly in pain as he lies on the ground. Teammates rush to his s"
+      },
+      {
+        "event_id": "U230",
+        "event_type": "shot",
+        "time": "01:48:12-01:49:28",
+        "excerpt": "Germany find a pocket of space and get the shot away under pressure. The defensive line reacts quickly, with the goalkeeper and nearby defenders staying alive to the second ball. /"
+      },
+      {
+        "event_id": "U233",
+        "event_type": "dangerous_attack",
+        "time": "01:50:12-01:50:24",
+        "excerpt": "Germany keep the pressure on around the penalty area. The move stretches the back line, forcing defenders to track runners and close the passing lane. / 德国队继续在禁区周围施压，进攻把防线拉开，迫使防守球员"
+      }
+    ],
+    "raw_visual": [
+      {
+        "event_id": "U002",
+        "event_type": "celebration_or_replay",
+        "time": "00:01:12-00:01:12",
+        "excerpt": "The German fans are on their feet, waving flags in unison as the stadium erupts in celebration — a powerful visual echo of Germany’s dominance in this World Cup encounter. / 德国队球迷全",
+        "patterns": [
+          "画面"
+        ]
+      },
+      {
+        "event_id": "U008",
+        "event_type": "period_transition",
+        "time": "00:04:28-00:04:28",
+        "excerpt": "A sweeping view of the stadium as Germany and Curacao line up for the pre-match ceremony. The pitch is adorned with giant national flags — Germany’s black-red-gold on the left, Cur",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U009",
+        "event_type": "celebration_or_replay",
+        "time": "00:04:32-00:04:32",
+        "excerpt": "A close-up on a Curacao player, eyes closed and mouth open in a moment of deep focus or reflection before the match begins. / 镜头给到库拉索队一名球员的特写，他双眼紧闭，嘴巴微张，似乎在赛前进行着深度的专注与调整。",
+        "patterns": [
+          "\\bclose-up\\b",
+          "镜头",
+          "特写"
+        ]
+      },
+      {
+        "event_id": "U016",
+        "event_type": "other_relevant",
+        "time": "00:06:28-00:06:36",
+        "excerpt": "The match officials are walking onto the pitch, ready to take control of the game. The referee and his assistants are seen in discussion, likely finalizing their pre-match briefing",
+        "patterns": [
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U018",
+        "event_type": "celebration_or_replay",
+        "time": "00:08:08-00:08:24",
+        "excerpt": "Germany players in white kits gather in a tight huddle, celebrating with visible emotion and unity — Sané (No. 19) among them, arms locked as teammates close in. The crowd behind t",
+        "patterns": [
+          "\\bvisible\\b",
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U023",
+        "event_type": "celebration_or_replay",
+        "time": "00:11:00-00:11:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U030",
+        "event_type": "celebration_or_replay",
+        "time": "00:15:44-00:15:56",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U047",
+        "event_type": "celebration_or_replay",
+        "time": "00:20:36-00:21:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U049",
+        "event_type": "celebration_or_replay",
+        "time": "00:22:52-00:23:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U063",
+        "event_type": "other_relevant",
+        "time": "00:29:08-00:29:08",
+        "excerpt": "Germany's No. 1, Manuel Neuer, stands on the pitch as a broadcast graphic reminds us he is Germany's oldest ever player at 40 years and 79 days. / 德国队门将诺伊尔站在场上，屏幕上的数据显示，他已成为德国队历史上年",
+        "patterns": [
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U068",
+        "event_type": "goal",
+        "time": "00:30:32-00:31:20",
+        "excerpt": "Curacao strike first! The blue and yellow team breaks through Germany's defense with a precise shot from inside the penalty area. The ball finds the bottom corner of the net as the",
+        "patterns": [
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U071",
+        "event_type": "period_transition",
+        "time": "00:31:52-00:32:44",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U077",
+        "event_type": "celebration_or_replay",
+        "time": "00:34:52-00:36:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U096",
+        "event_type": "celebration_or_replay",
+        "time": "00:41:48-00:41:52",
+        "excerpt": "Curacao's No. 7 takes a shot from close range, but Germany's goalkeeper makes a spectacular diving save to his right, pushing the ball away just in time. The German players react w",
+        "patterns": [
+          "\\bvisible\\b",
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U102",
+        "event_type": "goal",
+        "time": "00:45:16-00:46:36",
+        "excerpt": "Germany takes a free kick near the edge of the penalty area. The ball is struck with precision, flying past the defensive wall and into the net. The net ripples as the ball crosses",
+        "patterns": [
+          "镜头",
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U133",
+        "event_type": "celebration_or_replay",
+        "time": "00:56:16-00:56:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U134",
+        "event_type": "goal",
+        "time": "00:57:00-00:58:20",
+        "excerpt": "Germany's No. 7, Havertz, steps up to take the penalty kick. He approaches the ball with composure, the Curacao goalkeeper ready in goal. Havertz strikes it cleanly — the ball find",
+        "patterns": [
+          "\\bvisible\\b",
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U135",
+        "event_type": "celebration_or_replay",
+        "time": "00:58:40-00:59:08",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U139",
+        "event_type": "period_transition",
+        "time": "01:00:48-01:00:52",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U144",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:28-01:02:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U145",
+        "event_type": "celebration_or_replay",
+        "time": "01:02:56-01:03:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U149",
+        "event_type": "celebration_or_replay",
+        "time": "01:06:04-01:06:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U164",
+        "event_type": "celebration_or_replay",
+        "time": "01:14:52-01:15:00",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U176",
+        "event_type": "celebration_or_replay",
+        "time": "01:18:08-01:18:40",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U185",
+        "event_type": "celebration_or_replay",
+        "time": "01:23:16-01:24:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U186",
+        "event_type": "celebration_or_replay",
+        "time": "01:24:16-01:24:24",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U187",
+        "event_type": "var_review",
+        "time": "01:24:28-01:24:32",
+        "excerpt": "VAR review in progress: Germany's No. 18 is checked for offside against Curacao's No. 10. The graphic confirms 'ONSIDE' — the goal stands. / VAR正在回放：德国队18号球员在库拉索队10号防守下的越位情况。画面显示‘越",
+        "patterns": [
+          "画面",
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U188",
+        "event_type": "period_transition",
+        "time": "01:24:36-01:24:36",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U191",
+        "event_type": "period_transition",
+        "time": "01:25:44-01:25:56",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U192",
+        "event_type": "substitution",
+        "time": "01:26:04-01:26:12",
+        "excerpt": "Germany makes a change on the sideline. Goretzka, wearing number 8, is seen interacting with the coaching staff and preparing to leave the pitch as a substitute comes in. The subst",
+        "patterns": [
+          "\\bvisible\\b"
+        ]
+      },
+      {
+        "event_id": "U193",
+        "event_type": "celebration_or_replay",
+        "time": "01:26:24-01:26:36",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U197",
+        "event_type": "celebration_or_replay",
+        "time": "01:27:44-01:27:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U205",
+        "event_type": "celebration_or_replay",
+        "time": "01:29:44-01:30:32",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U208",
+        "event_type": "goal",
+        "time": "01:31:12-01:32:36",
+        "excerpt": "Germany in possession near Curacao's penalty area with multiple attackers advancing into the final third; German player dribbling toward Curacao box, drawing defenders; attacking b",
+        "patterns": [
+          "\\bvisible\\b",
+          "\\bclose-up\\b",
+          "镜头",
+          "特写",
+          "显示"
+        ]
+      },
+      {
+        "event_id": "U209",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:12-01:33:12",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U211",
+        "event_type": "celebration_or_replay",
+        "time": "01:33:40-01:33:48",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U220",
+        "event_type": "goal",
+        "time": "01:42:00-01:43:24",
+        "excerpt": "Germany's No. 7 drives forward into the Curacao penalty area, drawing a defender before unleashing a low shot from close range. The ball beats the diving Curacao goalkeeper and nes",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U221",
+        "event_type": "celebration_or_replay",
+        "time": "01:43:40-01:43:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U222",
+        "event_type": "period_transition",
+        "time": "01:44:28-01:44:28",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U225",
+        "event_type": "celebration_or_replay",
+        "time": "01:46:32-01:47:44",
+        "excerpt": "The broadcast brings us back to that attacking sequence. Germany worked the ball into a dangerous area, and the replay angle lets us focus on the movement, the defensive recovery, ",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U231",
+        "event_type": "period_transition",
+        "time": "01:49:36-01:49:40",
+        "excerpt": "The game moves through a short transition phase as players reset positions and the broadcast re-establishes the field. / 比赛进入短暂的阶段转换，球员重新站位，转播镜头重新交代场上形势。",
+        "patterns": [
+          "镜头"
+        ]
+      },
+      {
+        "event_id": "U234",
+        "event_type": "celebration_or_replay",
+        "time": "01:50:28-01:50:36",
+        "excerpt": "The final whistle has blown, and the players are coming together for the traditional post-match handshakes. We see Curacao's No. 8, Comenencia, exchanging a respectful handshake wi",
+        "patterns": [
+          "\\bwe see\\b"
+        ]
+      }
+    ],
+    "unsupported_name": [],
+    "wrong_entity": []
+  },
+  "recommendations": [
+    {
+      "priority": "Must",
+      "en": "Block unsupported names and wrong teams before final packaging.",
+      "zh": "最终打包前必须拦截无依据姓名和错误球队。"
+    },
+    {
+      "priority": "Should",
+      "en": "Add an identity cascade: verified name -> team+number/role -> team-only -> rare color rhetoric.",
+      "zh": "增加身份选择级联：已验证姓名 -> 球队+号码/角色 -> 仅球队 -> 少量颜色修辞。"
+    },
+    {
+      "priority": "Should",
+      "en": "Use a style sampler so wording varies naturally inside the same broadcast style instead of repeating one template.",
+      "zh": "使用风格采样器，让同一解说风格内部自然变化，而不是重复同一模板。"
+    }
+  ]
+}
