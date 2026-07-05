@@ -22,6 +22,14 @@ DEFAULT_MD = REPO_ROOT / "reference" / "evaluation" / "commentary_revision_annot
 PRIORITY_RANK = {"Must": 0, "Should": 1, "Could": 2, "Later": 3}
 
 
+def display_path(path: str | Path) -> str:
+    value = Path(path)
+    try:
+        return value.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(value)
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -138,8 +146,8 @@ def annotate_commentary(
 
     payload = {
         "policy": "Evaluation-only revision annotation. Do not inject public references or manual-review facts into target-agent hidden context.",
-        "source_commentary": str(Path(input_path)),
-        "source_revision_queue": str(Path(queue_path)),
+        "source_commentary": display_path(input_path),
+        "source_revision_queue": display_path(queue_path),
         "summary": {
             "segments": len(annotated_segments),
             "status_counts": status_counts,

@@ -1,7 +1,7 @@
 {
   "policy": "Evaluation-only revision annotation. Do not inject public references or manual-review facts into target-agent hidden context.",
-  "source_commentary": "C:\\Users\\CodexSandboxOffline\\.codex\\.sandbox\\cwd\\ea8a6d8af8c677df\\_remote\\111111111111111\\outputs\\commentary_bilingual.json",
-  "source_revision_queue": "C:\\Users\\CodexSandboxOffline\\.codex\\.sandbox\\cwd\\ea8a6d8af8c677df\\_remote\\111111111111111\\reference\\evaluation\\revision_queue.json",
+  "source_commentary": "outputs/commentary_bilingual.json",
+  "source_revision_queue": "reference/evaluation/revision_queue.json",
   "summary": {
     "segments": 257,
     "status_counts": {
