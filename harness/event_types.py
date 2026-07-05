@@ -16,6 +16,7 @@ DEFAULT_EVENT_TYPE_IDS = [
     "foul",
     "card",
     "substitution",
+    "var_show",
     "var_review",
     "celebration_or_replay",
     "period_transition",

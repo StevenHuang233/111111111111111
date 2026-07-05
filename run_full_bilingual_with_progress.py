@@ -46,13 +46,17 @@ from harness.scanner import (
     FrameObservation,
     ScanResult,
     SCAN_ALGORITHM_VERSION,
+    _apply_first_var_review_as_var_show,
     _aggregate_observations,
+    _apply_replay_marker_overrides,
     _build_event_candidates,
     _build_scan_messages,
     _merge_event_candidates,
     _parse_scan_response,
     _response_text,
     _scan_model_input_detail,
+    _scan_event_types,
+    _scan_prompt_reference,
     build_windows,
 )
 from harness.tracing import clip_text, should_record_model_io, tracker_text_limit
@@ -595,6 +599,7 @@ def main() -> None:
         stride_frames=args.dense_stride,
         merge_gap_sec=args.dense_merge_gap_sec,
         goal_replay_merge_gap_sec=args.goal_replay_merge_gap_sec,
+        first_var_review_as_var_show=False,
     )
 
     dense_root = run_dir / "dense"
@@ -722,6 +727,7 @@ def scan_events_parallel(
             "stride_frames": config.stride_frames,
             "merge_gap_sec": config.merge_gap_sec,
             "goal_replay_merge_gap_sec": config.goal_replay_merge_gap_sec,
+            "first_var_review_as_var_show": config.first_var_review_as_var_show,
             "concurrency": concurrency,
             "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
             "match_context_id": match_context.context_id if match_context else None,
@@ -880,6 +886,7 @@ def scan_events_parallel(
         raw_observations.extend(result.observations)
 
     observations = _aggregate_observations(manifest, raw_observations, registry)
+    observations, replay_marker_frames = _apply_replay_marker_overrides(manifest, observations, registry)
     trace.record(
         "scan_events_parallel",
         "aggregate_frame_observations",
@@ -887,14 +894,24 @@ def scan_events_parallel(
             "raw_observation_count": len(raw_observations),
             "frame_observation_count": len(observations),
             "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
+            "fifa_replay_marker_relabels": len(replay_marker_frames),
+            "fifa_replay_marker_frames": list(replay_marker_frames),
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
     events = _merge_event_candidates(initial_events, config, registry, observations)
+    var_show_event_id = None
+    if config.first_var_review_as_var_show:
+        events, var_show_event_id = _apply_first_var_review_as_var_show(events, registry)
     trace.record(
         "scan_events_parallel",
         "merge_event_candidates",
-        {"initial_event_count": len(initial_events), "merged_event_count": len(events)},
+        {
+            "initial_event_count": len(initial_events),
+            "merged_event_count": len(events),
+            "first_var_review_as_var_show": config.first_var_review_as_var_show,
+            "var_show_event_id": var_show_event_id,
+        },
     )
     trace.record("scan_events_parallel", "finish", {"window_errors": len(window_errors), "event_count": len(events)})
     return ScanResult(
@@ -920,9 +937,9 @@ def repair_scan_window(
     repair_prompt = f"""
 Fix this football event scan response into valid JSON.
 Error: {error}
-Allowed event_type values: {", ".join(registry.event_types)}
+Allowed event_type values: {", ".join(_scan_event_types(registry))}
 Event definitions and decision cues:
-{registry.prompt_reference()}
+{_scan_prompt_reference(registry)}
 Required frame_ids: {", ".join(frame.frame_id for frame in frames)}
 
 Bad response:
@@ -1181,6 +1198,7 @@ def scan_checkpoint_valid(
         and start_detail.get("stride_frames") == config.stride_frames
         and start_detail.get("merge_gap_sec") == config.merge_gap_sec
         and start_detail.get("goal_replay_merge_gap_sec") == config.goal_replay_merge_gap_sec
+        and start_detail.get("first_var_review_as_var_show") == config.first_var_review_as_var_show
         and start_detail.get("match_context_id") == (match_context.context_id if match_context else None)
         and windows_detail.get("frame_count") == frame_count
     )

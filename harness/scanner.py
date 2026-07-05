@@ -10,6 +10,7 @@ from .event_types import EventTypeRegistry, load_event_types
 from .json_utils import extract_json_object, to_pretty_json
 from .match_context import MatchContext, match_context_block
 from .manifest import FrameInfo, FramesManifest, load_manifest
+from .replay_markers import FIFA_REPLAY_BUMPER_EVIDENCE, detect_fifa_replay_bumper
 from .styles import StyleProfile
 from .time_utils import format_timestamp
 from .tracing import NullTracker, StepTracker, clip_text, should_record_model_io, tracker_text_limit
@@ -20,7 +21,8 @@ class ChatClient(Protocol):
         ...
 
 
-SCAN_ALGORITHM_VERSION = 2
+SCAN_ALGORITHM_VERSION = 3
+DERIVED_SCAN_EVENT_TYPES = {"var_show"}
 
 
 @dataclass(frozen=True)
@@ -31,6 +33,7 @@ class ScanConfig:
     event_types_path: str | None = None
     merge_gap_sec: float = 4.0
     goal_replay_merge_gap_sec: float = 30.0
+    first_var_review_as_var_show: bool = True
 
 
 @dataclass(frozen=True)
@@ -112,6 +115,7 @@ def scan_events(
             "stride_frames": scan_config.stride_frames,
             "merge_gap_sec": scan_config.merge_gap_sec,
             "goal_replay_merge_gap_sec": scan_config.goal_replay_merge_gap_sec,
+            "first_var_review_as_var_show": scan_config.first_var_review_as_var_show,
             "scan_algorithm_version": SCAN_ALGORITHM_VERSION,
             "match_context_id": match_context.context_id if match_context else None,
         },
@@ -201,6 +205,7 @@ def scan_events(
                 )
 
     observations = _aggregate_observations(manifest, raw_observations, registry)
+    observations, replay_marker_frames = _apply_replay_marker_overrides(manifest, observations, registry)
     trace.record(
         "scan_events",
         "aggregate_frame_observations",
@@ -208,14 +213,24 @@ def scan_events(
             "raw_observation_count": len(raw_observations),
             "frame_observation_count": len(observations),
             "positive_frame_count": sum(1 for item in observations if item.needs_commentary),
+            "fifa_replay_marker_relabels": len(replay_marker_frames),
+            "fifa_replay_marker_frames": list(replay_marker_frames),
         },
     )
     initial_events = _build_event_candidates(manifest, observations, registry)
     events = _merge_event_candidates(initial_events, scan_config, registry, observations)
+    var_show_event_id = None
+    if scan_config.first_var_review_as_var_show:
+        events, var_show_event_id = _apply_first_var_review_as_var_show(events, registry)
     trace.record(
         "scan_events",
         "merge_event_candidates",
-        {"initial_event_count": len(initial_events), "merged_event_count": len(events)},
+        {
+            "initial_event_count": len(initial_events),
+            "merged_event_count": len(events),
+            "first_var_review_as_var_show": scan_config.first_var_review_as_var_show,
+            "var_show_event_id": var_show_event_id,
+        },
     )
     trace.record("scan_events", "finish", {"window_errors": len(window_errors), "event_count": len(events)})
     return ScanResult(
@@ -233,8 +248,8 @@ def _build_scan_messages(
     match_context: MatchContext | None = None,
 ) -> list[dict[str, Any]]:
     frame_list = list(frames)
-    allowed_types = ", ".join(registry.event_types)
-    event_reference = registry.prompt_reference()
+    allowed_types = ", ".join(_scan_event_types(registry))
+    event_reference = _scan_prompt_reference(registry)
     prefixes = "\n".join(_frame_prefix(frame) for frame in frame_list)
     prompt = f"""
 You are a football video event scanner.
@@ -311,6 +326,30 @@ def _response_text(data: dict[str, Any]) -> str:
     return data["choices"][0]["message"].get("content") or ""
 
 
+def _scan_event_types(registry: EventTypeRegistry) -> tuple[str, ...]:
+    return tuple(event_type for event_type in registry.event_types if event_type not in DERIVED_SCAN_EVENT_TYPES)
+
+
+def _scan_prompt_reference(registry: EventTypeRegistry) -> str:
+    lines: list[str] = []
+    for definition in registry.definitions:
+        if definition.event_id in DERIVED_SCAN_EVENT_TYPES:
+            continue
+        lines.append(f"- {definition.event_id} ({definition.name}): {definition.description}")
+        if definition.positive_cues:
+            lines.append(f"  Positive cues: {'; '.join(definition.positive_cues)}")
+        if definition.negative_cues:
+            lines.append(f"  Negative cues: {'; '.join(definition.negative_cues)}")
+    return "\n".join(lines)
+
+
+def _normalize_scan_event_type(raw_event_type: str, registry: EventTypeRegistry) -> str:
+    event_type = raw_event_type.strip()
+    if event_type in DERIVED_SCAN_EVENT_TYPES:
+        return "var_review" if "var_review" in registry.allowed else registry.no_event_type
+    return event_type
+
+
 def _parse_scan_response(
     text: str,
     frames: tuple[FrameInfo, ...],
@@ -332,7 +371,7 @@ def _parse_scan_response(
         if frame_id is None:
             raise ValueError(f"Unknown frame_id '{raw_frame_id}'.")
 
-        event_type = registry.validate(str(row.get("event_type", registry.no_event_type)))
+        event_type = registry.validate(_normalize_scan_event_type(str(row.get("event_type", registry.no_event_type)), registry))
         needs_commentary = bool(row.get("needs_commentary", False)) and event_type != registry.no_event_type
         confidence = max(0.0, min(1.0, float(row.get("confidence", 0.0))))
         evidence = str(row.get("evidence", "")).strip()
@@ -387,9 +426,9 @@ def _try_repair_scan_response(
     repair_prompt = f"""
 Fix this football event scan response into valid JSON.
 Error: {error}
-Allowed event_type values: {", ".join(registry.event_types)}
+Allowed event_type values: {", ".join(_scan_event_types(registry))}
 Event definitions and decision cues:
-{registry.prompt_reference()}
+{_scan_prompt_reference(registry)}
 Required frame_ids: {", ".join(frame.frame_id for frame in frames)}
 
 Bad response:
@@ -464,6 +503,52 @@ def _aggregate_observations(
             )
         )
     return aggregated
+
+
+def _apply_replay_marker_overrides(
+    manifest: FramesManifest,
+    observations: list[FrameObservation],
+    registry: EventTypeRegistry,
+) -> tuple[list[FrameObservation], tuple[str, ...]]:
+    replay_event_type = "celebration_or_replay"
+    if replay_event_type not in registry.event_types:
+        return observations, ()
+
+    frame_by_id = {frame.frame_id: frame for frame in manifest.frames}
+    adjusted: list[FrameObservation] = []
+    relabeled_frame_ids: list[str] = []
+    for observation in observations:
+        if not (
+            observation.needs_commentary
+            and observation.event_type == "goal"
+            and (frame := frame_by_id.get(observation.frame_id)) is not None
+            and detect_fifa_replay_bumper(frame.path)
+        ):
+            adjusted.append(observation)
+            continue
+
+        relabeled_frame_ids.append(observation.frame_id)
+        adjusted.append(
+            FrameObservation(
+                frame_id=observation.frame_id,
+                timestamp_sec=observation.timestamp_sec,
+                needs_commentary=True,
+                event_type=replay_event_type,
+                confidence=observation.confidence,
+                evidence=_append_evidence(observation.evidence, FIFA_REPLAY_BUMPER_EVIDENCE),
+                source_window=observation.source_window,
+            )
+        )
+
+    return adjusted, tuple(relabeled_frame_ids)
+
+
+def _append_evidence(existing: str, note: str) -> str:
+    if not existing:
+        return note
+    if note in existing:
+        return existing
+    return f"{existing}; {note}"
 
 
 def _build_event_candidates(
@@ -560,6 +645,50 @@ def _merge_event_candidates(
             merged.append(candidate)
 
     return [_renumber_event(event, index + 1) for index, event in enumerate(merged)]
+
+
+def _apply_first_var_review_as_var_show(
+    events: list[EventCandidate],
+    registry: EventTypeRegistry,
+) -> tuple[list[EventCandidate], str | None]:
+    if "var_show" not in registry.allowed or "var_review" not in registry.allowed:
+        return list(events), None
+
+    adjusted: list[EventCandidate] = []
+    relabeled_event_id: str | None = None
+    for event in events:
+        if relabeled_event_id is None and event.event_type == "var_review":
+            adjusted.append(_relabel_event_and_matching_phases(event, "var_show", "var_review"))
+            relabeled_event_id = event.event_id
+            continue
+        adjusted.append(event)
+    return adjusted, relabeled_event_id
+
+
+def _relabel_event_and_matching_phases(
+    event: EventCandidate,
+    event_type: str,
+    phase_type_to_replace: str,
+) -> EventCandidate:
+    return EventCandidate(
+        event_id=event.event_id,
+        event_type=event_type,
+        start_sec=event.start_sec,
+        end_sec=event.end_sec,
+        evidence_frames=event.evidence_frames,
+        confidence=event.confidence,
+        evidence_summary=event.evidence_summary,
+        phases=tuple(
+            EventPhase(
+                phase_type=event_type if phase.phase_type == phase_type_to_replace else phase.phase_type,
+                start_sec=phase.start_sec,
+                end_sec=phase.end_sec,
+                evidence_frames=phase.evidence_frames,
+                evidence_summary=phase.evidence_summary,
+            )
+            for phase in event.phases
+        ),
+    )
 
 
 def _should_merge_events(

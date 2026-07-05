@@ -170,6 +170,10 @@ def _build_goal_unit(events: list[EventCandidate]) -> EventCandidate:
 
 def _goal_phase_type(event: EventCandidate, phase: EventPhase, first_goal: EventCandidate) -> str:
     if event.event_type == "goal":
+        if phase.phase_type in {"buildup", "replay", "celebration", "var_review"}:
+            return phase.phase_type
+        if phase.phase_type == "celebration_or_replay":
+            return _classify_replay_or_celebration(phase.evidence_summary or event.evidence_summary)
         if event.start_sec <= first_goal.end_sec and phase.start_sec <= first_goal.end_sec:
             return "live_goal"
         return "replay"

@@ -33,6 +33,7 @@ ALLOWED_CORRECTED_TYPES = {
     "foul",
     "card",
     "substitution",
+    "var_show",
     "var_review",
     "celebration_or_replay",
     "period_transition",
@@ -313,7 +314,7 @@ Decision rules:
 - Do not use confirmed_goal for scoreboard graphics alone, celebration-only shots, ball-already-in-net shots, or replays of an earlier goal unless the same candidate also contains the live scoring action.
 - Use not_goal when the best evidence says it is a save, blocked shot, ordinary shot, near miss, restart, duplicate replay, scoreboard-only moment, or celebration-only moment without proof of the live scoring action.
 - Use uncertain only when visual evidence is genuinely ambiguous.
-- If the event is not a goal, choose corrected_event_type from: shot, save, dangerous_attack, free_kick, penalty, var_review, celebration_or_replay, other_relevant.
+- If the event is not a goal, choose corrected_event_type from: shot, save, dangerous_attack, free_kick, penalty, var_show, var_review, celebration_or_replay, other_relevant.
 - If confirmed_goal, keep corrected_event_type as goal.
 - Relabel each existing phase by phase_index. Use only: buildup, live_goal, replay, celebration, var_review.
 - Mark at most one compact segment as live_goal: the first moment where the actual scoring action is visible. Later ball-in-net or scoreboard shots should be replay unless they are the first live scoring moment.

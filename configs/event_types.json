@@ -71,6 +71,13 @@
       "negative_cues": ["injury treatment without player replacement", "player warming up only"]
     },
     {
+      "id": "var_show",
+      "name": "VAR System Show",
+      "description": "A broadcast presentation of the video assistant referee team, VAR room, referee communication system, or VAR technology setup, without a specific active review decision being shown.",
+      "positive_cues": ["video assistant referee room", "VAR officials shown at monitors", "VAR technology or system graphic", "broadcast explains the VAR team or setup", "referee communication equipment shown without a decision"],
+      "negative_cues": ["specific foul or handball check", "on-field referee reviewing an incident", "VAR decision graphic", "players waiting for a review outcome", "replay of the incident under review"]
+    },
+    {
       "id": "var_review",
       "name": "VAR Review",
       "description": "A VAR review, referee monitor check, or broadcast VAR decision sequence is visible.",

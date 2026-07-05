@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from harness import (
     CommentaryResult,
@@ -57,6 +57,40 @@ class FakeClient:
 def write_png(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     Image.new("RGB", (8, 8), "green").save(path)
+
+
+def write_fifa_bumper_png(path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    image = Image.new("RGB", (640, 360), "#28456f")
+    draw = ImageDraw.Draw(image)
+    gold = "#d8a344"
+    shadow = "#523816"
+
+    def rect(box: tuple[int, int, int, int], fill: str) -> None:
+        draw.rectangle(box, fill=fill)
+
+    for offset, fill in ((5, shadow), (0, gold)):
+        x = 190 + offset
+        y = 132 + offset
+        rect((x, y, x + 22, y + 96), fill)
+        rect((x, y, x + 78, y + 22), fill)
+        rect((x, y + 39, x + 62, y + 59), fill)
+
+        x = 286 + offset
+        rect((x, y, x + 24, y + 96), fill)
+
+        x = 330 + offset
+        rect((x, y, x + 22, y + 96), fill)
+        rect((x, y, x + 78, y + 22), fill)
+        rect((x, y + 39, x + 62, y + 59), fill)
+
+        x = 426 + offset
+        rect((x, y, x + 22, y + 96), fill)
+        rect((x + 58, y, x + 80, y + 96), fill)
+        rect((x, y, x + 80, y + 22), fill)
+        rect((x + 8, y + 42, x + 72, y + 62), fill)
+
+    image.save(path)
 
 
 def write_manifest(root: Path, count: int = 5) -> Path:
@@ -127,7 +161,9 @@ class HarnessTests(unittest.TestCase):
         registry = load_event_types()
         reference = registry.prompt_reference()
         self.assertIn("goal", registry.event_types)
+        self.assertIn("var_show", registry.event_types)
         self.assertIn("A live scoring action where the ball clearly enters the goal", reference)
+        self.assertIn("video assistant referee team", reference)
 
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=1)
@@ -148,6 +184,8 @@ class HarnessTests(unittest.TestCase):
             prompt_content = fake.calls[0]["messages"][0]["content"][0]["text"]
             self.assertIn("Event definitions and decision cues", prompt_content)
             self.assertIn("A live scoring action where the ball clearly enters the goal", prompt_content)
+            self.assertNotIn("var_show", prompt_content)
+            self.assertNotIn("video assistant referee team", prompt_content)
 
     def test_match_context_loading_and_prompt_injection(self) -> None:
         context = load_match_context("germany_curacao_world_cup_2026")
@@ -182,6 +220,8 @@ class HarnessTests(unittest.TestCase):
             self.assertIn("Germany vs Curacao", prompt)
             self.assertIn("not Colombia", prompt)
             self.assertIn("Colombia or Paraguay", prompt)
+            self.assertIn("Refer to players by team and visible shirt number", prompt)
+            self.assertIn("Do not use kit-color descriptions", prompt)
 
     def test_sliding_windows(self) -> None:
         frames = tuple(FrameInfo(f"f{i}", Path(f"f{i}.png"), float(i)) for i in range(10))
@@ -267,6 +307,54 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual(result.events[0].evidence_frames, ("f0",))
             self.assertEqual(result.window_errors, ())
 
+    def test_first_var_review_event_is_relabelled_as_var_show(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=5)
+            response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": True, "event_type": "var_review", "confidence": 0.9, "evidence": "VAR officials shown at monitors"},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "var_review", "confidence": 0.8, "evidence": "video referee room continues"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                        {"frame_id": "f3", "needs_commentary": True, "event_type": "var_review", "confidence": 0.85, "evidence": "specific foul check under review"},
+                        {"frame_id": "f4", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+            result = scan_events(
+                manifest_path,
+                load_style("broadcast_professional"),
+                ScanConfig(window_size_frames=5, stride_frames=5),
+                FakeClient([response]),
+            )
+
+            self.assertEqual([event.event_type for event in result.events], ["var_show", "var_review"])
+            self.assertEqual([phase.phase_type for phase in result.events[0].phases], ["var_show"])
+            self.assertEqual([phase.phase_type for phase in result.events[1].phases], ["var_review"])
+
+    def test_model_var_show_output_is_normalized_before_postprocess(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest_path = write_manifest(Path(tmp), count=1)
+            response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": True, "event_type": "var_show", "confidence": 0.9, "evidence": "VAR room shown"},
+                    ]
+                }
+            )
+            fake = FakeClient([response])
+            result = scan_events(
+                manifest_path,
+                load_style("broadcast_professional"),
+                ScanConfig(window_size_frames=1, stride_frames=1),
+                fake,
+            )
+
+            prompt = fake.calls[0]["messages"][0]["content"][0]["text"]
+            self.assertNotIn("var_show", prompt)
+            self.assertEqual(result.observations[0].event_type, "var_review")
+            self.assertEqual([event.event_type for event in result.events], ["var_show"])
+
     def test_event_type_change_is_boundary(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = write_manifest(Path(tmp), count=4)
@@ -319,6 +407,46 @@ class HarnessTests(unittest.TestCase):
             self.assertEqual([phase.phase_type for phase in event.phases], ["live_goal", "replay"])
             self.assertIn("wide replay", event.evidence_summary)
 
+    def test_fifa_replay_bumper_relabels_goal_observation_as_replay(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            frames = []
+            for index in range(3):
+                frame_path = Path("frames") / f"f{index}.png"
+                if index == 1:
+                    write_fifa_bumper_png(root / frame_path)
+                else:
+                    write_png(root / frame_path)
+                frames.append({"frame_id": f"f{index}", "path": str(frame_path), "timestamp_sec": index * 2.0})
+
+            manifest_path = root / "frames_manifest.json"
+            manifest_path.write_text(
+                json.dumps({"video_id": "demo", "source_video": "demo.mp4", "frames": frames}),
+                encoding="utf-8",
+            )
+            response = json.dumps(
+                {
+                    "frames": [
+                        {"frame_id": "f0", "needs_commentary": True, "event_type": "goal", "confidence": 0.9, "evidence": "ball in net"},
+                        {"frame_id": "f1", "needs_commentary": True, "event_type": "goal", "confidence": 0.88, "evidence": "FIFA graphic replay of the goal"},
+                        {"frame_id": "f2", "needs_commentary": False, "event_type": "no_event", "confidence": 0.0, "evidence": ""},
+                    ]
+                }
+            )
+
+            result = scan_events(
+                manifest_path,
+                load_style("broadcast_professional"),
+                ScanConfig(window_size_frames=3, stride_frames=3),
+                FakeClient([response]),
+            )
+
+            self.assertEqual(result.observations[1].event_type, "celebration_or_replay")
+            self.assertIn("FIFA replay bumper detected", result.observations[1].evidence)
+            self.assertEqual(len(result.events), 1)
+            self.assertEqual(result.events[0].event_type, "goal")
+            self.assertEqual([phase.phase_type for phase in result.events[0].phases], ["live_goal", "replay"])
+
     def test_commentary_units_merge_goal_with_mixed_replay_sequence(self) -> None:
         events = [
             EventCandidate("E001", "shot", 10.0, 10.0, ("f1",), 0.8, "shot starts", (EventPhase("shot", 10.0, 10.0, ("f1",), "shot starts"),)),
@@ -336,6 +464,28 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual(units[0].end_sec, 34.0)
         self.assertEqual([phase.phase_type for phase in units[0].phases], ["buildup", "live_goal", "replay", "replay"])
         self.assertEqual(units[1].event_type, "foul")
+
+    def test_commentary_units_preserve_replay_phase_inside_goal_event(self) -> None:
+        events = [
+            EventCandidate(
+                "E001",
+                "goal",
+                20.0,
+                30.0,
+                ("f1", "f2"),
+                0.95,
+                "ball in net; FIFA replay bumper detected",
+                (
+                    EventPhase("live_goal", 20.0, 20.0, ("f1",), "ball in net"),
+                    EventPhase("replay", 24.0, 30.0, ("f2",), "FIFA replay bumper detected"),
+                ),
+            )
+        ]
+
+        units = build_commentary_units(events, CommentaryUnitConfig(goal_replay_after_sec=20.0))
+
+        self.assertEqual(len(units), 1)
+        self.assertEqual([phase.phase_type for phase in units[0].phases], ["live_goal", "replay"])
 
     def test_commentary_units_mark_goal_celebration_phase(self) -> None:
         events = [

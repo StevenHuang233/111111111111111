@@ -81,10 +81,30 @@ def style_instruction_block(style: StyleProfile, purpose: str) -> str:
     lines = [
         f"Style profile: {style.name} ({style.style_id})",
         f"Core style: {style.prompt_injection}",
-        "Mandatory style rules:",
+        "Global output constraints:",
     ]
+    lines.extend(f"- {rule}" for rule in _global_output_rules(purpose))
+    lines.append(
+        "Mandatory style rules:",
+    )
     lines.extend(f"- {rule}" for rule in rules)
     return "\n".join(lines)
+
+
+def _global_output_rules(purpose: str) -> list[str]:
+    player_reference_rule = (
+        "Refer to players by team and visible shirt number whenever possible, for example "
+        "\"Germany's No. 10\" or \"Curacao's No. 7\". Do not use kit-color descriptions such as "
+        "\"the blue-shirted player\", \"the player in white\", or equivalent color-only wording; "
+        "if the number is not legible, use the team plus role or a neutral team reference such as "
+        "\"Germany's attacker\", \"Curacao's defender\", or \"a Curacao player\"."
+    )
+    if purpose == "chinese_translation":
+        return [
+            player_reference_rule,
+            "When the English source uses a color-only player description but match context identifies the team, translate it as a team-based player reference instead of preserving the color wording.",
+        ]
+    return [player_reference_rule]
 
 
 def _default_style_rules(style: StyleProfile, purpose: str) -> list[str]:
